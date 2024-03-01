@@ -48,11 +48,14 @@ int main(int ac, char** av)
 	int n;
 	while ((n = read(sockfd, buffer, 511)) > 0)
 	{
+		printf("Ein\n");
 		buffer[n] = 0;
 		// printf("%d\n", n);
 		// printf("%s\n", buffer);
+		// fflush(stdout);
 		fputs(buffer, stdout);
 	}
 	if (n < 0)
 		printf("Error\n");
+	exit(0);
 }
