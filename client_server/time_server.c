@@ -5,10 +5,10 @@ int	main()
 	// creation of the TCP socket
 	int listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
-	struct sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(13);
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	struct sockaddr_in servaddr, cliaddr;
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(13);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//	The server's port (13 for the daytime service) is bound to							//
@@ -17,7 +17,7 @@ int	main()
 	//	to accept a client connection on any interface										//
 	//////////////////////////////////////////////////////////////////////////////////////////
 
-	if (bind(listenfd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
+	if (bind(listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0)
 	{
 		printf("bind failed ... \n");
 		exit(1);
@@ -46,11 +46,14 @@ int	main()
 	//	accept for each client that connects to our server.									//
 	//////////////////////////////////////////////////////////////////////////////////////////
 
-	socklen_t len = sizeof(addr);
+	socklen_t len = sizeof(cliaddr);
 	for( ; ; )
 	{
 		char buf[1000];
-		int connfd = accept(listenfd, (struct sockaddr *) NULL, NULL);
+		char buffer[1000];
+		int connfd = accept(listenfd, (struct sockaddr *) &cliaddr, &len);
+
+		printf("ip: %s | port: %d\n", inet_ntop(AF_INET, &cliaddr.sin_addr, buffer, sizeof(buffer)), ntohs(cliaddr.sin_port));
 
 		snprintf(buf, sizeof(buf),  "hello");	// A carriage return and linefeed are appended to the string by snprintf
 		write(connfd, buf, strlen(buf));
