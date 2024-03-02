@@ -94,9 +94,18 @@ queue is empty, the process is put to sleep (assuming the default of a blocking
 socket).
 
 
-+  
++  When we set a socket to be nonblocking, we are telling the kernel "when an I/O 
+operation that I request cannot be completed without putting the process to sleep, do 
+not put the process to sleep, but return an error instead.
+
++ When an application sits in a loop calling recvfrom on a nonblocking descriptor,
+it is called polling. The application is continually polling the kernel to see if some 
+operation is ready. This is often a waste of CPU time, but this model is occasionally 
+encountered, normally on systems dedicated to one function.
 
 =>> page 95
+
+=>> 6.2 I/O Models
 
 >> nonblocking sockets in Chapter 16
 
