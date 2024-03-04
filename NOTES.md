@@ -94,7 +94,12 @@ queue is empty, the process is put to sleep (assuming the default of a blocking
 socket).
 
 
-+  
++  The basic concept here is that when a server is handling multiple clients, the server 
+can never block in a function call related to a single client. Doing so can hang the 
+server and deny service to all other clients. This is called a denial-of-service attack. It 
+does something to the server that prevents it from servicing other legitimate clients. 
+Possible solutions are to: (i) use nonblocking I/O (Chapter 16)
+-> 293 non-blocking io code segment
 
 =>> page 95
 
