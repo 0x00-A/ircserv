@@ -38,7 +38,21 @@ public:
 
 	// Add getters and sitters
 
+	// get socket fd
 	int	getSockfd( void );
+
+	void	close( void )	const;
+
+	int		getPort( void ) const;
+
+	std::string		getIPAddr( void ) const;
+
+	// get read buffer
+	std::string&	rdBuf( void );
+
+	// get send buffer
+	std::string&	sdBuf( void );
+
 };
 
 IRCClient::IRCClient()
@@ -60,7 +74,7 @@ IRCClient::IRCClient(const std::string &ip, int port, int sockfd)
 
 IRCClient::~IRCClient()
 {
-	// leave all channels
+	// leave channels
 	// close fd
 }
 
@@ -68,5 +82,31 @@ int IRCClient::getSockfd(void)
 {
 	return (_clifd);
 }
+
+void IRCClient::close() const
+{
+	::close(_clifd);
+}
+
+int IRCClient::getPort(void) const
+{
+	return (_port);
+}
+
+std::string IRCClient::getIPAddr(void) const
+{
+	return (_ip);
+}
+
+std::string& IRCClient::rdBuf(void)
+{
+	return (_recvBuf);
+}
+
+std::string& IRCClient::sdBuf(void)
+{
+	return (_sendBuf);
+}
+
 
 #endif // CLIENT_HPP

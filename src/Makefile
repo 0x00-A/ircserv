@@ -8,7 +8,7 @@ SRC = main.cpp TCPSocket.cpp error.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))
 
-NAME = bin
+NAME = ircserv
 
 all: $(NAME)
 

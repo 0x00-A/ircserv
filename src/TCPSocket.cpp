@@ -10,10 +10,11 @@ TCPSocket::~TCPSocket()
 
 TCPSocket::TCPSocket(const char* port)
 {
-	struct sockaddr_in servaddr;
+	struct sockaddr_in	servaddr;
+	int					flags;
 
 	// create an end-point communication socket
-	if ( (_sockfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0)) == -1) /* SOCK_NONBLOCK: Using  this  flag  saves extra */
+	if ( (_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) /* SOCK_NONBLOCK: Using  this  flag  saves extra */
 	{																		/* calls to fcntl() to achieve the same result. */
 		std::perror("socket");
 		exit(1);
@@ -44,7 +45,14 @@ TCPSocket::TCPSocket(const char* port)
 	}
 
 	// Now we can accept connections using accept()
-
+	// set socket to non-blocking
+	if ( (flags = fcntl(_sockfd, F_GETFL)) == -1
+	 || fcntl(_sockfd, F_SETFL, O_NONBLOCK) == -1)
+	{
+		perror("fcntl");
+		close();
+		exit(1);
+	}
 }
 
 int TCPSocket::getfd()
