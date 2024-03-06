@@ -1,3 +1,12 @@
++ you need to consider the TIME_WAIT state. Once a TCP socket is closed (by default) the port remains occupied in TIME_WAIT 
+status for 2 minutes. This value is tunable. This will also "run you out of sockets" even though they are closed.
+
+Run netstat to see the TIME_WAIT stuff in action.
+
+P.S. The reason for TIME_WAIT is to handle the case of packets arriving after the socket is closed. This can happen because 
+packets are delayed or the other side just doesn't know that the socket has been closed yet. This allows the OS to silently 
+drop those packets without a chance of "infecting" a different, unrelated socket connection.
+
 + it is possible for an application to bypass the transport layer and use IPv4 or IPv6 directly. This is called a raw socket
 + we can even bypass the IP layer completely to read and write our own datalink-layer frames.
 + The sockets programming interfaces described in this book are interfaces from the upper three layers (the "application") 
@@ -94,6 +103,7 @@ queue is empty, the process is put to sleep (assuming the default of a blocking
 socket).
 
 
+<<<<<<< HEAD
 +  When we set a socket to be nonblocking, we are telling the kernel "when an I/O 
 operation that I request cannot be completed without putting the process to sleep, do 
 not put the process to sleep, but return an error instead.
@@ -102,6 +112,14 @@ not put the process to sleep, but return an error instead.
 it is called polling. The application is continually polling the kernel to see if some 
 operation is ready. This is often a waste of CPU time, but this model is occasionally 
 encountered, normally on systems dedicated to one function.
+=======
++  The basic concept here is that when a server is handling multiple clients, the server 
+can never block in a function call related to a single client. Doing so can hang the 
+server and deny service to all other clients. This is called a denial-of-service attack. It 
+does something to the server that prevents it from servicing other legitimate clients. 
+Possible solutions are to: (i) use nonblocking I/O (Chapter 16)
+-> 293 non-blocking io code segment
+>>>>>>> 3211dbd4f363cfd4052d9a7cc83f50adab93f8a5
 
 =>> page 95
 
