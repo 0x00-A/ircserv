@@ -1,3 +1,12 @@
++ you need to consider the TIME_WAIT state. Once a TCP socket is closed (by default) the port remains occupied in TIME_WAIT 
+status for 2 minutes. This value is tunable. This will also "run you out of sockets" even though they are closed.
+
+Run netstat to see the TIME_WAIT stuff in action.
+
+P.S. The reason for TIME_WAIT is to handle the case of packets arriving after the socket is closed. This can happen because 
+packets are delayed or the other side just doesn't know that the socket has been closed yet. This allows the OS to silently 
+drop those packets without a chance of "infecting" a different, unrelated socket connection.
+
 + it is possible for an application to bypass the transport layer and use IPv4 or IPv6 directly. This is called a raw socket
 + we can even bypass the IP layer completely to read and write our own datalink-layer frames.
 + The sockets programming interfaces described in this book are interfaces from the upper three layers (the "application") 
