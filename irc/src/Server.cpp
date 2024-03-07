@@ -97,13 +97,13 @@ std::string Server::getCommand(int id)
 
 	if (rdBuf.empty())
 		return ("");
-	pos = rdBuf.find("\r\n");
+	pos = rdBuf.find("\n");
 	if (pos != std::string::npos) {
 
-		std::string cmd = rdBuf.substr(0, pos + 2);
+		std::string cmd = rdBuf.substr(0, pos);
 		std::cout << "cmd: " << cmd << std::endl;
 
-		rdBuf = rdBuf.substr(pos + 2);
+		rdBuf = rdBuf.substr(pos + 1);
 		std::cout << "remain: " << rdBuf << std::endl;
 
 		return (cmd);
@@ -119,6 +119,11 @@ Server::Server(std::string port, std::string passwd, int fd)
 	servPoll.fd = _servfd;
 	servPoll.events = POLLIN;	// specify events of interest on fd
 	_pollfds.push_back(servPoll);
+
+	//
+	this->commandMap["PASS"] = &Server::pass;
+    this->commandMap["USER"] = &Server::user;
+    this->commandMap["NICK"] = &Server::nick;
 }
 
 Server::~Server()
@@ -168,7 +173,7 @@ void	Server::start()
 			// if (_pollfds[k].revents & POLLOUT) {
 			cmd = getCommand(k-1);
 			if (!cmd.empty()) {
-				handleCommand(cmd );
+				handleCommand(cmd, k-1);
 			}
 			// }
 			// if (!nready) break;

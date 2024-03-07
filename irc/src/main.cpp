@@ -9,7 +9,7 @@ int	main(int ac, char** av)
 		Server	ircserv(av[1], av[2], sock.getfd());
 
 		ircserv.start();
-		sock.close();
+		sock.closeSocket();
 	}
 	return (0);
 }

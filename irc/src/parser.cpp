@@ -30,7 +30,7 @@ std::string trim_internal(const std::string &str)
 }
 
 
-void  Server::handleCommand(std::string &command)
+void  Server::parseCommand(std::string &command)
 {
     if (command.find(" :") != std::string::npos)
     {
@@ -60,35 +60,51 @@ void  Server::handleCommand(std::string &command)
     }
 }
 
-
-bool Server::parseCommandClient(char *buffer, Client &client)
+void Server::handleCommand(std::string& cmd, int id)
 {
-    bool isCommand = true;
-    int len = std::strlen(buffer) - 2;
-    if (buffer[len] == '\r')
+    parseCommand(cmd);
+    mapIter it = this->commandMap.find(this->serverParamiters[0]);
+    if (it != this->commandMap.end())
     {
-        buffer[len] = '\n';
-        buffer[len + 1] = '\0';
+        // if not connected check this for connection
+        (this->*it->second)(_clients[id]);
     }
-    std::stringstream ss(buffer);
-    std::string token;
-    while (getline(ss, token))
+    else
     {
-        if (ss.eof())
-        {
-            client.appendBuffer(token);
-            token.clear();
-            isCommand = false;
-        }
-        else 
-        {
-            // std::cout << "command: ||" << token << "||" << std::endl;
-            client.appendBuffer(token);
-            handleCommand(client.getBuffer());
-            token.clear();
-            client.getBuffer().clear();
-            isCommand = true;
-        }
+        std::cerr << "Error: invalid command" << std::endl;
     }
-    return isCommand;
+    this->serverParamiters.clear();
 }
+
+
+// bool Server::parseCommandClient(char *buffer, Client &client)
+// {
+//     bool isCommand = true;
+//     int len = std::strlen(buffer) - 2;
+//     if (buffer[len] == '\r')
+//     {
+//         buffer[len] = '\n';
+//         buffer[len + 1] = '\0';
+//     }
+//     std::stringstream ss(buffer);
+//     std::string token;
+//     while (getline(ss, token))
+//     {
+//         if (ss.eof())
+//         {
+//             client.appendBuffer(token);
+//             token.clear();
+//             isCommand = false;
+//         }
+//         else 
+//         {
+//             // std::cout << "command: ||" << token << "||" << std::endl;
+//             client.appendBuffer(token);
+//             handleCommand(client.getBuffer());
+//             token.clear();
+//             client.getBuffer().clear();
+//             isCommand = true;
+//         }
+//     }
+//     return isCommand;
+// }

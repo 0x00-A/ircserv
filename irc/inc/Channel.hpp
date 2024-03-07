@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <vector>
-#include "client.hpp"
+#include "Client.hpp"
 
 class Channel
 {

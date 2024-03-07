@@ -11,11 +11,14 @@
 # include <unistd.h>
 # include <map>
 # include <sstream>
+# include "Channel.hpp"
 
 
 # include <iomanip> // delete
 
 # define SA struct sockaddr
+
+# define mapIter std::map<std::string, void (Server::*)(Client &)>::iterator
 
 class Server
 {
@@ -26,11 +29,12 @@ private:
 	const std::string			_passwd;
 	int		 					_servfd;
 	std::vector<struct pollfd>	_pollfds;
-	std::vector<Client>		_clients;
+	std::vector<Client>			_clients;
 
 	// just added
-	std::vector<std::string> serverParamiters;
+	std::vector<std::string> 	serverParamiters;
 	std::map<std::string, void (Server::*)(Client&)> commandMap;
+	std::vector<Channel> 		channels; 
 
 	void		handleNewConnection();
 
@@ -58,8 +62,10 @@ public:
 
 	// ============================================================ //
 	 // parser functions
-        bool parseCommandClient(char *buffer, Client& client);
-        void handleCommand(std::string& commad);
+        // bool parseCommandClient(char *buffer, Client& client);
+        void handleCommand(std::string& cmd, int id);
+		void parseCommand(std::string& cmd);
+
 
         // check nick clients
         bool checkAlreadyNick(std::string &nick);
