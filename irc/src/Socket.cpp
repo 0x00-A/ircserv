@@ -1,14 +1,14 @@
-#include "TCPSocket.hpp"
+#include "Socket.hpp"
 
-TCPSocket::TCPSocket()
+Socket::Socket()
 {
 }
 
-TCPSocket::~TCPSocket()
+Socket::~Socket()
 {
 }
 
-TCPSocket::TCPSocket(const char* port)
+Socket::Socket(const char* port)
 {
 	struct sockaddr_in	servaddr;
 	int					flags;
@@ -55,12 +55,12 @@ TCPSocket::TCPSocket(const char* port)
 	}
 }
 
-int TCPSocket::getfd()
+int Socket::getfd()
 {
 	return (_sockfd);
 }
 
-void TCPSocket::closeSocket(void)
+void Socket::closeSocket(void)
 {
 	close(_sockfd);
 }

@@ -5,7 +5,7 @@ SRCDIR = src
 OBJDIR = obj
 INC = ./inc
 
-SRC = main.cpp TCPSocket.cpp IRCServer.cpp IRCClient.cpp
+SRC = main.cpp Socket.cpp Server.cpp Client.cpp command.cpp parser.cpp channels.cpp Channel.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))
 

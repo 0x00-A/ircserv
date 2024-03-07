@@ -1,6 +1,6 @@
-#include "IRCServer.hpp"
+#include "Server.hpp"
 
-void IRCServer::handleNewConnection()
+void Server::handleNewConnection()
 {
 	struct sockaddr_in	cliaddr;
 	char				buffer[512];
@@ -24,7 +24,7 @@ void IRCServer::handleNewConnection()
 	}
 
 	// Add the new client socket to _clients and _pollfds
-	_clients.push_back(IRCClient(buffer, ntohs(cliaddr.sin_port), connfd));
+	_clients.push_back(Client(buffer, ntohs(cliaddr.sin_port), connfd));
 	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN | POLLHUP)});
 
 	// set socket to be Non-blocking
@@ -39,11 +39,11 @@ void IRCServer::handleNewConnection()
 	std::cout << "client " << connfd << " connected" << std::endl;
 }
 
-void IRCServer::disconnectClient(int id)
+void Server::disconnectClient(int id)
 {
 	std::cout << "client " << _pollfds[id+1].fd << " disconnected" << std::endl;
 
-	std::vector<IRCClient>::iterator		cli_it;
+	std::vector<Client>::iterator		cli_it;
 	std::vector<struct pollfd>::iterator	poll_it;
 
 	cli_it = _clients.begin() + id;
@@ -55,7 +55,7 @@ void IRCServer::disconnectClient(int id)
 	_pollfds.erase(poll_it);
 }
 
-void IRCServer::handleRead(int id)
+void Server::handleRead(int id)
 {
 	char		readbuf[512];
 	ssize_t		bytesread;
@@ -81,7 +81,7 @@ void IRCServer::handleRead(int id)
 
 }
 
-void IRCServer::handleWrite(int id)
+void Server::handleWrite(int id)
 {
 	if (write(_clients[id].getSockfd(), _clients[id].sdBuf().c_str(), (_clients[id].sdBuf()).length()) == -1)
 	{
@@ -90,7 +90,7 @@ void IRCServer::handleWrite(int id)
 	}
 }
 
-std::string IRCServer::getCommand(int id)
+std::string Server::getCommand(int id)
 {
 	std::string& rdBuf = _clients[id].rdBuf();
 	size_t	pos;
@@ -111,7 +111,7 @@ std::string IRCServer::getCommand(int id)
 	return ("");
 }
 
-IRCServer::IRCServer(std::string port, std::string passwd, int fd)
+Server::Server(std::string port, std::string passwd, int fd)
 	: _port(port), _passwd(passwd), _servfd(fd)
 {
 	// First entry in the _pollfds array is used for the listening socket
@@ -121,11 +121,11 @@ IRCServer::IRCServer(std::string port, std::string passwd, int fd)
 	_pollfds.push_back(servPoll);
 }
 
-IRCServer::~IRCServer()
+Server::~Server()
 {
 }
 
-void	IRCServer::start()
+void	Server::start()
 {
 	int				nready;
 	std::string		cmd;
@@ -168,7 +168,7 @@ void	IRCServer::start()
 			// if (_pollfds[k].revents & POLLOUT) {
 			cmd = getCommand(k-1);
 			if (!cmd.empty()) {
-				// handleCommand(cmd);
+				handleCommand(cmd );
 			}
 			// }
 			// if (!nready) break;
@@ -178,9 +178,9 @@ void	IRCServer::start()
 }
 
 
-void IRCServer::printClients(void)
+void Server::printClients(void)
 {
-	std::vector<IRCClient>::iterator it;
+	std::vector<Client>::iterator it;
 
     // Define column headers
 	std::cout << "----------------------------------------\n";
@@ -204,7 +204,7 @@ void IRCServer::printClients(void)
 	std::cout << "\n\n";
 }
 
-void IRCServer::printpollfds(void)
+void Server::printpollfds(void)
 {
 	std::vector<struct pollfd>::iterator it;
 

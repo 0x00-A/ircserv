@@ -1,10 +1,10 @@
-#include "IRCClient.hpp"
+#include "Client.hpp"
 
-IRCClient::IRCClient()
+Client::Client()
 {
 }
 
-IRCClient::IRCClient(const std::string &ip, int port, int sockfd)
+Client::Client(const std::string &ip, int port, int sockfd)
 	: _ip(ip), _port(port), _clifd(sockfd)
 {
 	_nick = "";
@@ -17,38 +17,38 @@ IRCClient::IRCClient(const std::string &ip, int port, int sockfd)
 	_isOperator = false;
 }
 
-IRCClient::~IRCClient()
+Client::~Client()
 {
 	// leave channels
 	// close fd
 }
 
-int IRCClient::getSockfd(void)
+int Client::getSockfd(void)
 {
 	return (_clifd);
 }
 
-void IRCClient::close() const
+void Client::close() const
 {
 	::close(_clifd);
 }
 
-int IRCClient::getPort(void) const
+int Client::getPort(void) const
 {
 	return (_port);
 }
 
-std::string IRCClient::getIPAddr(void) const
+std::string Client::getIPAddr(void) const
 {
 	return (_ip);
 }
 
-std::string& IRCClient::rdBuf(void)
+std::string& Client::rdBuf(void)
 {
 	return (_recvBuf);
 }
 
-std::string& IRCClient::sdBuf(void)
+std::string& Client::sdBuf(void)
 {
 	return (_sendBuf);
 }

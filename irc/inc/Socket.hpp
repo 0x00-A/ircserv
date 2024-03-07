@@ -12,20 +12,20 @@
 
 # define BACKLOG 50
 
-class TCPSocket
+class Socket
 {
 
 private:
 
 	int		_sockfd;
 
-	TCPSocket();
+	Socket();
 
 public:
 
-	~TCPSocket();
+	~Socket();
 
-	TCPSocket( const char* port );
+	Socket( const char* port );
 
 	int		getfd( void );
 

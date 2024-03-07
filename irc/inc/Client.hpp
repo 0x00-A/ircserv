@@ -6,7 +6,7 @@
 # include <unistd.h>
 # include <set>
 
-class IRCClient
+class Client
 {
 private:
 
@@ -28,13 +28,13 @@ private:
 
 	std::set<std::string> _channels; // channels user currently in
 
-	IRCClient();
+	Client();
 
 public:
 
-	IRCClient( const std::string& ip, int port, int sockfd );
+	Client( const std::string& ip, int port, int sockfd );
 
-	~IRCClient();
+	~Client();
 
 	// Add getters and sitters
 
