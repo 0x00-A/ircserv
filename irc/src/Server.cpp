@@ -81,15 +81,6 @@ void Server::handleRead(int id)
 
 }
 
-void Server::handleWrite(int id)
-{
-	if (write(_clients[id].getSockfd(), _clients[id].sdBuf().c_str(), (_clients[id].sdBuf()).length()) == -1)
-	{
-		std::perror("write");
-		return;
-	}
-}
-
 std::string Server::getCommand(int id)
 {
 	std::string& rdBuf = _clients[id].rdBuf();
