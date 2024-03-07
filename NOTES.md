@@ -47,7 +47,7 @@ local port, foreign IP address, and foreign port. A socket pair uniquely identif
 
 + The two values that identify each endpoint, an IP address and a port number, are often called a socket.
 
-+ socket functions that pass a socket address structure from the process to the kernel, bind, connect
++ socket functions that pass a socket address structure from the process to the kernel: bind, connect
 
 + sin.len: The four socket functions that pass a socket address structure from the process to the kernel, bind, connect, sendto, and 
 sendmsg, all go through the sockargs function in a Berkeley-derived implementation (p. 452 of TCPv2). This function copies the socket 
@@ -71,8 +71,7 @@ This type of argument is called a value-result argument.
 contained in the structure. Newer implementations that support variable-length socket address structures also contain a length field 
 at the beginning, which contains the length of the entire structure.
 
-+ The client does not have to call [[bind]] (which we will describe in the next section) 
-before calling connect: the kernel will choose both an ephemeral port and the source 
++ The client does not have to call [[bind]] before calling connect: the kernel will choose both an ephemeral port and the source 
 IP address if necessary.
 -> Client Connection Process:
 	+ When a client application establishes a connection to a server using the connect system call, it does not necessarily need to call bind explicitly before that.
