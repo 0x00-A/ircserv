@@ -32,7 +32,7 @@ TCPSocket::TCPSocket(const char* port)
 	if (bind(_sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
 	{
 		std::perror("bind");
-		close();
+		closeSocket();
 		exit(1);
 	}
 
@@ -40,7 +40,7 @@ TCPSocket::TCPSocket(const char* port)
 	if (listen(_sockfd, BACKLOG) == -1)
 	{
 		std::perror("listen");
-		close();
+		closeSocket();
 		exit(1);
 	}
 
@@ -50,7 +50,7 @@ TCPSocket::TCPSocket(const char* port)
 	 || fcntl(_sockfd, F_SETFL, O_NONBLOCK) == -1)
 	{
 		perror("fcntl");
-		close();
+		closeSocket();
 		exit(1);
 	}
 }
@@ -60,7 +60,7 @@ int TCPSocket::getfd()
 	return (_sockfd);
 }
 
-void TCPSocket::close(void)
+void TCPSocket::closeSocket(void)
 {
-	::close(_sockfd);
+	close(_sockfd);
 }

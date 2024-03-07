@@ -127,8 +127,8 @@ IRCServer::~IRCServer()
 
 void	IRCServer::start()
 {
-	int			nready;
-	std::string	cmd;
+	int				nready;
+	std::string		cmd;
 
 	for ( ; ; ) {
 

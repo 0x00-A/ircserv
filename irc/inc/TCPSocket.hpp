@@ -29,7 +29,7 @@ public:
 
 	int		getfd( void );
 
-	void	close( void );
+	void	closeSocket( void );
 	
 };
 
