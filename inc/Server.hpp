@@ -18,6 +18,8 @@
 
 # define SA struct sockaddr
 
+# define RD_BUF_SIZE 512
+
 # define mapIter std::map<std::string, void (Server::*)(Client &)>::iterator
 
 class Server
@@ -36,9 +38,9 @@ private:
 	std::map<std::string, void (Server::*)(Client&)> commandMap;
 	std::vector<Channel> 		channels; 
 
-	void		handleNewConnection();
+	int			handleNewConnection();
 
-	void		handleRead(int id);
+	int			handleRead(int id);
 
 	void		handleWrite(int id);
 
@@ -47,6 +49,8 @@ private:
 	// void		handleCommand(int	id);
 
 	void		disconnectClient(int id);
+
+	void		closeAllOpenSockets( void );
 
 public:
 
