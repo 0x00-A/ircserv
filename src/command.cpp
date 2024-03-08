@@ -35,7 +35,7 @@ void Server::nick(Client &client)
     if (client.getHasPassed() == false)
     {
         std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
-            client.getNick()  + " :dir b3da pass";
+            client.getNick()  + " :dir b3da pass hhh";
         reply(client, response);
         return;
     }
