@@ -1,5 +1,5 @@
 .vscode
 obj
 ircserv
-        .DS_Store
-        clieant.py
+.DS_Store
+clieant.py
