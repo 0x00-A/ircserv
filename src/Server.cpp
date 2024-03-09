@@ -30,11 +30,8 @@ int Server::handleNewConnection()
 	len = sizeof(cliaddr);
 	if ( (connfd = accept(_servfd, (SA *) (&cliaddr), &len)) == -1)	// use c++ cast
 	{
-		if (errno != EWOULDBLOCK)
-		{
+		if (errno != EWOULDBLOCK && errno != EAGAIN)
 			std::perror("accept");
-			return (-1);
-		}
 		return (1);
 	}
 	// get ip address
@@ -46,7 +43,7 @@ int Server::handleNewConnection()
 	}
 	// Add the new client socket to _clients and _pollfds
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
-	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN | POLLOUT)});
+	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
 	// set socket to be Non-blocking
 	if ( (flags = fcntl(connfd, F_GETFL)) == -1
 		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
@@ -84,7 +81,7 @@ int Server::handleRead(int id)
 		bytesread = read(_clients[id].getSockfd(), readbuf, sizeof(readbuf));
 		if (bytesread < 0)
 		{
-			if (errno != EWOULDBLOCK)
+			if (errno != EWOULDBLOCK && errno != EAGAIN)
 			{
 				std::perror("read");
 				return (-1);
@@ -98,11 +95,7 @@ int Server::handleRead(int id)
 		// append to client read buffer
 		readbuf[bytesread] = '\0';
 		_clients[id].rdBuf() += std::string(readbuf);
-		// send msg back to client
-		// std::string reply = "srv recved msg: " + std::string(readbuf);
-		// _clients[id].sdBuf().push(reply);
-		// write(_clients[id].getSockfd(), reply.c_str(), reply.length());
-		std::cout << _clients[id].getSockfd() << " rdbuf: " << _clients[id].rdBuf() << std::endl;
+		// std::cout << "fd " << _clients[id].getSockfd() << " rdbuf: " << _clients[id].rdBuf() << std::endl;
 	} while (true);
 }
 
@@ -110,6 +103,13 @@ int	Server::handleWrite(int id)
 {
 	ssize_t sent_data;
 	std::queue<std::string>& buffer = _clients[id].sdBuf();
+
+	// just for debuging
+	if (buffer.empty())
+	{
+		std::cout << "send Buffer empty returning - fd: " << _clients[id].getSockfd() << std::endl;
+		return (0);
+	}
 
 	while (!buffer.empty())
 	{
@@ -140,6 +140,7 @@ int	Server::handleWrite(int id)
 		// if all data was sent
 		buffer.pop();
 	}
+	std::cout << "Done sending data to client - fd: " << _clients[id].getSockfd() << std::endl;
 	_pollfds[id+1].events = POLLIN;
 	return (0);
 }
@@ -170,21 +171,18 @@ void	Server::start()
 	pollfdIter it;
 	int			ret;
 	std::string	cmd;
-	bool		stat = true;
-	// size_t	end;
 
 	std::cout << "Server running" << std::endl;
-	do
+	while (true)
 	{
 		std::cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << std::endl;
 		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
 		{
 			std::perror("poll"); break;
 		}
-		// end = _pollfds.size();
 		for (size_t i = 0; i < _pollfds.size(); i++)
 		{
-			if (_pollfds[i].revents & POLLIN)
+			if (_pollfds[i].revents & POLLIN)	// data sent from client
 			{
 				//
 				if (_pollfds[i].fd == _servfd)
@@ -195,11 +193,7 @@ void	Server::start()
 					{
 						// accept incomming connections
 						ret = handleNewConnection();
-						if (ret == -1)
-						{
-							stat = false;
-							break;
-						}
+
 					} while (ret != 1);
 				}
 				else
@@ -214,24 +208,19 @@ void	Server::start()
 					}
 					while ((cmd = getCommand(i-1)) != "")
 					{
-						// _pollfds[i].revents |= POLLOUT;
-						// _clients[i-1].sdBuf().push("msg recv: " + cmd);
 						handleCommand(cmd, i-1);
-						continue;	
 					}
 				}
 			}
-			if (_pollfds[i].revents & POLLOUT)
+			if (_pollfds[i].revents & POLLOUT)	// Client can recieve data
 			{				
 				/******************************************************************************/
-				/*  Set POLLOUT only if you have outstanding data to send to the other end.   */
+				/*  Set POLLOUT only if you have data to send to the other end.               */
 				/*  This is because most of the time, sockets are writable, and POLLOUT will  */
 				/*  almost always be set if you ask for it. So, asking for POLLOUT when you   */
 				/*  don’t have anything to write would just waste CPU cycles. 	              */
 				/******************************************************************************/
 			
-				// socket is writeable
-				// send reply to client
 				std::cout << "fd " << _pollfds[i].fd << " is writeable" << std::endl;
 				ret = handleWrite(i-1);
 				if (ret == -1)
@@ -240,12 +229,12 @@ void	Server::start()
 					continue;
 				}
 			}
-			if (_pollfds[i].revents & POLLERR)
+			if (_pollfds[i].revents & POLLERR)	// client Connection reset (RST) 
 			{	
 				if (_pollfds[i].fd == _servfd)
 				{
 					std::cerr << "Server: polling failed" << std::endl;
-					stat = false;
+					break;
 				}
 				else
 				{
@@ -253,7 +242,7 @@ void	Server::start()
 				}
 			}
 		}
-	} while (stat == true);
+	}
 	closeAllOpenSockets();
 }
 
@@ -263,6 +252,7 @@ void Server::closeAllOpenSockets(void)
 	{
 		close(_pollfds[i].fd);
 	}
+	std::cout << "Done closing all sockets" << std::endl;
 }
 
 void Server::printClients(void)
