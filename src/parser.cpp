@@ -1,5 +1,19 @@
 #include "Server.hpp"
 
+bool Server::checkAlreadyNick(std::string &nick)
+{
+    std::vector<Client>::iterator it = _clients.begin();
+    for (; it != _clients.end(); it++)
+    {
+        if (it->checkConnect())
+        {
+            if (it->getNick() == nick)
+                return false;
+        }
+    }
+    return true;
+}
+
 std::string trim_internal(const std::string &str)
 {
     std::string result;

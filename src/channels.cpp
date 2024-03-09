@@ -33,10 +33,3 @@ void Server::leaveChannel(Client &client, std::string channelName)
     }
     std::cerr << "Error: channel not found" << std::endl;
 }
-
-bool Server::checkAlreadyNick(std::string &nick)
-{
-    (void)nick;
-    // after add clients check nick name all client
-    return true;
-}

@@ -30,9 +30,9 @@ int Client::getSockfd(void)
 	return (_clifd);
 }
 
-void Client::close() const
+void Client::closeSocket() const
 {
-	::close(_clifd);
+	close(_clifd);
 }
 
 int Client::getPort(void) const
@@ -85,10 +85,6 @@ bool Client::getHasUsedUser()
     return this->_hasUsedUser;
 }
 
-bool Client::isRegistered(void)
-{
-    return (this->_hasPassed && this->_hasUsedNick && this->_hasUsedUser);
-}
 bool Client::checkNick(std::string &nick)
 {
     if (nick.empty())

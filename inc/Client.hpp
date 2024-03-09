@@ -50,6 +50,11 @@ private:
 
 public:
 
+	bool operator==(const Client& rhs) {
+
+		return (this->_clifd == rhs._clifd);
+	}
+
 	Client( const std::string& ip, int port, int sockfd );
 
 	~Client();
@@ -59,7 +64,7 @@ public:
 	// get socket fd
 	int				getSockfd( void );
 
-	void			close( void )	const;
+	void			closeSocket( void )	const;
 
 	int				getPort( void ) const;
 
@@ -73,18 +78,17 @@ public:
 
 	///////////////////////////////////////////
 
-	void			setNick(std::string nick);
-	void			setUsername(std::string username);
+	void				setNick(std::string nick);
+	void				setUsername(std::string username);
 
-	void			setHasPassed(bool value);
-	void 			setHasUsedNick(bool value);
-	void 			setHasUsedUser(bool value);
-	bool 			checkConnect();
-	bool 			getHasPassed();
-	bool 			getHasUsedNick();
-	bool 			getHasUsedUser();
-	bool 			isRegistered(void);
-	bool			checkNick(std::string &nick);
+	void				setHasPassed(bool value);
+	void 				setHasUsedNick(bool value);
+	void 				setHasUsedUser(bool value);
+	bool 				checkConnect();
+	bool 				getHasPassed();
+	bool 				getHasUsedNick();
+	bool 				getHasUsedUser();
+	bool				checkNick(std::string &nick);
 
 	std::string&		getNick(void);
 	std::string&		getUsername(void);

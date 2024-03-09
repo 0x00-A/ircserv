@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+int	Server::_idxCounter = 0;
+
 Server::Server(std::string port, std::string passwd, int fd)
 	: _port(port), _passwd(passwd), _servfd(fd)
 {
@@ -14,6 +16,7 @@ Server::Server(std::string port, std::string passwd, int fd)
     this->commandMap["USER"] = &Server::user;
     this->commandMap["NICK"] = &Server::nick;
 }
+
 
 Server::~Server()
 {
@@ -41,9 +44,6 @@ int Server::handleNewConnection()
 		close(connfd);
 		return (1);
 	}
-	// Add the new client socket to _clients and _pollfds
-	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
-	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
 	// set socket to be Non-blocking
 	if ( (flags = fcntl(connfd, F_GETFL)) == -1
 		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
@@ -52,6 +52,10 @@ int Server::handleNewConnection()
 		close(connfd);
 		return (1);
 	}
+	// Add the new client socket to _clients and _pollfds
+	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
+	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
+
 	std::cout << "client connected - fd: " << connfd << std::endl;
 	return (0);
 }
@@ -60,13 +64,13 @@ void Server::disconnectClient(int id)
 {
 
 	clientIter			cli_it;
-	pollfdIter	poll_it;
+	pollfdIter			poll_it;
 
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 
 	std::cout << "client disconnected - fd: " << _pollfds[id+1].fd << std::endl;
-	cli_it->close();
+	cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
 }
@@ -172,9 +176,11 @@ void	Server::start()
 	int			ret;
 	std::string	cmd;
 
+
 	std::cout << "Server running" << std::endl;
 	while (true)
 	{
+		printClients();
 		std::cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << std::endl;
 		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
 		{
@@ -193,6 +199,10 @@ void	Server::start()
 					{
 						// accept incomming connections
 						ret = handleNewConnection();
+						// if (ret == 0)
+						// {
+						// 	_clients[_clients.size() - 1].setIndex(_clients.size() - 1);
+						// }
 
 					} while (ret != 1);
 				}
@@ -242,8 +252,21 @@ void	Server::start()
 				}
 			}
 		}
+		cleanUnusedClients();
 	}
 	closeAllOpenSockets();
+}
+
+void Server::cleanUnusedClients()
+{
+	for (size_t i = 0; i < _pollfds.size(); i++)
+	{
+		if (_pollfds[i].fd == -1)
+		{
+			disconnectClient(i - 1);
+			std::cout << "Done cleaning all sockets" << std::endl;
+		}
+	}
 }
 
 void Server::closeAllOpenSockets(void)
@@ -253,6 +276,25 @@ void Server::closeAllOpenSockets(void)
 		close(_pollfds[i].fd);
 	}
 	std::cout << "Done closing all sockets" << std::endl;
+}
+
+int Server::getIndexOfClient(const Client &cli)
+{
+    clientIter	beginIter = _clients.begin();
+
+    return (getClientIterator(cli) - beginIter);
+}
+
+Server::clientIter Server::getClientIterator(const Client &cli)
+{
+    return (std::find(_clients.begin(), _clients.end(), cli));
+}
+
+int Server::getIndexOfClient(const clientIter& currIter)
+{
+    clientIter	beginIter = _clients.begin();
+	// return (std::distance(currIter, beginIter));
+	return (currIter - beginIter);
 }
 
 void Server::printClients(void)
@@ -271,9 +313,9 @@ void Server::printClients(void)
     std::cout << std::setfill(' ');
 
     // Print data rows
-	int id = 0;
+	// int id = 0;
     for (it = _clients.begin(); it < _clients.end(); it++) {
-        std::cout << std::left << std::setw(5) << id++
+        std::cout << std::left << std::setw(5) << getIndexOfClient(it)
                   << std::setw(10) << it->getSockfd()
                   << std::setw(15) << it->getIPAddr()
                   << std::setw(10) << it->getPort() << std::endl;

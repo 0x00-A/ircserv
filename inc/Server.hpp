@@ -23,6 +23,13 @@
 class Server
 {
 
+public:
+
+	typedef std::vector<struct pollfd>::iterator pollfdIter;
+	typedef std::vector<Client>::iterator clientIter;
+	typedef std::map<std::string, void (Server::*)(Client &)>::iterator cmdmapIter;
+	typedef	std::vector<Channel>::iterator channelIter;
+
 private:
 
 	const std::string			_port;
@@ -30,6 +37,7 @@ private:
 	int		 					_servfd;
 	std::vector<struct pollfd>	_pollfds;
 	std::vector<Client>			_clients;
+	static int					_idxCounter;
 
 	// just added
 	std::vector<std::string> 	serverParamiters;
@@ -48,15 +56,17 @@ private:
 
 	void		disconnectClient(int id);
 
+	void		cleanUnusedClients();
+
 	void		closeAllOpenSockets( void );
+
+	int			getIndexOfClient(const clientIter& currIter);
+	int			getIndexOfClient(const Client& cli);
+
+	clientIter	getClientIterator(const Client& cli);
 
 	
 public:
-
-	typedef std::vector<struct pollfd>::iterator pollfdIter;
-	typedef std::vector<Client>::iterator clientIter;
-	typedef std::map<std::string, void (Server::*)(Client &)>::iterator cmdmapIter;
-	typedef	std::vector<Channel>::iterator channelIter;
 
 	Server( std::string port, std::string passwd, int fd );
 
@@ -77,11 +87,13 @@ public:
 
         // check nick clients
         bool checkAlreadyNick(std::string &nick);
+		// bool checkNickFormeClient(Client &client);
 
         // command member functions
         void pass(Client& client);
         void user(Client& client);
         void nick(Client& client);
+
 
         // channel member functions
 
@@ -91,6 +103,7 @@ public:
         // void listChannels();
 
         // send messg
+
 		void 	reply(Client &client, std::string const& reply);
 
 };

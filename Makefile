@@ -18,7 +18,7 @@ $(NAME) : $(OBJ)
 	$(CC) $(FSAN) $(OBJ) -o $(NAME)
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.cpp | $(OBJDIR)
-	$(CC) $(FSAN) $(CFLAGS) -c $< -o $@
+	$(CC)  $(CFLAGS) $(FSAN) -c $< -o $@
 
 $(OBJDIR) :
 	mkdir $(OBJDIR)

@@ -29,6 +29,16 @@ void Server::pass(Client &client)
     }
 }
 
+// bool Server::checkNickFormeClient(Client &client)
+// {
+//     clientIter it = std::find(_clients.begin(), _clients.end(), client);
+//     --it;
+//     if (it->getNick() == client.getNick())
+//     {
+//         return false;
+//     }
+//     return true;
+// }
 void Server::nick(Client &client)
 {
     // i wnat check here
@@ -58,6 +68,7 @@ void Server::nick(Client &client)
         // this command not work now you moust add how find all client for check nick (add clinets in vector);
         std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NICKNAMEINUSE) + " " + \
             client.getNick()  + " :Nickname is already in use";
+        reply(client, response);
 
     }
     if (!client.getNick().empty())
@@ -92,5 +103,22 @@ void Server::user(Client &client)
     {
         client.setHasUsedUser(true);
         client.setUsername(this->serverParamiters[1]);
+        std::cout << "size:: " << _clients.size() << std::endl;
+        if (_clients.size() > 1)
+        {
+            clientIter it = getClientIterator(client);
+            --it;
+            if (it->getNick() == client.getNick())
+            {
+                std::cout << "nick::1 " << it->getNick() << std::endl;
+                std::cout << "nick::2 " << client.getNick() << std::endl;
+                std::string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
+                send(it->getSockfd(), response.c_str(), response.length(), 0);
+                // disconnectClient(it->getIndex());
+
+                it->closeSocket();
+                _pollfds[getIndexOfClient(it) + 1].fd = -1;
+            }
+        }
     }
 }
