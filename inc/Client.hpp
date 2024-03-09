@@ -5,6 +5,7 @@
 # include <vector>
 # include <unistd.h>
 # include <set>
+# include <queue>
 
 // for pass
 # define ERR_NEEDMOREPARAMS 461
@@ -38,7 +39,7 @@ private:
 	bool 		_hasUsedUser;
 
 	std::string _recvBuf;
-	std::string _sendBuf;
+	std::queue<std::string> _sendBuf;
 
 	int			_clifd;
 
@@ -68,7 +69,7 @@ public:
 	std::string&	rdBuf( void );
 
 	// get send buffer
-	std::string&	sdBuf( void );
+	std::queue<std::string>&	sdBuf( void );
 
 	///////////////////////////////////////////
 

@@ -12,7 +12,6 @@ Client::Client(const std::string &ip, int port, int sockfd)
 	_real = "";
 	_hostname = "";
 	_recvBuf = "";
-	_sendBuf = "";
 	_isRegistered = false;
 	_isOperator = false;
 	_hasPassed = false;
@@ -51,7 +50,7 @@ std::string& Client::rdBuf(void)
 	return (_recvBuf);
 }
 
-std::string& Client::sdBuf(void)
+std::queue<std::string>& Client::sdBuf(void)
 {
 	return (_sendBuf);
 }
