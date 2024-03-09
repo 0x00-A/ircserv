@@ -117,6 +117,10 @@ does something to the server that prevents it from servicing other legitimate cl
 Possible solutions are to: (i) use nonblocking I/O (Chapter 16)
 -> 293 non-blocking io code segment
 
+
++ When the send()/recv() functions’ flags parameter is set to 0, they are equivalent to write()/read().
+ However, if there are specific needs that read()/write() cannot meet, you must use recv()/send()
+
 =>> page 95
 
 =>> 6.2 I/O Models

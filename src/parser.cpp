@@ -63,7 +63,7 @@ void  Server::parseCommand(std::string &command)
 void Server::handleCommand(std::string& cmd, int id)
 {
     parseCommand(cmd);
-    mapIter it = this->commandMap.find(this->serverParamiters[0]);
+    cmdmapIter it = this->commandMap.find(this->serverParamiters[0]);
     if (it != this->commandMap.end())
     {
         // if not connected check this for connection
