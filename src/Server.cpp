@@ -38,7 +38,7 @@ int Server::handleNewConnection()
 		return (1);
 	}
 	// get ip address
-	if (!(ip = inet_ntoa(cliaddr.sin_addr)))		// returns a pointer to a static buffer inside the function
+	if (!(ip = inet_ntoa(cliaddr.sin_addr)))		// inet_ntoa returns a pointer to a static buffer inside the function
 	{
 		std::cerr << "inet_ntoa failed" << std::endl;
 		close(connfd);
@@ -46,7 +46,7 @@ int Server::handleNewConnection()
 	}
 	// Add the new client socket to _clients and _pollfds
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
-	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
+	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN | POLLOUT)});
 	// set socket to be Non-blocking
 	if ( (flags = fcntl(connfd, F_GETFL)) == -1
 		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
@@ -62,8 +62,8 @@ int Server::handleNewConnection()
 void Server::disconnectClient(int id)
 {
 
-	std::vector<Client>::iterator			cli_it;
-	std::vector<struct pollfd>::iterator	poll_it;
+	clientIter			cli_it;
+	pollfdIter	poll_it;
 
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
@@ -99,20 +99,49 @@ int Server::handleRead(int id)
 		readbuf[bytesread] = '\0';
 		_clients[id].rdBuf() += std::string(readbuf);
 		// send msg back to client
-		std::string reply = "srv recved msg: " + std::string(readbuf);
-		_clients[id].sdBuf() = reply;
-		write(_clients[id].getSockfd(), reply.c_str(), reply.length());
+		// std::string reply = "srv recved msg: " + std::string(readbuf);
+		// _clients[id].sdBuf().push(reply);
+		// write(_clients[id].getSockfd(), reply.c_str(), reply.length());
 		std::cout << _clients[id].getSockfd() << " rdbuf: " << _clients[id].rdBuf() << std::endl;
 	} while (true);
 }
 
-void Server::handleWrite(int id)
+int	Server::handleWrite(int id)
 {
-	if (write(_clients[id].getSockfd(), _clients[id].sdBuf().c_str(), (_clients[id].sdBuf()).length()) == -1)
+	ssize_t sent_data;
+	std::queue<std::string>& buffer = _clients[id].sdBuf();
+
+	while (!buffer.empty())
 	{
-		std::perror("write");
-		return;
+		std::string	data = buffer.front();
+
+		sent_data = write(_clients[id].getSockfd(), data.c_str(), data.length());
+		if (sent_data < 0)
+		{
+			/************************************************************************/
+			/*  if a socket file descriptor is set to non-blocking mode and          */
+			/*  you attempt to write() to it when the send buffer is full, write()  */
+			/*  will fail and return -1, and errno will be set to EWOULDBLOCK       */
+			/************************************************************************/
+			if (errno != EWOULDBLOCK)
+			{
+				perror("write");
+				return(-1);
+			}
+			return (0);
+		}
+
+		// if part of data was sent
+		if (static_cast<size_t>(sent_data) < data.length())
+		{
+			buffer.front() = data.substr(sent_data);
+			continue;
+		}
+		// if all data was sent
+		buffer.pop();
 	}
+	_pollfds[id+1].events = POLLIN;
+	return (0);
 }
 
 std::string Server::getCommand(int id)
@@ -129,7 +158,7 @@ std::string Server::getCommand(int id)
 		std::cout << "cmd: " << cmd << std::endl;
 
 		rdBuf = rdBuf.substr(pos + 1);
-		std::cout << "remain: " << rdBuf << std::endl;
+		// std::cout << "remain: " << rdBuf << std::endl;
 
 		return (cmd);
 	}
@@ -138,10 +167,11 @@ std::string Server::getCommand(int id)
 
 void	Server::start()
 {
-	bool	stat = true;
-	std::vector<struct pollfd>::iterator it;
-	int		ret;
-	size_t	end;
+	pollfdIter it;
+	int			ret;
+	std::string	cmd;
+	bool		stat = true;
+	// size_t	end;
 
 	std::cout << "Server running" << std::endl;
 	do
@@ -151,9 +181,8 @@ void	Server::start()
 		{
 			std::perror("poll"); break;
 		}
-
-		end = _pollfds.size();
-		for (size_t i = 0; i < end; i++)
+		// end = _pollfds.size();
+		for (size_t i = 0; i < _pollfds.size(); i++)
 		{
 			if (_pollfds[i].revents & POLLIN)
 			{
@@ -175,31 +204,54 @@ void	Server::start()
 				}
 				else
 				{
-
 					// handle existing connections
 					std::cout << "fd " << _pollfds[i].fd << " is readable" << std::endl;
 					ret = handleRead(i-1);
 					if (ret == -1)
 					{
-						disconnectClient(i-1);
-						i--;
-						end--;
+						disconnectClient(--i);
 						continue;
 					}
-					std::string cmd = getCommand(i-1);
-					if (!cmd.empty()) {
+					while ((cmd = getCommand(i-1)) != "")
+					{
+						// _pollfds[i].revents |= POLLOUT;
+						// _clients[i-1].sdBuf().push("msg recv: " + cmd);
 						handleCommand(cmd, i-1);
+						continue;	
 					}
 				}
 			}
-			// else if (_pollfds[i].revents & POLLOUT)
-			// {
-			// 	// send reply to client
-			// }
-			// else if (_pollfds[i].revents & POLLERR)
-			// {
-			// 	std::cerr << "Server: polling failed" << std::endl;
-			// }
+			if (_pollfds[i].revents & POLLOUT)
+			{				
+				/******************************************************************************/
+				/*  Set POLLOUT only if you have outstanding data to send to the other end.   */
+				/*  This is because most of the time, sockets are writable, and POLLOUT will  */
+				/*  almost always be set if you ask for it. So, asking for POLLOUT when you   */
+				/*  don’t have anything to write would just waste CPU cycles. 	              */
+				/******************************************************************************/
+			
+				// socket is writeable
+				// send reply to client
+				std::cout << "fd " << _pollfds[i].fd << " is writeable" << std::endl;
+				ret = handleWrite(i-1);
+				if (ret == -1)
+				{
+					disconnectClient(--i);
+					continue;
+				}
+			}
+			if (_pollfds[i].revents & POLLERR)
+			{	
+				if (_pollfds[i].fd == _servfd)
+				{
+					std::cerr << "Server: polling failed" << std::endl;
+					stat = false;
+				}
+				else
+				{
+					disconnectClient(--i);
+				}
+			}
 		}
 	} while (stat == true);
 	closeAllOpenSockets();
@@ -215,7 +267,7 @@ void Server::closeAllOpenSockets(void)
 
 void Server::printClients(void)
 {
-	std::vector<Client>::iterator it;
+	clientIter it;
 
     // Define column headers
 	std::cout << "----------------------------------------\n";
@@ -241,7 +293,7 @@ void Server::printClients(void)
 
 void Server::printpollfds(void)
 {
-	std::vector<struct pollfd>::iterator it;
+	pollfdIter it;
 
     // Define column headers
 	std::cout << "----------------------------------------\n";

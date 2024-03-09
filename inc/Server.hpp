@@ -20,8 +20,6 @@
 
 # define RD_BUF_SIZE 512
 
-# define mapIter std::map<std::string, void (Server::*)(Client &)>::iterator
-
 class Server
 {
 
@@ -42,7 +40,7 @@ private:
 
 	int			handleRead(int id);
 
-	void		handleWrite(int id);
+	int			handleWrite(int id);
 
 	std::string	getCommand(int id);
 
@@ -52,7 +50,13 @@ private:
 
 	void		closeAllOpenSockets( void );
 
+	
 public:
+
+	typedef std::vector<struct pollfd>::iterator pollfdIter;
+	typedef std::vector<Client>::iterator clientIter;
+	typedef std::map<std::string, void (Server::*)(Client &)>::iterator cmdmapIter;
+	typedef	std::vector<Channel>::iterator channelIter;
 
 	Server( std::string port, std::string passwd, int fd );
 
