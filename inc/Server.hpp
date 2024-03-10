@@ -87,6 +87,7 @@ public:
 
         // check nick clients
         bool checkAlreadyNick(std::string &nick);
+		void checkSpamClient(Client& client);
 		// bool checkNickFormeClient(Client &client);
 
         // command member functions

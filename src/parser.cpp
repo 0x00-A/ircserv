@@ -1,5 +1,18 @@
 #include "Server.hpp"
 
+void Server::checkSpamClient(Client& client)
+{
+    for (clientIter it = _clients.begin(); it > _clients.end(); it++)
+    {
+        if (it->getNick() == client.getNick())
+        {
+            std::string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
+            send(it->getSockfd(), response.c_str(), response.length(), 0);
+            it->closeSocket();
+            _pollfds[getIndexOfClient(it) + 1].fd = -1;
+        }
+    }
+}
 bool Server::checkAlreadyNick(std::string &nick)
 {
     std::vector<Client>::iterator it = _clients.begin();
