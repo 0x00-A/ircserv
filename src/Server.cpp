@@ -1,8 +1,12 @@
 #include "Server.hpp"
 
-Server::Server(std::string port, std::string passwd, int fd)
-	: _port(port), _passwd(passwd), _servfd(fd)
+Server::Server(const string& port, const string& passwd)
+	: _port(port), _passwd(passwd)
 {
+	// socket part
+	_socket.listenSocket(_port);
+	_socket.setSocketNonBlocking();
+	_servfd = _socket.getfd();
 	// First entry in the _pollfds array is used for the listening socket
 	struct pollfd servPoll;
 	servPoll.fd = _servfd;
@@ -31,16 +35,20 @@ int Server::handleNewConnection()
 	if ( (connfd = accept(_servfd, (SA *) (&cliaddr), &len)) == -1)	// use c++ cast
 	{
 		if (errno != EWOULDBLOCK && errno != EAGAIN)
-			std::perror("accept");
+			perror("accept");
 		return (1);
 	}
 	// get ip address
 	if (!(ip = inet_ntoa(cliaddr.sin_addr)))		// inet_ntoa returns a pointer to a static buffer inside the function
 	{
-		std::cerr << "inet_ntoa failed" << std::endl;
+		cerr << "inet_ntoa failed" << endl;
 		close(connfd);
 		return (1);
 	}
+	//
+	struct hostent*	hptr = gethostbyname (ip);
+	cout << "hostname of client >> " << hptr->h_name << endl;
+
 	// Add the new client socket to _clients and _pollfds
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
 	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
@@ -48,11 +56,11 @@ int Server::handleNewConnection()
 	if ( (flags = fcntl(connfd, F_GETFL)) == -1
 		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
 	{
-		std::perror("fcntl");
+		perror("fcntl");
 		close(connfd);
 		return (1);
 	}
-	std::cout << "client connected - fd: " << connfd << std::endl;
+	cout << "client connected - fd: " << connfd << endl;
 	return (0);
 }
 
@@ -65,7 +73,7 @@ void Server::disconnectClient(int id)
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 
-	std::cout << "client disconnected - fd: " << _pollfds[id+1].fd << std::endl;
+	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
 	cli_it->close();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
@@ -83,7 +91,7 @@ int Server::handleRead(int id)
 		{
 			if (errno != EWOULDBLOCK && errno != EAGAIN)
 			{
-				std::perror("read");
+				perror("read");
 				return (-1);
 			}
 			return (0);
@@ -94,26 +102,26 @@ int Server::handleRead(int id)
 		}
 		// append to client read buffer
 		readbuf[bytesread] = '\0';
-		_clients[id].rdBuf() += std::string(readbuf);
-		// std::cout << "fd " << _clients[id].getSockfd() << " rdbuf: " << _clients[id].rdBuf() << std::endl;
+		_clients[id].rdBuf() += string(readbuf);
+		// cout << "fd " << _clients[id].getSockfd() << " rdbuf: " << _clients[id].rdBuf() << endl;
 	} while (true);
 }
 
 int	Server::handleWrite(int id)
 {
 	ssize_t sent_data;
-	std::queue<std::string>& buffer = _clients[id].sdBuf();
+	std::queue<string>& buffer = _clients[id].sdBuf();
 
 	// just for debuging
 	if (buffer.empty())
 	{
-		std::cout << "send Buffer empty returning - fd: " << _clients[id].getSockfd() << std::endl;
+		cout << "send Buffer empty returning - fd: " << _clients[id].getSockfd() << endl;
 		return (0);
 	}
 
 	while (!buffer.empty())
 	{
-		std::string	data = buffer.front();
+		string	data = buffer.front();
 
 		sent_data = write(_clients[id].getSockfd(), data.c_str(), data.length());
 		if (sent_data < 0)
@@ -140,26 +148,26 @@ int	Server::handleWrite(int id)
 		// if all data was sent
 		buffer.pop();
 	}
-	std::cout << "Done sending data to client - fd: " << _clients[id].getSockfd() << std::endl;
+	cout << "Done sending data to client - fd: " << _clients[id].getSockfd() << endl;
 	_pollfds[id+1].events = POLLIN;
 	return (0);
 }
 
-std::string Server::getCommand(int id)
+string Server::getCommand(int id)
 {
-	std::string& rdBuf = _clients[id].rdBuf();
+	string& rdBuf = _clients[id].rdBuf();
 	size_t	pos;
 
 	if (rdBuf.empty())
 		return ("");
 	pos = rdBuf.find("\n");
-	if (pos != std::string::npos) {
+	if (pos != string::npos) {
 
-		std::string cmd = rdBuf.substr(0, pos);
-		std::cout << "cmd: " << cmd << std::endl;
+		string cmd = rdBuf.substr(0, pos);
+		cout << "cmd: " << cmd << endl;
 
 		rdBuf = rdBuf.substr(pos + 1);
-		// std::cout << "remain: " << rdBuf << std::endl;
+		// cout << "remain: " << rdBuf << endl;
 
 		return (cmd);
 	}
@@ -168,17 +176,17 @@ std::string Server::getCommand(int id)
 
 void	Server::start()
 {
-	pollfdIter it;
+	pollfdIter	it;
 	int			ret;
-	std::string	cmd;
+	string		cmd;
 
-	std::cout << "Server running" << std::endl;
+	cout << "Server running" << endl;
 	while (true)
 	{
-		std::cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << std::endl;
+		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
 		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
 		{
-			std::perror("poll"); break;
+			perror("poll"); break;
 		}
 		for (size_t i = 0; i < _pollfds.size(); i++)
 		{
@@ -188,7 +196,7 @@ void	Server::start()
 				if (_pollfds[i].fd == _servfd)
 				{
 					
-					std::cout << "Server has incomming connection(s)" << std::endl;
+					cout << "Server has incomming connection(s)" << endl;
 					do
 					{
 						// accept incomming connections
@@ -199,7 +207,7 @@ void	Server::start()
 				else
 				{
 					// handle existing connections
-					std::cout << "fd " << _pollfds[i].fd << " is readable" << std::endl;
+					cout << "fd " << _pollfds[i].fd << " is readable" << endl;
 					ret = handleRead(i-1);
 					if (ret == -1)
 					{
@@ -221,7 +229,7 @@ void	Server::start()
 				/*  don’t have anything to write would just waste CPU cycles. 	              */
 				/******************************************************************************/
 			
-				std::cout << "fd " << _pollfds[i].fd << " is writeable" << std::endl;
+				cout << "fd " << _pollfds[i].fd << " is writeable" << endl;
 				ret = handleWrite(i-1);
 				if (ret == -1)
 				{
@@ -233,7 +241,7 @@ void	Server::start()
 			{	
 				if (_pollfds[i].fd == _servfd)
 				{
-					std::cerr << "Server: polling failed" << std::endl;
+					cerr << "Server: polling failed" << endl;
 					break;
 				}
 				else
@@ -252,7 +260,7 @@ void Server::closeAllOpenSockets(void)
 	{
 		close(_pollfds[i].fd);
 	}
-	std::cout << "Done closing all sockets" << std::endl;
+	cout << "Done closing all sockets" << endl;
 }
 
 void Server::printClients(void)
@@ -260,25 +268,25 @@ void Server::printClients(void)
 	clientIter it;
 
     // Define column headers
-	std::cout << "----------------------------------------\n";
-    std::cout << std::left << std::setw(5) << "id"
+	cout << "----------------------------------------\n";
+    cout << std::left << std::setw(5) << "id"
               << std::setw(10) << "fd"
               << std::setw(15) << "ip"
-              << std::setw(10) << "port" << std::endl;
+              << std::setw(10) << "port" << endl;
 
     // Print separator line
-    std::cout << std::setfill('-') << std::setw(40) << "" << std::endl;
-    std::cout << std::setfill(' ');
+    cout << std::setfill('-') << std::setw(40) << "" << endl;
+    cout << std::setfill(' ');
 
     // Print data rows
 	int id = 0;
     for (it = _clients.begin(); it < _clients.end(); it++) {
-        std::cout << std::left << std::setw(5) << id++
+        cout << std::left << std::setw(5) << id++
                   << std::setw(10) << it->getSockfd()
                   << std::setw(15) << it->getIPAddr()
-                  << std::setw(10) << it->getPort() << std::endl;
+                  << std::setw(10) << it->getPort() << endl;
     }
-	std::cout << "\n";
+	cout << "\n";
 }
 
 void Server::printpollfds(void)
@@ -286,20 +294,20 @@ void Server::printpollfds(void)
 	pollfdIter it;
 
     // Define column headers
-	std::cout << "----------------------------------------\n";
-    std::cout << std::left << std::setw(5) << "id"
+	cout << "----------------------------------------\n";
+    cout << std::left << std::setw(5) << "id"
               << std::setw(10) << "fd"
-              << std::setw(15)  << std::endl;
+              << std::setw(15)  << endl;
 
     // Print separator line
-    std::cout << std::setfill('-') << std::setw(40) << "" << std::endl;
-    std::cout << std::setfill(' ');
+    cout << std::setfill('-') << std::setw(40) << "" << endl;
+    cout << std::setfill(' ');
 
     // Print data rows
 	int id = 0;
     for (it = _pollfds.begin(); it < _pollfds.end(); it++) {
-        std::cout << std::left << std::setw(5) << id++
-                  << std::setw(10) << it->fd << std::endl;
+        cout << std::left << std::setw(5) << id++
+                  << std::setw(10) << it->fd << endl;
     }
-	std::cout << "\n";
+	cout << "\n";
 }

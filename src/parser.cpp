@@ -1,11 +1,11 @@
 #include "Server.hpp"
 
-std::string trim_internal(const std::string &str)
+string trim_internal(const string &str)
 {
-    std::string result;
+    string result;
     bool prev_is_space = false;
 
-    for (std::string::size_type i = 0; i < str.size(); i++)
+    for (string::size_type i = 0; i < str.size(); i++)
     {
         char c = str[i];
         if (isspace(c))
@@ -30,17 +30,17 @@ std::string trim_internal(const std::string &str)
 }
 
 
-void  Server::parseCommand(std::string &command)
+void  Server::parseCommand(string &command)
 {
-    if (command.find(" :") != std::string::npos)
+    if (command.find(" :") != string::npos)
     {
         command.erase(0, command.find_first_not_of(" "));
         if (command[0] == ':')
             command.insert(0, " ");
-        std::string temp = command;
+        string temp = command;
         command = command.substr(0, command.find(" :"));
         std::stringstream ss(command);
-        std::string token;
+        string token;
         while (std::getline(ss, token, ' '))
         {
             this->serverParamiters.push_back(token);
@@ -52,7 +52,7 @@ void  Server::parseCommand(std::string &command)
     {
         command = trim_internal(command);
         std::stringstream ss(command);
-        std::string token;
+        string token;
         while (std::getline(ss, token, ' '))
         {
             this->serverParamiters.push_back(token);
@@ -60,7 +60,7 @@ void  Server::parseCommand(std::string &command)
     }
 }
 
-void Server::handleCommand(std::string& cmd, int id)
+void Server::handleCommand(string& cmd, int id)
 {
     parseCommand(cmd);
     cmdmapIter it = this->commandMap.find(this->serverParamiters[0]);
@@ -71,7 +71,7 @@ void Server::handleCommand(std::string& cmd, int id)
     }
     else
     {
-        std::cerr << "Error: invalid command" << std::endl;
+        cerr << "Error: invalid command" << endl;
     }
     this->serverParamiters.clear();
 }
@@ -87,7 +87,7 @@ void Server::handleCommand(std::string& cmd, int id)
 //         buffer[len + 1] = '\0';
 //     }
 //     std::stringstream ss(buffer);
-//     std::string token;
+//     string token;
 //     while (getline(ss, token))
 //     {
 //         if (ss.eof())
@@ -98,7 +98,7 @@ void Server::handleCommand(std::string& cmd, int id)
 //         }
 //         else 
 //         {
-//             // std::cout << "command: ||" << token << "||" << std::endl;
+//             // cout << "command: ||" << token << "||" << endl;
 //             client.appendBuffer(token);
 //             handleCommand(client.getBuffer());
 //             token.clear();
