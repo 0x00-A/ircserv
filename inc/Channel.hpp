@@ -9,21 +9,21 @@
 class Channel
 {
     private:
-        std::string name;
+        string name;
         std::vector<Client *> clients;
 
     public:
-        Channel(std::string channelName);
+        Channel(string channelName);
         ~Channel();
 
         // Channel operations
         void join(Client &client);
         void leave(Client &client);
-        void broadcastMessage(Client &sender, std::string message);
+        void broadcastMessage(Client &sender, string message);
         void listClients();
 
         // Getters
-        std::string getName();
+        string getName();
         std::vector<Client *> &getClients();
 };
 

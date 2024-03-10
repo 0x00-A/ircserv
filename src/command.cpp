@@ -4,14 +4,14 @@ void Server::pass(Client &client)
 {
     if (client.checkConnect())
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_ALREADYREGISTRED) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_ALREADYREGISTRED) + " " + \
             client.getNick()  + " :You may not reregister";
         reply(client, response);
         return ;
     }
     if (this->serverParamiters.size() < 2)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NEEDMOREPARAMS) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_NEEDMOREPARAMS) + " " + \
             client.getNick()  + " " + this->serverParamiters[0] + " :Not enough parameters";
         reply(client, response);
         return;
@@ -23,7 +23,7 @@ void Server::pass(Client &client)
     else
     {
         // ERR_PASSWDMISMATCH
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_PASSWDMISMATCH) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_PASSWDMISMATCH) + " " + \
             client.getNick()  + " " + this->serverParamiters[1] + " :Password incorrect";
         reply(client, response);
     }
@@ -34,21 +34,21 @@ void Server::nick(Client &client)
     // i wnat check here
     if (client.getHasPassed() == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
             client.getNick()  + " :dir b3da pass";
         reply(client, response);
         return;
     }
     if (this->serverParamiters.size() < 2)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NONICKNAMEGIVEN) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_NONICKNAMEGIVEN) + " " + \
             client.getNick()  + " :No nickname given";
         reply(client, response);
         return;
     }
     if (client.checkNick(this->serverParamiters[1]) == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
             client.getNick()  + " :Erroneus nickname";
         reply(client, response);
         return;
@@ -56,7 +56,7 @@ void Server::nick(Client &client)
     if (checkAlreadyNick(this->serverParamiters[1]) == false)
     {
         // this command not work now you moust add how find all client for check nick (add clinets in vector);
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NICKNAMEINUSE) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_NICKNAMEINUSE) + " " + \
             client.getNick()  + " :Nickname is already in use";
 
     }
@@ -64,7 +64,7 @@ void Server::nick(Client &client)
     {
         if (client.getHasUsedNick() == true)
         {
-            std::string response = ":" + client.getNick() + "!@ " + this->serverParamiters[0] + " :" +  this->serverParamiters[1];
+            string response = ":" + client.getNick() + "!@ " + this->serverParamiters[0] + " :" +  this->serverParamiters[1];
             reply(client, response);
         }
         client.setNick(this->serverParamiters[1]);
@@ -76,14 +76,14 @@ void Server::user(Client &client)
 {
     if (client.getHasPassed() == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
             client.getNick()  + " :dir b3da pass";
         reply(client, response);
         return;
     }
     if (this->serverParamiters.size() < 5)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NEEDMOREPARAMS) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_NEEDMOREPARAMS) + " " + \
             client.getNick()  + " " + this->serverParamiters[0] + " :Not enough parameters";
         reply(client, response);
         return;

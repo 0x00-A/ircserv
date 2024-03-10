@@ -1,12 +1,12 @@
 #include "Server.hpp"
 
-void Server::createChannel(std::string channelName)
+void Server::createChannel(string channelName)
 {
     Channel newChannel(channelName);
     this->channels.push_back(newChannel);
 }
 
-void Server::joinChannel(Client &client, std::string channelName)
+void Server::joinChannel(Client &client, string channelName)
 {
     for (size_t i = 0; i < this->channels.size(); i++)
     {
@@ -17,10 +17,10 @@ void Server::joinChannel(Client &client, std::string channelName)
             return;
         }
     }
-    std::cerr << "Error: channel not found" << std::endl;
+    cerr << "Error: channel not found" << endl;
 }
 
-void Server::leaveChannel(Client &client, std::string channelName)
+void Server::leaveChannel(Client &client, string channelName)
 {
     for (size_t i = 0; i < this->channels.size(); i++)
     {
@@ -31,10 +31,10 @@ void Server::leaveChannel(Client &client, std::string channelName)
             return;
         }
     }
-    std::cerr << "Error: channel not found" << std::endl;
+    cerr << "Error: channel not found" << endl;
 }
 
-bool Server::checkAlreadyNick(std::string &nick)
+bool Server::checkAlreadyNick(string &nick)
 {
     (void)nick;
     // after add clients check nick name all client
