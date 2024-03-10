@@ -6,6 +6,8 @@
 # include <sys/socket.h>
 # include <netinet/in.h>
 
+# include <sys/types.h>
+
 # define BACKLOG 50
 
 class Socket
@@ -15,19 +17,17 @@ private:
 
 	int		_sockfd;
 
-	Socket();
-
 public:
 
-	Socket( const string port );
+	Socket();
+
+	// Socket( const string port );
 
 	~Socket();
 
 	int		getfd( void );
 
-	void	bindSocket(string port);
-
-	void	listenSocket();
+	void	listenSocket( const string port );
 
 	void	setSocketNonBlocking();
 
