@@ -4,8 +4,33 @@ Socket::~Socket()
 {
 }
 
-Socket::Socket()
+Socket::Socket(const string port)
 {
+	struct addrinfo hints, *res, *ressave;
+	int	n;
+
+	bzero(&hints, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;		// fill in my IP for me
+
+	if ( (n = getaddrinfo(NULL, port.c_str(), &hints, &res)))	// return 0 on success
+	{
+		gai_strerror(n);
+		exit(1);
+	}
+
+	ressave = res;
+
+	while (res)
+	{
+		/* code */
+		res = res->ai_next;
+	}
+	
+
+
 	// create an end-point communication socket
 	if ( (_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) /* SOCK_NONBLOCK: Using  this  flag  saves extra */
 	{																		/* calls to fcntl() to achieve the same result. */

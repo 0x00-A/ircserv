@@ -15,10 +15,11 @@ private:
 
 	int		_sockfd;
 
+	Socket();
 
 public:
 
-	Socket();
+	Socket( const string port );
 
 	~Socket();
 
