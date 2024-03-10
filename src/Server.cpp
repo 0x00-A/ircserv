@@ -48,13 +48,6 @@ int Server::handleNewConnection()
 		close(connfd);
 		return (1);
 	}
-	//
-	struct hostent*	hptr = gethostbyname (ip);
-	cout << "hostname of client >> " << hptr->h_name << endl;
-
-	// Add the new client socket to _clients and _pollfds
-	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
-	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
 	// set socket to be Non-blocking
 	if ( (flags = fcntl(connfd, F_GETFL)) == -1
 		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
