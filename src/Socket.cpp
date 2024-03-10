@@ -19,7 +19,8 @@ Socket::Socket(const char* port)
 		std::perror("socket");
 		exit(1);
 	}
-
+	int a = 1;
+    setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &a, sizeof(a));
 	// fill in an Internet socket address structure with the server's IP address and port number
 	bzero(&servaddr, sizeof(struct sockaddr_in));
 	servaddr.sin_family = AF_INET;

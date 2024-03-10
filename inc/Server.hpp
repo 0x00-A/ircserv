@@ -94,7 +94,8 @@ public:
         void pass(Client& client);
         void user(Client& client);
         void nick(Client& client);
-
+		void quit(Client& client);
+		void join(Client& client);
 
         // channel member functions
 

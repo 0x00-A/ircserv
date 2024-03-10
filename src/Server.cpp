@@ -15,6 +15,8 @@ Server::Server(std::string port, std::string passwd, int fd)
 	this->commandMap["PASS"] = &Server::pass;
     this->commandMap["USER"] = &Server::user;
     this->commandMap["NICK"] = &Server::nick;
+    this->commandMap["QUIT"] = &Server::quit;
+    this->commandMap["JOIN"] = &Server::join;
 }
 
 

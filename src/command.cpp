@@ -76,6 +76,7 @@ void Server::nick(Client &client)
     }
 }
 
+
 void Server::user(Client &client)
 {
     if (client.getHasPassed() == false)
@@ -103,4 +104,16 @@ void Server::user(Client &client)
             checkSpamClient(client);
         }
     }
+}
+
+void Server::quit(Client &client)
+{
+    std::string response = "ERROR:: by by\r\n";
+    send(client.getSockfd(), response.c_str(), response.length(), 0);
+    client.closeSocket();
+    _pollfds[getIndexOfClient(client) + 1].fd = -1;
+}
+
+void Server::join(Client &client)
+{
 }
