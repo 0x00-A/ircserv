@@ -34,8 +34,8 @@ void Server::nick(Client &client)
     // i wnat check here
     if (client.getHasPassed() == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
-            client.getNick()  + " :dir b3da pass hhh";
+        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NOTREGISTERED) + " " + \
+            client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
     }
@@ -55,15 +55,10 @@ void Server::nick(Client &client)
     }
     if (checkAlreadyNick(this->serverParamiters[1]) == false)
     {
-        // this command not work now you moust add how find all client for check nick (add clinets in vector);
         std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NICKNAMEINUSE) + " " + \
             client.getNick()  + " :Nickname is already in use";
         reply(client, response);
 
-    }
-    if (_clients.size() > 1 && client.getHasUsedUser())
-    {
-        checkSpamClient(client);
     }
     if (!client.getNick().empty())
     {
@@ -74,6 +69,10 @@ void Server::nick(Client &client)
         }
         client.setNick(this->serverParamiters[1]);
         client.setHasUsedNick(true);
+        if (_clients.size() > 1 && client.getHasUsedUser())
+        {
+            checkSpamClient(client);
+        }
     }
 }
 
@@ -81,8 +80,8 @@ void Server::user(Client &client)
 {
     if (client.getHasPassed() == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_ERRONEUSNICKNAME) + " " + \
-            client.getNick()  + " :dir b3da pass";
+        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NOTREGISTERED) + " " + \
+            client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
     }
@@ -100,6 +99,7 @@ void Server::user(Client &client)
 
         if (_clients.size() > 1 && client.getHasUsedNick())
         {
+            std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
             checkSpamClient(client);
         }
     }

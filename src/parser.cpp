@@ -2,7 +2,8 @@
 
 void Server::checkSpamClient(Client& client)
 {
-    for (clientIter it = _clients.begin(); it > _clients.end(); it++)
+    clientIter it = _clients.begin();
+    for ( ; it != _clients.end(); it++)
     {
         if (it->getNick() == client.getNick() && it->checkConnect() == false)
         {

@@ -180,7 +180,7 @@ void	Server::start()
 	std::cout << "Server running" << std::endl;
 	while (true)
 	{
-		printClients();
+		// printClients();
 		std::cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << std::endl;
 		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
 		{
