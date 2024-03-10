@@ -61,7 +61,7 @@ void Server::nick(Client &client)
         reply(client, response);
 
     }
-    if (_clients.size() > 1 && client.getHasUsedNick())
+    if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);
     }

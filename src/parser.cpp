@@ -4,7 +4,7 @@ void Server::checkSpamClient(Client& client)
 {
     for (clientIter it = _clients.begin(); it > _clients.end(); it++)
     {
-        if (it->getNick() == client.getNick())
+        if (it->getNick() == client.getNick() && it->checkConnect() == false)
         {
             std::string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
             send(it->getSockfd(), response.c_str(), response.length(), 0);
