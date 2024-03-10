@@ -34,7 +34,7 @@ void Server::nick(Client &client)
     // i wnat check here
     if (client.getHasPassed() == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NOTREGISTERED) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
@@ -55,7 +55,7 @@ void Server::nick(Client &client)
     }
     if (checkAlreadyNick(this->serverParamiters[1]) == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NICKNAMEINUSE) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_NICKNAMEINUSE) + " " + \
             client.getNick()  + " :Nickname is already in use";
         reply(client, response);
 
@@ -81,7 +81,7 @@ void Server::user(Client &client)
 {
     if (client.getHasPassed() == false)
     {
-        std::string response = ":ft_irc.1337.ma " + std::to_string(ERR_NOTREGISTERED) + " " + \
+        string response = ":ft_irc.1337.ma " + std::to_string(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
@@ -100,7 +100,7 @@ void Server::user(Client &client)
 
         if (_clients.size() > 1 && client.getHasUsedNick())
         {
-            std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+            cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
             checkSpamClient(client);
         }
     }
@@ -108,7 +108,7 @@ void Server::user(Client &client)
 
 void Server::quit(Client &client)
 {
-    std::string response = "ERROR:: by by\r\n";
+    string response = "ERROR:: by by\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
     client.closeSocket();
     _pollfds[getIndexOfClient(client) + 1].fd = -1;

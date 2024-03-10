@@ -67,7 +67,7 @@ int Server::handleNewConnection()
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
 	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
 
-	std::cout << "client connected - fd: " << connfd << std::endl;
+	cout << "client connected - fd: " << connfd << endl;
 	return (0);
 }
 
@@ -80,7 +80,7 @@ void Server::disconnectClient(int id)
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 
-	std::cout << "client disconnected - fd: " << _pollfds[id+1].fd << std::endl;
+	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
 	cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
@@ -188,11 +188,11 @@ void	Server::start()
 	string		cmd;
 
 
-	std::cout << "Server running" << std::endl;
+	cout << "Server running" << endl;
 	while (true)
 	{
 		// printClients();
-		std::cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << std::endl;
+		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
 		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
 		{
 			perror("poll"); break;
@@ -275,7 +275,7 @@ void Server::cleanUnusedClients()
 		if (_pollfds[i].fd == -1)
 		{
 			disconnectClient(i - 1);
-			std::cout << "Done cleaning all sockets" << std::endl;
+			cout << "Done cleaning all sockets" << endl;
 		}
 	}
 }
@@ -326,7 +326,7 @@ void Server::printClients(void)
     // Print data rows
 	// int id = 0;
     for (it = _clients.begin(); it < _clients.end(); it++) {
-        std::cout << std::left << std::setw(5) << getIndexOfClient(it)
+        cout << std::left << std::setw(5) << getIndexOfClient(it)
                   << std::setw(10) << it->getSockfd()
                   << std::setw(15) << it->getIPAddr()
                   << std::setw(10) << it->getPort() << endl;

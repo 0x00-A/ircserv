@@ -23,7 +23,7 @@ public:
 
 	typedef std::vector<struct pollfd>::iterator pollfdIter;
 	typedef std::vector<Client>::iterator clientIter;
-	typedef std::map<std::string, void (Server::*)(Client &)>::iterator cmdmapIter;
+	typedef std::map<string, void (Server::*)(Client &)>::iterator cmdmapIter;
 	typedef	std::vector<Channel>::iterator channelIter;
 
 private:
@@ -80,7 +80,7 @@ public:
 
 
         // check nick clients
-        bool checkAlreadyNick(std::string &nick);
+        bool checkAlreadyNick(string &nick);
 		void checkSpamClient(Client& client);
 		// bool checkNickFormeClient(Client &client);
 
@@ -100,7 +100,7 @@ public:
 
         // send messg
 
-		void 	reply(Client &client, std::string const& reply);
+		void 	reply(Client &client, string const& reply);
 
 };
 

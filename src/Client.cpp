@@ -85,7 +85,7 @@ bool Client::getHasUsedUser()
     return this->_hasUsedUser;
 }
 
-bool Client::checkNick(std::string &nick)
+bool Client::checkNick(string &nick)
 {
     if (nick.empty())
     {

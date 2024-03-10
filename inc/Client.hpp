@@ -49,7 +49,7 @@ public:
 		return (this->_clifd == rhs._clifd);
 	}
 
-	Client( const std::string& ip, int port, int sockfd );
+	Client( const string& ip, int port, int sockfd );
 
 	~Client();
 

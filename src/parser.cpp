@@ -7,14 +7,14 @@ void Server::checkSpamClient(Client& client)
     {
         if (it->getNick() == client.getNick() && it->checkConnect() == false)
         {
-            std::string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
+            string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
             send(it->getSockfd(), response.c_str(), response.length(), 0);
             it->closeSocket();
             _pollfds[getIndexOfClient(it) + 1].fd = -1;
         }
     }
 }
-bool Server::checkAlreadyNick(std::string &nick)
+bool Server::checkAlreadyNick(string &nick)
 {
     std::vector<Client>::iterator it = _clients.begin();
     for (; it != _clients.end(); it++)
@@ -28,7 +28,7 @@ bool Server::checkAlreadyNick(std::string &nick)
     return true;
 }
 
-std::string trim_internal(const std::string &str)
+string trim_internal(const string &str)
 {
     string result;
     bool prev_is_space = false;
