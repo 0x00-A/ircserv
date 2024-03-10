@@ -116,4 +116,5 @@ void Server::quit(Client &client)
 
 void Server::join(Client &client)
 {
+    (void)client;
 }
