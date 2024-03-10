@@ -5,8 +5,7 @@ int	main(int ac, char** av)
 {
 	if (ac == 3)
 	{
-		Socket	sock(av[1]);
-		Server	ircserv(av[1], av[2], sock.getfd());
+		Server	ircserv(av[1], av[2]);
 
 		ircserv.start();
 	}

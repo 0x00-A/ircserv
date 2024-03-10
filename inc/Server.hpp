@@ -1,24 +1,20 @@
-#ifndef IRCSERVER_HPP
-#define IRCSERVER_HPP
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
-# include <string>
-# include <vector>
+# include "ircserv.hpp"
+
 # include <poll.h>
-# include "Client.hpp"
 # include <arpa/inet.h>
-# include <iostream>
-# include <fcntl.h>
-# include <unistd.h>
-# include <map>
-# include <sstream>
+
+# include <netdb.h>
+
+# include "Client.hpp"
 # include "Channel.hpp"
-
-
-# include <iomanip> // delete
+# include "Socket.hpp"
 
 # define SA struct sockaddr
 
-# define RD_BUF_SIZE 512
+# define RD_BUF_SIZE 512	// not used
 
 class Server
 {
@@ -32,16 +28,16 @@ public:
 
 private:
 
-	const std::string			_port;
-	const std::string			_passwd;
+	const string				_port;
+	const string				_passwd;
 	int		 					_servfd;
 	std::vector<struct pollfd>	_pollfds;
 	std::vector<Client>			_clients;
-	static int					_idxCounter;
+	Socket						_socket;
 
 	// just added
-	std::vector<std::string> 	serverParamiters;
-	std::map<std::string, void (Server::*)(Client&)> commandMap;
+	std::vector<string> 	serverParamiters;
+	std::map<string, void (Server::*)(Client&)> commandMap;
 	std::vector<Channel> 		channels; 
 
 	int			handleNewConnection();
@@ -50,9 +46,7 @@ private:
 
 	int			handleWrite(int id);
 
-	std::string	getCommand(int id);
-
-	// void		handleCommand(int	id);
+	string		getCommand(int id);
 
 	void		disconnectClient(int id);
 
@@ -68,7 +62,7 @@ private:
 	
 public:
 
-	Server( std::string port, std::string passwd, int fd );
+	Server( const string& port, const string& passwd );
 
 	~Server();
 
@@ -81,8 +75,8 @@ public:
 	// ============================================================ //
 	 // parser functions
         // bool parseCommandClient(char *buffer, Client& client);
-        void handleCommand(std::string& cmd, int id);
-		void parseCommand(std::string& cmd);
+        void handleCommand(string& cmd, int id);
+		void parseCommand(string& cmd);
 
 
         // check nick clients
@@ -99,9 +93,9 @@ public:
 
         // channel member functions
 
-        void createChannel(std::string channelName);
-        void joinChannel(Client& client, std::string channelName);
-        void leaveChannel(Client& client, std::string channelName);
+        void createChannel(string channelName);
+        void joinChannel(Client& client, string channelName);
+        void leaveChannel(Client& client, string channelName);
         // void listChannels();
 
         // send messg
@@ -110,4 +104,4 @@ public:
 
 };
 
-#endif //IRCSERVER_HPP
+#endif //SERVER_HPP

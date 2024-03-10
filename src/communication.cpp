@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-void Server::reply(Client &client, std::string const& reply)
+void Server::reply(Client &client, string const& reply)
 {
 
     std::string response = reply + "\r\n";

@@ -1,13 +1,13 @@
 #include "Channel.hpp"
 
-Channel::Channel(std::string channelName) : name(channelName) {}
+Channel::Channel(string channelName) : name(channelName) {}
 
 Channel::~Channel() {}
 
 void Channel::join(Client &client)
 {
     clients.push_back(&client);
-    std::cout << client.getNick() << " joined channel " << name << std::endl;
+    cout << client.getNick() << " joined channel " << name << endl;
 }
 
 void Channel::leave(Client &client)
@@ -16,27 +16,27 @@ void Channel::leave(Client &client)
     if (it != clients.end())
     {
         clients.erase(it);
-        std::cout << client.getNick() << " left channel " << name << std::endl;
+        cout << client.getNick() << " left channel " << name << endl;
     }
 }
 
-void Channel::broadcastMessage(Client &sender, std::string message)
+void Channel::broadcastMessage(Client &sender, string message)
 {
-    std::cout << "[" << name << "] " << sender.getNick() << ": " << message << std::endl;
+    cout << "[" << name << "] " << sender.getNick() << ": " << message << endl;
 }
 
 void Channel::listClients()
 {
-    std::cout << "Users in channel " << name << ": ";
+    cout << "Users in channel " << name << ": ";
 
     for (std::vector<Client *>::iterator it = clients.begin(); it != clients.end(); it++)
     {
-        std::cout << (*it)->getNick() << " ";
+        cout << (*it)->getNick() << " ";
     }
-    std::cout << std::endl;
+    cout << endl;
 }
 
-std::string Channel::getName()
+string Channel::getName()
 {
     return name;
 }

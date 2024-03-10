@@ -1,14 +1,12 @@
-#ifndef TCPSOCKET_HPP
-#define TCPSOCKET_HPP
+#ifndef SOCKET_HPP
+#define SOCKET_HPP
 
-# include <unistd.h>
-# include <string.h>
+# include <netdb.h>
+# include "ircserv.hpp"
 # include <sys/socket.h>
 # include <netinet/in.h>
-# include <cstdlib>
-# include <fcntl.h>
-# include <cstdio>
 
+# include <sys/types.h>
 
 # define BACKLOG 50
 
@@ -19,18 +17,22 @@ private:
 
 	int		_sockfd;
 
+public:
+
 	Socket();
 
-public:
+	// Socket( const string port );
 
 	~Socket();
 
-	Socket( const char* port );
-
 	int		getfd( void );
+
+	void	listenSocket( const string port );
+
+	void	setSocketNonBlocking();
 
 	void	closeSocket( void );
 	
 };
 
-#endif //TCPSOCKET_HPP
+#endif //SOCKET_HPP
