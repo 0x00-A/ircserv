@@ -19,8 +19,8 @@ Server::Server(const string& port, const string& passwd)
     this->commandMap["NICK"] = &Server::nick;
     this->commandMap["QUIT"] = &Server::quit;
     this->commandMap["JOIN"] = &Server::join;
+    this->commandMap["PRIVMSG"] = &Server::privmsg;
 }
-
 
 Server::~Server()
 {

@@ -118,3 +118,56 @@ void Server::join(Client &client)
 {
     (void)client;
 }
+
+string trim_comma(const string &str)
+{
+    string result;
+    bool prev_is_comma = false;
+
+    for (string::size_type i = 0; i < str.size(); i++)
+    {
+        char c = str[i];
+        if (c == ',')
+        {
+            if (!prev_is_comma)
+            {
+                result += c;
+            }
+            prev_is_comma = true;
+        }
+        else
+        {
+            result += c;
+            prev_is_comma = false;
+        }
+    }
+    if (result[0] == ',')
+        result.erase(0, 1);
+    if (result[result.size() - 1] == ',')
+        result.erase(result.size() - 1, 1);
+    return result;
+}
+
+void Server::privmsg(Client &client)
+{
+    (void)client;
+    string clients = trim_comma(serverParamiters[1]);
+    cout << "++++++++++++++++++++++++++++++++" << endl;
+    cout << "nick Clients: |" <<  clients << "|" << endl;
+    cout << "++++++++++++++++++++++++++++++++" << endl;
+
+
+    std::stringstream ss(clients);
+    string token;
+    while (std::getline(ss, token, ','))
+    {
+        _sendMsgClient.push_back(token);
+    }
+
+    for (size_t i = 0; i < _sendMsgClient.size(); i++)
+    {
+        cout << "nickClient[" << i << "]: " << _sendMsgClient.at(i)<< endl;
+    }
+    _messagClient = serverParamiters[serverParamiters.size() - 1];
+    cout << "messgClient: " << _messagClient << endl;
+}

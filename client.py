@@ -32,9 +32,9 @@ def connect_to_server(host, port, i):
 
 if __name__ == "__main__":
     host = 'localhost'  # Change this to your server's IP address
-    port = 123  # Change this to the port your server is listening on
-    for i in range(5000):
+    port = 8080  # Change this to the port your server is listening on
+    for i in range(50):
         connect_to_server(host, port, i)
     a = input()
-    for i in range(5000):
+    for i in range(50):
         clients[i].close()

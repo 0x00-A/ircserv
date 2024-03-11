@@ -37,6 +37,8 @@ private:
 
 	// just added
 	std::vector<string> 	serverParamiters;
+	std::vector<string>		_sendMsgClient;
+	string					_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 	std::vector<Channel> 		channels; 
 
@@ -90,6 +92,7 @@ public:
         void nick(Client& client);
 		void quit(Client& client);
 		void join(Client& client);
+		void privmsg(Client& client);
 
         // channel member functions
 

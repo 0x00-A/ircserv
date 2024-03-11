@@ -28,73 +28,95 @@ bool Server::checkAlreadyNick(string &nick)
     return true;
 }
 
-string trim_internal(const string &str)
-{
-    string result;
-    bool prev_is_space = false;
+// string trim_internal(const string &str)
+// {
+//     string result;
+//     bool prev_is_space = false;
 
-    for (string::size_type i = 0; i < str.size(); i++)
-    {
-        char c = str[i];
-        if (isspace(c))
-        {
-            if (!prev_is_space)
-            {
-                result += c;
-            }
-            prev_is_space = true;
-        }
-        else
-        {
-            result += c;
-            prev_is_space = false;
-        }
-    }
-    if (result[0] == ' ')
-        result.erase(0, 1);
-    if (result[result.size() - 1] == ' ')
-        result.erase(result.size() - 1, 1);
-    return result;
-}
+//     for (string::size_type i = 0; i < str.size(); i++)
+//     {
+//         char c = str[i];
+//         if (isspace(c))
+//         {
+//             if (!prev_is_space)
+//             {
+//                 result += c;
+//             }
+//             prev_is_space = true;
+//         }
+//         else
+//         {
+//             result += c;
+//             prev_is_space = false;
+//         }
+//     }
+//     if (result[0] == ' ')
+//         result.erase(0, 1);
+//     if (result[result.size() - 1] == ' ')
+//         result.erase(result.size() - 1, 1);
+//     return result;
+// }
 
 
 void  Server::parseCommand(string &command)
 {
-    if (command.find(" :") != string::npos)
+    size_t pos;
+    std::stringstream ss;
+    string token, tmp = "";
+
+    if ( (pos = command.find(" :")) != string::npos)
     {
-        command.erase(0, command.find_first_not_of(" "));
-        if (command[0] == ':')
-            command.insert(0, " ");
-        string temp = command;
-        command = command.substr(0, command.find(" :"));
-        std::stringstream ss(command);
-        string token;
-        while (std::getline(ss, token, ' '))
-        {
-            this->serverParamiters.push_back(token);
-        }
-        temp = temp.substr(temp.find(":") + 1);
-        this->serverParamiters.push_back(temp);
+        tmp = command.substr(pos + 2);
+        command = command.substr(0, pos);
     }
-    else
+    ss << command;
+    while (ss >> token)
     {
-        command = trim_internal(command);
-        std::stringstream ss(command);
-        string token;
-        while (std::getline(ss, token, ' '))
-        {
-            this->serverParamiters.push_back(token);
-        }
+        this->serverParamiters.push_back(token);
     }
+    if (!tmp.empty())
+        this->serverParamiters.push_back(tmp);
+
+    // for (size_t i = 0; i < serverParamiters.size(); i++)
+    // {
+    //     cout << "p |" << serverParamiters[i] << "|" << endl;
+    // }
+
+    // if (command.find(" :") != string::npos)
+    // {
+    //     command.erase(0, command.find_first_not_of(" "));
+    //     if (command[0] == ':')
+    //         command.insert(0, " ");
+    //     string temp = command;
+    //     command = command.substr(0, command.find(" :"));
+    //     std::stringstream ss(command);
+    //     string token;
+    //     while (std::getline(ss, token, ' '))
+    //     {
+    //         this->serverParamiters.push_back(token);
+    //     }
+    //     temp = temp.substr(temp.find(":") + 1);
+    //     this->serverParamiters.push_back(temp);
+    // }
+    // else
+    // {
+    //     command = trim_internal(command);
+    //     std::stringstream ss(command);
+    //     string token;
+    //     while (std::getline(ss, token, ' '))
+    //     {
+    //         this->serverParamiters.push_back(token);
+    //     }
+    // }
 }
 
 void Server::handleCommand(string& cmd, int id)
 {
     parseCommand(cmd);
+    if (this->serverParamiters.empty()) return;
     cmdmapIter it = this->commandMap.find(this->serverParamiters[0]);
     if (it != this->commandMap.end())
     {
-        // if not connected check this for connection
         (this->*it->second)(_clients[id]);
     }
     else

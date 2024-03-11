@@ -82,7 +82,7 @@ public:
 	bool 			getHasPassed();
 	bool 			getHasUsedNick();
 	bool 			getHasUsedUser();
-	bool 			isRegistered(void);
+	// bool 			isRegistered(void);
 	bool			checkNick(string &nick);
 
 	string&		getNick(void);
