@@ -75,7 +75,8 @@ public:
 	// functions for debuging
 	void	printClients( void );
 	void	printpollfds( void );
-	string trim_comma(const string &str);
+	string 	trim_comma(const string &str);
+	void	initPrivmsg();
 
 	// ============================================================ //
 	 // parser functions
