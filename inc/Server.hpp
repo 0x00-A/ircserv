@@ -38,9 +38,9 @@ private:
 	Socket						_socket;
 
 	// just added
-	std::vector<string> 	serverParamiters;
+	std::vector<string> 					_params;
 	std::vector<std::pair<string, int> >	_sendMsgClient;
-	string					_messagClient;
+	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 	std::vector<Channel> 		channels; 
 

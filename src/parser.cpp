@@ -5,7 +5,7 @@ void Server::checkSpamClient(Client& client)
     clientIter it = _clients.begin();
     for ( ; it != _clients.end(); it++)
     {
-        if (it->getNick() == client.getNick() && it->checkConnect() == false)
+        if (it->getNick() == client.getNick() && it->isConnected() == false)
         {
             string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
             send(it->getSockfd(), response.c_str(), response.length(), 0);
@@ -19,7 +19,7 @@ bool Server::checkAlreadyNick(string &nick)
     std::vector<Client>::iterator it = _clients.begin();
     for (; it != _clients.end(); it++)
     {
-        if (it->checkConnect())
+        if (it->isConnected())
         {
             if (it->getNick() == nick)
                 return false;
@@ -42,38 +42,40 @@ void  Server::parseCommand(string &command)
     ss << command;
     while (ss >> token)
     {
-        this->serverParamiters.push_back(token);
+        this->_params.push_back(token);
     }
     if (!tmp.empty())
-        this->serverParamiters.push_back(tmp);
+        this->_params.push_back(tmp);
 
-    // for (size_t i = 0; i < serverParamiters.size(); i++)
+    // for (size_t i = 0; i < _params.size(); i++)
     // {
-    //     cout << "p |" << serverParamiters[i] << "|" << endl;
+    //     cout << "p |" << _params[i] << "|" << endl;
     // }
 }
 
 void Server::handleCommand(string& cmd, int id)
 {
     parseCommand(cmd);
-    if (this->serverParamiters.empty()) return;
-    cmdmapIter it = this->commandMap.find(this->serverParamiters[0]);
+    if (this->_params.empty()) return;
+    cmdmapIter it = this->commandMap.find(this->_params[0]);
     if (it != this->commandMap.end())
     {
         (this->*it->second)(_clients[id]);
     }
-    else
+    else if (_clients[id].isConnected())
     {
-        cerr << "Error: invalid command" << endl;
+        string response = ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNCOMMAND) + " " + \
+        _clients[id].getNick() + " " + _params[0]  + " :Unknown command";
+        reply(_clients[id], response);
     }
     this->_messagClient.clear();
     this->_sendMsgClient.clear();
-    this->serverParamiters.clear();
+    this->_params.clear();
 }
 
 void Server::initPrivmsg()
 {
-    string clients = trim_comma(serverParamiters[1]);
+    string clients = trim_comma(_params[1]);
     std::stringstream ss(clients);
     string token;
     while (std::getline(ss, token, ','))
@@ -84,5 +86,5 @@ void Server::initPrivmsg()
             _sendMsgClient.push_back(std::make_pair(token, CLIENT));
 
     }
-    _messagClient = serverParamiters[serverParamiters.size() - 1];
+    _messagClient = _params[_params.size() - 1];
 }

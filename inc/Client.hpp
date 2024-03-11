@@ -2,6 +2,7 @@
 # define CLIENT_HPP
 
 # include "ircserv.hpp"
+// # include "message.hpp"
 
 # define ERR_NEEDMOREPARAMS 461
 # define ERR_ALREADYREGISTRED 462
@@ -11,6 +12,11 @@
 # define ERR_NICKNAMEINUSE 433
 # define ERR_NICKCOLLISION 436
 # define ERR_NOTREGISTERED 451
+# define ERR_UNKNOWNCOMMAND 421
+
+# define RPL_WELCOME 001
+
+
 
 class Client
 {
@@ -78,7 +84,7 @@ public:
 	void			setHasPassed(bool value);
 	void 			setHasUsedNick(bool value);
 	void 			setHasUsedUser(bool value);
-	bool 			checkConnect();
+	bool 			isConnected();
 	bool 			getHasPassed();
 	bool 			getHasUsedNick();
 	bool 			getHasUsedUser();
