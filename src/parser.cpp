@@ -123,6 +123,8 @@ void Server::handleCommand(string& cmd, int id)
     {
         cerr << "Error: invalid command" << endl;
     }
+    this->_messagClient.clear();
+    this->_sendMsgClient.clear();
     this->serverParamiters.clear();
 }
 

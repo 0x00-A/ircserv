@@ -15,6 +15,8 @@
 # define SA struct sockaddr
 
 # define RD_BUF_SIZE 512	// not used
+# define CHANNEL 1
+# define CLIENT 2
 
 class Server
 {
@@ -37,7 +39,7 @@ private:
 
 	// just added
 	std::vector<string> 	serverParamiters;
-	std::vector<string>		_sendMsgClient;
+	std::vector<std::pair<string, int> >	_sendMsgClient;
 	string					_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 	std::vector<Channel> 		channels; 
@@ -73,6 +75,7 @@ public:
 	// functions for debuging
 	void	printClients( void );
 	void	printpollfds( void );
+	string trim_comma(const string &str);
 
 	// ============================================================ //
 	 // parser functions

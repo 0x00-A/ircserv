@@ -97,10 +97,8 @@ void Server::user(Client &client)
     {
         client.setHasUsedUser(true);
         client.setUsername(this->serverParamiters[1]);
-
         if (_clients.size() > 1 && client.getHasUsedNick())
         {
-            cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
             checkSpamClient(client);
         }
     }
@@ -119,7 +117,7 @@ void Server::join(Client &client)
     (void)client;
 }
 
-string trim_comma(const string &str)
+string Server::trim_comma(const string &str)
 {
     string result;
     bool prev_is_comma = false;
@@ -161,12 +159,17 @@ void Server::privmsg(Client &client)
     string token;
     while (std::getline(ss, token, ','))
     {
-        _sendMsgClient.push_back(token);
+        // _sendMsgClient.push_back(token);
+        if (token.front() == '#')
+            _sendMsgClient.push_back(std::make_pair(token, CHANNEL));
+        else
+            _sendMsgClient.push_back(std::make_pair(token, CLIENT));
+
     }
 
     for (size_t i = 0; i < _sendMsgClient.size(); i++)
     {
-        cout << "nickClient[" << i << "]: " << _sendMsgClient.at(i)<< endl;
+        cout << "nickClient[" << i << "]: " << _sendMsgClient[i].first << ">>" << _sendMsgClient[i].second << endl;
     }
     _messagClient = serverParamiters[serverParamiters.size() - 1];
     cout << "messgClient: " << _messagClient << endl;
