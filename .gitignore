@@ -1,3 +1,10 @@
 .vscode
+<<<<<<< HEAD
 irc/obj
 irc/ircserv
+=======
+obj
+ircserv
+.DS_Store
+in
+>>>>>>> 382262e151bc84ddc2b8a89d6ed79cd97410d147

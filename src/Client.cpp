@@ -4,7 +4,7 @@ Client::Client()
 {
 }
 
-Client::Client(const std::string &ip, int port, int sockfd)
+Client::Client(const string &ip, int port, int sockfd)
 	: _ip(ip), _port(port), _clifd(sockfd)
 {
 	_nick = "*";
@@ -12,7 +12,6 @@ Client::Client(const std::string &ip, int port, int sockfd)
 	_real = "";
 	_hostname = "";
 	_recvBuf = "";
-	_sendBuf = "";
 	_isRegistered = false;
 	_isOperator = false;
 	_hasPassed = false;
@@ -26,14 +25,14 @@ Client::~Client()
 	// close fd
 }
 
-int Client::getSockfd(void)
+int Client::getSockfd(void) const
 {
 	return (_clifd);
 }
 
-void Client::close() const
+void Client::closeSocket() const
 {
-	::close(_clifd);
+	close(_clifd);
 }
 
 int Client::getPort(void) const
@@ -41,17 +40,17 @@ int Client::getPort(void) const
 	return (_port);
 }
 
-std::string Client::getIPAddr(void) const
+string Client::getIPAddr(void) const
 {
 	return (_ip);
 }
 
-std::string& Client::rdBuf(void)
+string& Client::rdBuf(void)
 {
 	return (_recvBuf);
 }
 
-std::string& Client::sdBuf(void)
+std::queue<string>& Client::sdBuf(void)
 {
 	return (_sendBuf);
 }
@@ -86,11 +85,7 @@ bool Client::getHasUsedUser()
     return this->_hasUsedUser;
 }
 
-bool Client::isRegistered(void)
-{
-    return (this->_hasPassed && this->_hasUsedNick && this->_hasUsedUser);
-}
-bool Client::checkNick(std::string &nick)
+bool Client::checkNick(string &nick)
 {
     if (nick.empty())
     {
@@ -114,27 +109,27 @@ bool Client::checkNick(std::string &nick)
     return true;
 }
 
-std::string &Client::getNick(void)
+string &Client::getNick(void)
 {
     return this->_nick;
 }
 
-std::string &Client::getUsername(void)
+string &Client::getUsername(void)
 {
     return this->_username;
 }
 
-void Client::setNick(std::string nick)
+void Client::setNick(string nick)
 {
     this->_nick = nick;
 }
 
-void Client::setUsername(std::string username)
+void Client::setUsername(string username)
 {
     this->_username = username;
 }
 
-bool Client::checkConnect()
+bool Client::isConnected()
 {
     return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }
