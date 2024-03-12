@@ -5,7 +5,7 @@ void Server::checkSpamClient(Client& client)
     clientIter it = _clients.begin();
     for ( ; it != _clients.end(); it++)
     {
-        if (it->getNick() == client.getNick() && it->checkConnect() == false)
+        if (it->getNick() == client.getNick() && it->isConnected() == false)
         {
             string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
             send(it->getSockfd(), response.c_str(), response.length(), 0);
@@ -19,7 +19,7 @@ bool Server::checkAlreadyNick(string &nick)
     std::vector<Client>::iterator it = _clients.begin();
     for (; it != _clients.end(); it++)
     {
-        if (it->checkConnect())
+        if (it->isConnected())
         {
             if (it->getNick() == nick)
                 return false;
@@ -28,111 +28,78 @@ bool Server::checkAlreadyNick(string &nick)
     return true;
 }
 
-string trim_internal(const string &str)
-{
-    string result;
-    bool prev_is_space = false;
-
-    for (string::size_type i = 0; i < str.size(); i++)
-    {
-        char c = str[i];
-        if (isspace(c))
-        {
-            if (!prev_is_space)
-            {
-                result += c;
-            }
-            prev_is_space = true;
-        }
-        else
-        {
-            result += c;
-            prev_is_space = false;
-        }
-    }
-    if (result[0] == ' ')
-        result.erase(0, 1);
-    if (result[result.size() - 1] == ' ')
-        result.erase(result.size() - 1, 1);
-    return result;
-}
-
-
 void  Server::parseCommand(string &command)
 {
-    if (command.find(" :") != string::npos)
+    size_t pos;
+    std::stringstream ss;
+    string token, tmp = "";
+
+    if ( (pos = command.find(" :")) != string::npos)
     {
-        command.erase(0, command.find_first_not_of(" "));
-        if (command[0] == ':')
-            command.insert(0, " ");
-        string temp = command;
-        command = command.substr(0, command.find(" :"));
-        std::stringstream ss(command);
-        string token;
-        while (std::getline(ss, token, ' '))
-        {
-            this->serverParamiters.push_back(token);
-        }
-        temp = temp.substr(temp.find(":") + 1);
-        this->serverParamiters.push_back(temp);
+        tmp = command.substr(pos + 2);
+        command = command.substr(0, pos);
     }
-    else
+    ss << command;
+    while (ss >> token)
     {
-        command = trim_internal(command);
-        std::stringstream ss(command);
-        string token;
-        while (std::getline(ss, token, ' '))
-        {
-            this->serverParamiters.push_back(token);
-        }
+        this->_params.push_back(token);
     }
+    if (!tmp.empty())
+        this->_params.push_back(tmp);
+
+    // for (size_t i = 0; i < _params.size(); i++)
+    // {
+    //     cout << "p |" << _params[i] << "|" << endl;
+    // }
 }
 
 void Server::handleCommand(string& cmd, int id)
 {
     parseCommand(cmd);
-    cmdmapIter it = this->commandMap.find(this->serverParamiters[0]);
+    if (this->_params.empty()) return;
+    cmdmapIter it = this->commandMap.find(this->_params[0]);
     if (it != this->commandMap.end())
     {
-        // if not connected check this for connection
         (this->*it->second)(_clients[id]);
     }
-    else
+    else if (_clients[id].isConnected())
     {
-        cerr << "Error: invalid command" << endl;
+        string response = ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNCOMMAND) + " " + \
+        _clients[id].getNick() + " " + _params[0]  + " :Unknown command";
+        reply(_clients[id], response);
     }
-    this->serverParamiters.clear();
+    this->_messagClient.clear();
+    this->_sendMsgClient.clear();
+    this->_params.clear();
 }
 
+void Server::initPrivmsg(Client &client)
+{
+    string response;
+    if (_params.size() < 2)
+    {
+        response = ":ft_irc.1337.ma " + to_string(ERR_NORECIPIENT) + " " + \
+            client.getNick()  + " ::No recipient given (" + _params[0] + ")";
+        reply(client, response);
+        return;
+    }
+    if (_params.size() < 3)
+    {
+        response = ":ft_irc.1337.ma " + to_string(ERR_NOTEXTTOSEND) + " " + \
+            client.getNick()  + " ::No text to send";
+        reply(client, response);
+        return;
+    }
+    string clients = trim_comma(_params[1]);
+    std::stringstream ss(clients);
+    string token;
+    while (std::getline(ss, token, ','))
+    {
+        if (token.front() == '#')
+            _sendMsgClient.push_back(std::make_pair(token, CHANNEL));
+        else
+            _sendMsgClient.push_back(std::make_pair(token, CLIENT));
 
-// bool Server::parseCommandClient(char *buffer, Client &client)
-// {
-//     bool isCommand = true;
-//     int len = std::strlen(buffer) - 2;
-//     if (buffer[len] == '\r')
-//     {
-//         buffer[len] = '\n';
-//         buffer[len + 1] = '\0';
-//     }
-//     std::stringstream ss(buffer);
-//     string token;
-//     while (getline(ss, token))
-//     {
-//         if (ss.eof())
-//         {
-//             client.appendBuffer(token);
-//             token.clear();
-//             isCommand = false;
-//         }
-//         else 
-//         {
-//             // cout << "command: ||" << token << "||" << endl;
-//             client.appendBuffer(token);
-//             handleCommand(client.getBuffer());
-//             token.clear();
-//             client.getBuffer().clear();
-//             isCommand = true;
-//         }
-//     }
-//     return isCommand;
-// }
+    }
+    _messagClient = _params[_params.size() - 1];
+}

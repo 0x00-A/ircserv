@@ -14,7 +14,9 @@
 
 # define SA struct sockaddr
 
-# define RD_BUF_SIZE 512	// not used
+# define RD_BUF_SIZE 512
+# define CHANNEL 1
+# define CLIENT 2
 
 class Server
 {
@@ -36,7 +38,9 @@ private:
 	Socket						_socket;
 
 	// just added
-	std::vector<string> 	serverParamiters;
+	std::vector<string> 					_params;
+	std::vector<std::pair<string, int> >	_sendMsgClient;
+	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 	std::vector<Channel> 		channels; 
 
@@ -77,6 +81,8 @@ public:
         // bool parseCommandClient(char *buffer, Client& client);
         void handleCommand(string& cmd, int id);
 		void parseCommand(string& cmd);
+		string 	trim_comma(const string &str);
+		void	initPrivmsg(Client &client);
 
 
         // check nick clients
@@ -90,6 +96,7 @@ public:
         void nick(Client& client);
 		void quit(Client& client);
 		void join(Client& client);
+		void privmsg(Client& client);
 
         // channel member functions
 

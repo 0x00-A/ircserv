@@ -129,7 +129,7 @@ void Client::setUsername(string username)
     this->_username = username;
 }
 
-bool Client::checkConnect()
+bool Client::isConnected()
 {
     return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }
