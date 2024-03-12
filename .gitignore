@@ -3,3 +3,5 @@ obj
 ircserv
 .DS_Store
 in
+irc/obj
+irc/ircserv
