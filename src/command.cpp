@@ -117,7 +117,8 @@ void Server::user(Client &client)
 void Server::quit(Client &client)
 {
     // :dan-!d@localhost QUIT :Quit: Bye for now!
-    string response = "ERROR:: by by\r\n";
+    string response = ":" + client.getNick() + "-!" + client.getUsername() + \
+        "@" + client.getIPAddr() + " QUIT :Quit: Bye for now!\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
     client.closeSocket();
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
@@ -160,8 +161,54 @@ string Server::trim_comma(const string &str)
 
 void Server::privmsg(Client &client)
 {
+    // ERR_CANNOTSENDTOCHAN >> if don't find client in channel  
+    // ERR_NOTOPLEVEL 
 
-    (void)client;
-    initPrivmsg();
-    
+    std::set<std::string> seenNicks;
+    bool found = false;
+    string response;
+    if (!client.isConnected())
+    {
+        //  :stockholm.se.quakenet.org 451 *  :You have not registered
+        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+            client.getNick()  + " :You have not registered";
+        reply(client, response);
+        return;
+    }
+    initPrivmsg(client);
+    for (size_t i = 0; i < _sendMsgClient.size(); i++)
+    {
+        found = false;
+        if (seenNicks.count(_sendMsgClient[i].first) > 0) 
+        {
+            response = ":ft_irc.1337.ma " + to_string(ERR_TOOMANYTARGETS) + \
+             " " +  client.getNick() + " :Duplicate recipients";
+            reply(client, response);
+            continue ;
+        }
+        seenNicks.insert(_sendMsgClient[i].first);
+        for (size_t j = 0; j < _clients.size(); j++)
+        {
+            if (_sendMsgClient[i].first == _clients[j].getNick())
+            {
+                found = true;
+                response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@" + \
+                 client.getIPAddr() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
+                reply(_clients[j], response);
+                break ;
+            }
+        }
+        if (!found && (_sendMsgClient[i].second == CLIENT))
+        {
+            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
+            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick";
+            reply(client, response);
+        }
+        if (!found && (_sendMsgClient[i].second == CHANNEL))
+        {
+            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
+            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such channel";
+            reply(client, response);
+        }
+    }   
 }

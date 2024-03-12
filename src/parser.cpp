@@ -73,8 +73,23 @@ void Server::handleCommand(string& cmd, int id)
     this->_params.clear();
 }
 
-void Server::initPrivmsg()
+void Server::initPrivmsg(Client &client)
 {
+    string response;
+    if (_params.size() < 2)
+    {
+        response = ":ft_irc.1337.ma " + to_string(ERR_NORECIPIENT) + " " + \
+            client.getNick()  + " ::No recipient given (" + _params[0] + ")";
+        reply(client, response);
+        return;
+    }
+    if (_params.size() < 3)
+    {
+        response = ":ft_irc.1337.ma " + to_string(ERR_NOTEXTTOSEND) + " " + \
+            client.getNick()  + " ::No text to send";
+        reply(client, response);
+        return;
+    }
     string clients = trim_comma(_params[1]);
     std::stringstream ss(clients);
     string token;

@@ -14,7 +14,7 @@
 
 # define SA struct sockaddr
 
-# define RD_BUF_SIZE 512	// not used
+# define RD_BUF_SIZE 512
 # define CHANNEL 1
 # define CLIENT 2
 
@@ -75,14 +75,14 @@ public:
 	// functions for debuging
 	void	printClients( void );
 	void	printpollfds( void );
-	string 	trim_comma(const string &str);
-	void	initPrivmsg();
 
 	// ============================================================ //
 	 // parser functions
         // bool parseCommandClient(char *buffer, Client& client);
         void handleCommand(string& cmd, int id);
 		void parseCommand(string& cmd);
+		string 	trim_comma(const string &str);
+		void	initPrivmsg(Client &client);
 
 
         // check nick clients
