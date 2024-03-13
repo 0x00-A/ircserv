@@ -99,13 +99,10 @@ public:
 
         // channel member functions
 
-        void createChannel(string channelName);
+        void addChannel(string channelName);
         void joinChannel(Client& client, string channelName);
-        void leaveChannel(Client& client, string channelName);
-        // void listChannels();
 
         // send messg
-
 		void 	reply(Client &client, string const& reply);
 
 };
