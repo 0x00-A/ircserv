@@ -108,7 +108,7 @@ void Server::user(Client &client)
     }
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NICKNAMEINUSE) + " " + \
+        response = ":ft_irc.1337.ma " + to_string(RPL_WELCOME) + " " + \
             client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
         reply(client, response);
     }
@@ -116,7 +116,6 @@ void Server::user(Client &client)
 
 void Server::quit(Client &client)
 {
-    // :dan-!d@localhost QUIT :Quit: Bye for now!
     string response = ":" + client.getNick() + "-!" + client.getUsername() + \
         "@" + client.getIPAddr() + " QUIT :Quit: Bye for now!\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
@@ -134,7 +133,7 @@ string Server::trim_comma(const string &str)
     string result;
     bool prev_is_comma = false;
 
-    for (string::size_type i = 0; i < str.size(); i++)
+    for (size_t i = 0; i < str.size(); i++)
     {
         char c = str[i];
         if (c == ',')
@@ -168,7 +167,6 @@ void Server::privmsg(Client &client)
 
     if (!client.isConnected())
     {
-        //  :stockholm.se.quakenet.org 451 *  :You have not registered
         response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
@@ -215,7 +213,7 @@ void Server::privmsg(Client &client)
         if (!found && (_sendMsgClient[i].second == CLIENT))
         {
             response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
-            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick";
+            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick/channel";
             reply(client, response);
         }
         if (!found && (_sendMsgClient[i].second == CHANNEL))
