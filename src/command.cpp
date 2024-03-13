@@ -220,23 +220,23 @@ void Server::privmsg(Client &client)
 
 // MODES
 
-/*	o - give/take channel operator privileges;
-/*	i - invite-only channel flag;
-/*	t - topic settable by channel operator only flag;
-/*	l - set the user limit to channel;
-/*	k - set a channel key (password).
+//	o - give/take channel operator privileges;
+//	i - invite-only channel flag;
+//	t - topic settable by channel operator only flag;
+//	l - set the user limit to channel;
+//	k - set a channel key (password).
 
-Parameters: <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>]
+// Parameters: <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>]
 
 // NOTES
-/*	When using the 'o' options, a restriction on a total of three per mode command has been imposed
+//	When using the 'o' options, a restriction on a total of three per mode command has been imposed
 
-// Examples
+/* Examples
     MODE #Finnish +i               ; Makes #Finnish channel 'invite-only'.
     MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on channel #Finnish.
     MODE #42 +k oulu                ; Set the channel key to "oulu".
     MODE #eu-opers +l 10            ; Set the limit for the number of users on channel to 10.
-
+*/
 /********************************************
 
  * if the channel already has the mode nothing happens
@@ -278,10 +278,44 @@ MODE #gggg
 :zinc.libera.chat 324 rimi #gggg +Cnstl 123
 :zinc.libera.chat 329 rimi #gggg 1710302483
 
-/********************************************/
+********************************************/
+
+bool    Server::ValidMode(char& c)
+{
+    return (c == 'o' || c == 'l' || c == 'k' || c == 't' || c == 'i');
+}
+
+// bool    Server::getModes(std::queue<char>& modes)
+// {
+//     if (_params[1].front() != '+' || _params[1].front() != '-')
+//     {
+//         if (!ValidMode(_params[1].front()))
+//         {
+//             // MODE #gggg df
+//             // :zinc.libera.chat 472 rimi d :is an unknown mode char to me
+//             return (false);
+//         }
+//         else
+//         {
+//             // MODE #gggg l key
+//             // MODE #gggg
+//             // :zinc.libera.chat 324 rimi #gggg +Cnst
+//             return (false);
+//         }
+//     }
+//     else if (_params[1].size() == 1)
+//         return (false);
+//     for (size_t i = 1; i < _params[1].size(); i++)
+//     {
+//         if (ValidMode(_params[1][i]))
+//     }
+    
+// }
 
 void    Server::mode(Client& client)
 {
+    (void)client;
+    std::queue<char> modes;
     // add function hasChannel() to Server
     if (_params.size() < 1)
     {
@@ -295,5 +329,6 @@ void    Server::mode(Client& client)
         // else
             // :zinc.libera.chat 403 rimi eer :No such channel
     }
-    
+    // if (!getModes(modes))
+    //     return ;
 }

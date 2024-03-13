@@ -1,8 +1,17 @@
 #include "Channel.hpp"
 
 Channel::Channel(const string& channelName)
-    : _name(channelName), _topic("+t"), _modes(""), _hasPasskey(false), _hasLimit(false), _hasTopic(false), _userLimit(0), _passkey("")
-{}
+{
+		_name = channelName;
+		_modes = "+t";
+		_topic = "";
+		_userLimit = -1;		// or string?
+		_passkey = "";
+		_hasInvite = false;
+		_hasPasskey = false;
+		_hasLimit = false;
+		_hasTopic = false;
+}
 
 Channel::~Channel() {}
 
@@ -66,14 +75,19 @@ std::set<string> Channel::getOperatorList() const
 	return (_operators);
 }
 
-string Channel::getPasskey(void)
+string Channel::getPasskey(void) const
 {
 	return (_passkey);
 }
 
-int Channel::getUserLimit(void)
+int Channel::getUserLimit(void) const
 {
 	return (_userLimit);
+}
+
+string Channel::getTopic(void) const
+{
+	return (_topic);
 }
 
 bool Channel::empty(void) const
@@ -91,15 +105,30 @@ bool Channel::hasUserLimit(void) const
 	return (_hasLimit);
 }
 
-bool Channel::hasMode(const string &mode) const
+bool Channel::hasInvite(void) const
 {
-	return (_modes.find(mode[1]) != string::npos);
+	return (_hasInvite);
 }
 
-// void Channel::broadcastMessage(Client &sender, string message)
-// {
-//     cout << "[" << name << "] " << sender.getNick() << ": " << message << endl;
-// }
+void Channel::setHasPasskey(void)
+{
+    _hasPasskey = true;
+}
+
+void Channel::setHasUserLimit(void)
+{
+    _hasLimit = true;
+}
+
+void Channel::setHasInvite(void)
+{
+    _hasInvite = true;
+}
+
+bool Channel::hasMode(const char& mode) const
+{
+	return (_modes.find(mode) != string::npos);
+}
 
 void Channel::printUsers()
 {
@@ -144,6 +173,11 @@ bool Channel::setMode(const string& mode, const string& param)
     return (false);
 }
 
+void Channel::setTopic(const string &topic)
+{
+    _topic = topic;
+}
+
 void Channel::setPasskey(const string &key)
 {
     _passkey = key;
@@ -154,7 +188,23 @@ void Channel::setUserLimit(int limit)
     _userLimit = limit;
 }
 
+void Channel::setInviteOnly()
+{
+    _hasInvite = true;
+}
+
+void Channel::unsetTopic( void )
+{
+    _topic = "";
+    _hasTopic = false;
+}
+
 string Channel::getName() const
 {
     return _name;
+}
+
+string Channel::getModes(void) const
+{
+	return (_modes);
 }

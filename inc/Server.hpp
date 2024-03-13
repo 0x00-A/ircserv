@@ -48,25 +48,19 @@ private:
 	void broadcastMsg(const Client &sender, const string& msg, const Channel& chan);
 
 	int			handleNewConnection();
-
 	int			handleRead(int id);
-
 	int			handleWrite(int id);
-
 	string		getCommand(int id);
-
 	void		disconnectClient(int id);
-
 	void		cleanUnusedClients();
-
 	void		closeAllOpenSockets( void );
-
 	int			getIndexOfClient(const clientIter& currIter);
 	int			getIndexOfClient(const Client& cli);
-
 	clientIter	getClientIterator(const Client& cli);
 
-	
+	bool 		getModes(std::queue<char>& modes);
+	bool    	ValidMode(char& c);
+
 public:
 
 	Server( const string& port, const string& passwd );

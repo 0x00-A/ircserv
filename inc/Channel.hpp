@@ -11,16 +11,21 @@ class Channel
 	private:
 
 		string						_name;
-		string						_topic;
 		std::set<string>			_users;
 		std::set<string>			_operators;
 		
 		string						_modes;
+
+
+		string						_topic;
+		int							_userLimit;		// or string?
+		string						_passkey;
+
+		bool						_hasInvite;
 		bool						_hasPasskey;
 		bool						_hasLimit;
 		bool						_hasTopic;
-		int							_userLimit;		// or string?
-		string						_passkey;
+
 
 	public:
 
@@ -28,50 +33,46 @@ class Channel
 		
 		~Channel();
 
-		// add a user to channel
 		bool				joinUser( const string& user );
-
-		// check if a user is member in channel
-		bool				isUserInChannel( const string& user ) const;
-
-		// check if a user is an operator
-		bool				isUserOperator( const string& user ) const;
-		
-		// give user operator privilages
-		bool				setUserAsOperator( const string& user );
-		
-		// delets a user from the channel
 		bool				partUser( const string& user );
 
+		bool				isUserInChannel( const string& user ) const;
 
-		// moved this to Server
-		// void broadcastMessage(Client &sender, string message);
-
-		// still not sure how to implement this
+		bool				isUserOperator( const string& user ) const;	// -o
+		
+		bool				setUserAsOperator( const string& user );
+		
 		bool				setMode(const string& mode, const string& param);
+		bool				hasMode( const char& mode ) const;
 
+		void				setTopic(const string& topic);
 		void				setPasskey( const string& key );
 		void				setUserLimit( int limit );
+		void				setInviteOnly();
+	
+		void				unsetTopic( void );
+		// void				unsetPasskey( const string& key );
+		// void				unsetUserLimit( int limit );
+		// void				unsetInviteOnly();
 
-		// returns channel name
+
 		string				getName() const;
-
-		// return a list of channel users
-		std::set<string>	getUserList() const;
-
-		// return a list channel operators
+		string				getModes( void ) const;
+		std::set<string>	getUserList( void ) const;
 		std::set<string>	getOperatorList() const;
+		string				getPasskey( void ) const;
+		int					getUserLimit( void ) const;
+		string				getTopic( void ) const;
 
-		
-		string				getPasskey( void );
-
-		int					getUserLimit( void );
-		// returns if the channel is empty or not
 		bool				empty( void ) const;
-
 		bool				hasPasskey( void ) const;
 		bool				hasUserLimit( void ) const;
-		bool				hasMode( const string& mode ) const;
+		bool				hasInvite( void) const;
+
+		void				setHasPasskey( void );
+		void				setHasUserLimit( void );
+		void				setHasInvite( void);
+		
 
 
 		void				printUsers( void );
