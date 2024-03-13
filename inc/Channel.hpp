@@ -10,6 +10,8 @@ class Channel
 {
     private:
         string name;
+        string admin;
+        bool    key;
         std::vector<Client *> clients;
 
     public:
