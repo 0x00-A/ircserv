@@ -14,12 +14,13 @@ Server::Server(const string& port, const string& passwd)
 	_pollfds.push_back(servPoll);
 
 	//
-	this->commandMap["PASS"] = &Server::pass;
-    this->commandMap["USER"] = &Server::user;
-    this->commandMap["NICK"] = &Server::nick;
-    this->commandMap["QUIT"] = &Server::quit;
-    this->commandMap["JOIN"] = &Server::join;
-    this->commandMap["PRIVMSG"] = &Server::privmsg;
+	this->commandMap["pass"] = &Server::pass;
+    this->commandMap["user"] = &Server::user;
+    this->commandMap["nick"] = &Server::nick;
+    this->commandMap["quit"] = &Server::quit;
+    this->commandMap["join"] = &Server::join;
+    this->commandMap["privmsg"] = &Server::privmsg;
+    this->commandMap["mode"] = &Server::mode;
 }
 
 Server::~Server()

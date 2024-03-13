@@ -23,10 +23,13 @@ int main() {
     //     std::cerr << "Hostname resolution failed." << std::endl;
     // }
 
-    string    s = "-okl";
+    // string    s = "-okl";
 
-    // s.erase(2, 1);
-    s.erase(s.find("k"), 1);
-    std::cout << s << std::endl;
+    // // s.erase(2, 1);
+    // s.erase(s.find("k"), 1);
+    // std::cout << s << std::endl;
+
+    // string s = 'a' + 'b';
+
     return 0;
 }

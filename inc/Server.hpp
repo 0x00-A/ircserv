@@ -44,7 +44,7 @@ private:
 	std::map<string, void (Server::*)(Client&)> commandMap;
 
 	//
-	std::vector<Channel> 		channels;
+	std::vector<Channel> 		_channels;
 	void broadcastMsg(const Client &sender, const string& msg, const Channel& chan);
 
 	int			handleNewConnection();
@@ -58,8 +58,9 @@ private:
 	int			getIndexOfClient(const Client& cli);
 	clientIter	getClientIterator(const Client& cli);
 
-	bool 		getModes(std::queue<char>& modes);
-	bool    	ValidMode(char& c);
+	bool 		getModes( std::queue< std::pair<string, string> >& modes, Client& cli );
+	bool    	ValidMode( char& c );
+	// bool		checkThirdParam(std::queue<char> modes);
 
 public:
 
@@ -103,6 +104,7 @@ public:
         void joinChannel(Client& client, string channelName);
         void leaveChannel(Client& client, string channelName);
         // void listChannels();
+		channelIter	channelExists(const string& chan);
 
         // send messg
 

@@ -278,6 +278,10 @@ MODE #gggg
 :zinc.libera.chat 324 rimi #gggg +Cnstl 123
 :zinc.libera.chat 329 rimi #gggg 1710302483
 
+
+mode #ch1 --t+++i
+:kkk!~x@197.230.30.146 MODE #ch1 -t+i
+
 ********************************************/
 
 bool    Server::ValidMode(char& c)
@@ -285,50 +289,183 @@ bool    Server::ValidMode(char& c)
     return (c == 'o' || c == 'l' || c == 'k' || c == 't' || c == 'i');
 }
 
-// bool    Server::getModes(std::queue<char>& modes)
-// {
-//     if (_params[1].front() != '+' || _params[1].front() != '-')
-//     {
-//         if (!ValidMode(_params[1].front()))
-//         {
-//             // MODE #gggg df
-//             // :zinc.libera.chat 472 rimi d :is an unknown mode char to me
-//             return (false);
-//         }
-//         else
-//         {
-//             // MODE #gggg l key
-//             // MODE #gggg
-//             // :zinc.libera.chat 324 rimi #gggg +Cnst
-//             return (false);
-//         }
-//     }
-//     else if (_params[1].size() == 1)
-//         return (false);
-//     for (size_t i = 1; i < _params[1].size(); i++)
-//     {
-//         if (ValidMode(_params[1][i]))
-//     }
+bool    Server::getModes(std::queue< std::pair<string, string> >& modes, Client& client)
+{
+    if (_params[1].front() != '+' && _params[1].front() != '-')
+    {
+        if (!ValidMode(_params[1].front()))
+        {
+            // MODE #gggg df
+            // :zinc.libera.chat 472 rimi d :is an unknown mode char to me
+            reply(client, ":is an unknown mode char to me");
+            return (false);
+        }
+        else
+        {
+            // MODE #gggg l key
+            // MODE #gggg
+            // :zinc.libera.chat 324 rimi #gggg +Cnst
+            return (false);
+        }
+    }
+    else if (_params[1].size() == 1)    // there is only + or -
+        return (false);
     
+    // used pair of <mode, param> to handle case like this MODE #chan0 +lk 20 key
+    string sign;
+    for (size_t i = 0, k = 2; i < _params[1].size(); i++)
+    {
+        if (_params[1][i] == '-' || _params[1][i] == '+')
+        {
+            sign = _params[1].substr(i, 1);
+            continue;
+        }
+        char c = _params[1][i];
+        if (ValidMode(c))
+        {
+            if ( (c == 'o' || c == 'k' || c == 'l') && !(k < _params.size()))
+            {
+                // not enough params
+                reply(client, ":not enough params");
+                return (false);
+
+            }
+            if (c == 'o' || c == 'k' || c == 'l')
+                modes.push(std::make_pair(sign + _params[1].substr(i, 1), _params[k++]));
+            else
+                modes.push(std::make_pair(sign + _params[1].substr(i, 1), ""));
+        }
+        else
+        {
+            // MODE #chan3 +id
+            // :silver.libera.chat 472 kkk d :is an unknown mode char to me
+            return (false);
+        }
+    }
+    // check third param for -o -l -k
+    // std::queue<std::pair<char, string> > tmp(modes);
+    // while (!tmp.empty())
+    // {
+    //     std::pair<char, string> m = tmp.front();
+    //     if ((m.first == 'o' || m.first == 'k' || m.first == 'l') && _params.size() < 3)
+    //     {
+    //         // not enough params
+    //         return (false);
+    //     }
+    //     tmp.pop();
+    // }
+    return (true);
+}
+
+// bool    Server::checkThirdParam(std::queue<char> modes)
+// {
+//     while (!modes.empty())
+//     {
+//         char m = modes.front();
+//         if ((m == 'o' || m == 'k' || m == 'l') && _params.size() < 3)
+//         {
+//             // not enough params
+//             return (false);
+//         }
+//         modes.pop();
+//     }
+//     return (true);
 // }
 
 void    Server::mode(Client& client)
 {
     (void)client;
-    std::queue<char> modes;
+    std::queue<std::pair<string, string> >    modes;
+    // std::queue<string>  params;
+    channelIter         chan;
+    string              paramsave;
+    string              modesave;
+
     // add function hasChannel() to Server
+    _channels.push_back(Channel("#chan1"));
+    _channels.begin()->joinUser("aaa");
+    _channels.begin()->setUserAsOperator("aaa");
+    _params.erase(_params.begin());
     if (_params.size() < 1)
     {
         // not enough params
+        reply(client, ":not enough params");
+        return;
+    }
+    if ( (chan = channelExists(_params[0])) == _channels.end())
+    {
+        // no such channel
+        std::cout << ">>>> " << _params.size() << std::endl;
+        reply(client, ":No such channel");
+        return;
     }
     if (_params.size() == 1)
     {
         // if channel exist print channel modes
             // :zinc.libera.chat 324 rimi #gggg +Cnsl 123
             // :zinc.libera.chat 329 rimi #gggg 1710302483
+        reply(client, "chan modes: " + chan->getModes());
         // else
             // :zinc.libera.chat 403 rimi eer :No such channel
+            return;
     }
-    // if (!getModes(modes))
-    //     return ;
+    if (!getModes(modes, client))
+        return ;
+    if (!chan->isUserOperator(client.getNick()))
+    {
+        // :tantalum.libera.chat 482 pppp #chan0 :You're not a channel operator
+        reply(client, "You're not a channel operator");
+        return;
+    }
+    while (!modes.empty())
+    {
+        std::pair<string, string> m = modes.front();
+        switch (m.first[1])
+        {
+        case 'o':
+            if (!chan->setUserAsOperator(m.second))
+            {
+                // user not in channel
+                reply(client, "user not in channel");
+            }
+            break;
+        case 'i':
+            chan->setInviteOnly();
+            break;
+        case 'k':
+            chan->setPasskey(m.second);
+            chan->setHasPasskey();
+            break;
+        case 't':
+            chan->setTopic(m.second);
+            chan->setHasTopic();
+            break;
+        case 'l':
+            if (!chan->setUserLimit(m.second))
+            {
+                modes.pop();
+                continue;
+            }
+            chan->setHasInvite();
+            break;
+        default:
+            break;
+        }
+        if (chan->setMode(m.first))
+        {
+            modesave += m.first;
+            paramsave += " " + m.second;
+        }
+        modes.pop();
+    }
+    // string response = "nick@hostname";
+    // for (size_t i = 0; i < _params.size(); i++)
+    // {
+    //     response += "";
+    //     response += _params[i];
+    // }
+    // send reply
+    reply(client, " " + modesave + " " + paramsave);
 }
+
+// TODO: problen in -k to change pass

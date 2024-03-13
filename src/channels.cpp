@@ -3,17 +3,17 @@
 void Server::createChannel(string channelName)
 {
     Channel newChannel(channelName);
-    this->channels.push_back(newChannel);
+    this->_channels.push_back(newChannel);
 }
 
 void Server::joinChannel(Client &client, string channelName)
 {
-    for (size_t i = 0; i < this->channels.size(); i++)
+    for (size_t i = 0; i < this->_channels.size(); i++)
     {
-        if (this->channels[i].getName() == channelName)
+        if (this->_channels[i].getName() == channelName)
         {
             (void)client;
-            // this->channels[i].addClient(client);
+            // this->_channels[i].addClient(client);
             return;
         }
     }
@@ -22,14 +22,24 @@ void Server::joinChannel(Client &client, string channelName)
 
 void Server::leaveChannel(Client &client, string channelName)
 {
-    for (size_t i = 0; i < this->channels.size(); i++)
+    for (size_t i = 0; i < this->_channels.size(); i++)
     {
-        if (this->channels[i].getName() == channelName)
+        if (this->_channels[i].getName() == channelName)
         {
             (void)client;
-            // this->channels[i].removeClient(client);
+            // this->_channels[i].removeClient(client);
             return;
         }
     }
     cerr << "Error: channel not found" << endl;
+}
+
+Server::channelIter Server::channelExists(const string &chan)
+{
+    for (channelIter it = _channels.begin(); it < _channels.end(); it++)
+    {
+        if (it->getName() == chan)
+            return (it);
+    }
+	return (_channels.end());
 }

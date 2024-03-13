@@ -110,6 +110,11 @@ bool Channel::hasInvite(void) const
 	return (_hasInvite);
 }
 
+bool Channel::hasTopic(void) const
+{
+	return (_hasTopic);
+}
+
 void Channel::setHasPasskey(void)
 {
     _hasPasskey = true;
@@ -125,7 +130,12 @@ void Channel::setHasInvite(void)
     _hasInvite = true;
 }
 
-bool Channel::hasMode(const char& mode) const
+void Channel::setHasTopic(void)
+{
+    _hasTopic = true;
+}
+
+bool Channel::hasMode(char mode) const
 {
 	return (_modes.find(mode) != string::npos);
 }
@@ -152,10 +162,10 @@ void Channel::printOperators()
     cout << endl;
 }
 
-bool Channel::setMode(const string& mode, const string& param)
+bool Channel::setMode(const string& mode)
 {
     // if mode == "-o" > if param is in channel > add to operator list
-    (void)param;
+
     // this code is not tested !!!!
     if (mode[0] == '+')
     {
@@ -183,9 +193,11 @@ void Channel::setPasskey(const string &key)
     _passkey = key;
 }
 
-void Channel::setUserLimit(int limit)
+bool Channel::setUserLimit(string limit)
 {
-    _userLimit = limit;
+    // TODO: parse limit
+    _userLimit = std::atoi(limit.c_str());
+    return (true);
 }
 
 void Channel::setInviteOnly()
