@@ -1,11 +1,14 @@
 #include "Channel.hpp"
 
-Channel::Channel(const string& channelName) : _name(channelName) {}
+Channel::Channel(const string& channelName)
+    : _name(channelName), _topic("+t"), _modes(""), _hasPasskey(false), _hasLimit(false), _hasTopic(false), _userLimit(0), _passkey("")
+{}
 
 Channel::~Channel() {}
 
 bool Channel::joinUser(const string& user)
 {
+    // if modes has "+l" >> if _users.size() + 1 > _userLimit > don't add
     if ((_users.insert(user)).second)
     {
         cout << user << " joined channel " << _name << endl;
@@ -36,6 +39,7 @@ bool Channel::setUserAsOperator(const string &user)
     if (!isUserInChannel(user))
         return (false);
     _operators.insert(user);
+    cout << user << " is now an operator in channel " << _name << endl;
     return (true);
 }
 
@@ -44,6 +48,8 @@ bool Channel::partUser(const string& user)
     if (_users.erase(user))     // returns Number of elements removed (0 or 1)
     {
         cout << user << " left channel " << _name << endl;
+        if (isUserOperator(user))
+            _operators.erase(user);
         return (true);
     }
     cout << user << " is not in channel " << _name << endl;
@@ -58,6 +64,36 @@ std::set<string> Channel::getUserList() const
 std::set<string> Channel::getOperatorList() const
 {
 	return (_operators);
+}
+
+string Channel::getPasskey(void)
+{
+	return (_passkey);
+}
+
+int Channel::getUserLimit(void)
+{
+	return (_userLimit);
+}
+
+bool Channel::empty(void) const
+{
+    return (_users.size() == 0);
+}
+
+bool Channel::hasPasskey(void) const
+{
+	return (_hasPasskey);
+}
+
+bool Channel::hasUserLimit(void) const
+{
+	return (_hasLimit);
+}
+
+bool Channel::hasMode(const string &mode) const
+{
+	return (_modes.find(mode[1]) != string::npos);
 }
 
 // void Channel::broadcastMessage(Client &sender, string message)
@@ -85,6 +121,37 @@ void Channel::printOperators()
         cout << *it << " ";
     }
     cout << endl;
+}
+
+bool Channel::setMode(const string& mode, const string& param)
+{
+    // if mode == "-o" > if param is in channel > add to operator list
+    (void)param;
+    // this code is not tested !!!!
+    if (mode[0] == '+')
+    {
+        if (_modes.find(mode[1]) == string::npos)
+        {
+            _modes += mode[1];
+            return (true);
+        }
+    }
+    else if (_modes.find(mode[1]) != string::npos)
+    {
+        _modes.erase(_modes.find(mode[1]), 1);
+        return (true);
+    }
+    return (false);
+}
+
+void Channel::setPasskey(const string &key)
+{
+    _passkey = key;
+}
+
+void Channel::setUserLimit(int limit)
+{
+    _userLimit = limit;
 }
 
 string Channel::getName() const
