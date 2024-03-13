@@ -42,28 +42,25 @@ private:
 	std::vector<std::pair<string, int> >	_sendMsgClient;
 	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
-	std::vector<Channel> 		channels; 
+
+	//
+	std::vector<Channel> 		_channels;
+	void broadcastMsg(Client &sender, const string& msg, const Channel& chan);
 
 	int			handleNewConnection();
-
 	int			handleRead(int id);
-
 	int			handleWrite(int id);
-
 	string		getCommand(int id);
-
 	void		disconnectClient(int id);
-
 	void		cleanUnusedClients();
-
 	void		closeAllOpenSockets( void );
-
 	int			getIndexOfClient(const clientIter& currIter);
 	int			getIndexOfClient(const Client& cli);
-
 	clientIter	getClientIterator(const Client& cli);
 
-	
+	bool 		getModes(std::queue<char>& modes);
+	bool    	ValidMode(char& c);
+
 public:
 
 	Server( const string& port, const string& passwd );
@@ -91,12 +88,14 @@ public:
 		// bool checkNickFormeClient(Client &client);
 
         // command member functions
-        void pass(Client& client);
-        void user(Client& client);
-        void nick(Client& client);
-		void quit(Client& client);
-		void join(Client& client);
-		void privmsg(Client& client);
+        void	pass(Client& client);
+        void	user(Client& client);
+        void	nick(Client& client);
+		void	quit(Client& client);
+		void	join(Client& client);
+		void	privmsg(Client& client);
+
+		void	mode(Client& client);
 
         // channel member functions
 

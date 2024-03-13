@@ -26,6 +26,30 @@ Server::~Server()
 {
 }
 
+void Server::broadcastMsg(Client &sender, const string &msg, const Channel &chan)
+{
+
+	string response;
+	if (chan.isUserInChannel(sender.getNick()) == false)
+	{
+			response = ":ft_irc.1337.ma " + to_string(ERR_CANNOTSENDTOCHAN) + \
+             " " +  sender.getNick() + " " + chan.getName() + " :Cannot send to channel";
+            reply(sender, response);
+	}
+	else 
+	{
+		for (clientIter it = _clients.begin(); it < _clients.end(); it++)
+		{
+			if (chan.isUserInChannel(it->getNick()))
+			{
+				response = ":"  + sender.getNick() + "!~" + sender.getUsername()  + "@" + \
+						sender.getIPAddr() + " PRIVMSG " + it->getNick() + " :" +  msg;
+				reply(*it, response);
+			}
+		}
+	}
+}
+
 int Server::handleNewConnection()
 {
 	struct sockaddr_in	cliaddr;

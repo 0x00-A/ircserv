@@ -3,14 +3,14 @@
 void Server::createChannel(string channelName)
 {
     Channel newChannel(channelName);
-    this->channels.push_back(newChannel);
+    this->_channels.push_back(newChannel);
 }
 
 void Server::joinChannel(Client &client, string channelName)
 {
-    for (size_t i = 0; i < this->channels.size(); i++)
+    for (size_t i = 0; i < this->_channels.size(); i++)
     {
-        if (this->channels[i].getName() == channelName)
+        if (this->_channels[i].getName() == channelName)
         {
             (void)client;
             // this->channels[i].addClient(client);
@@ -22,9 +22,9 @@ void Server::joinChannel(Client &client, string channelName)
 
 void Server::leaveChannel(Client &client, string channelName)
 {
-    for (size_t i = 0; i < this->channels.size(); i++)
+    for (size_t i = 0; i < this->_channels.size(); i++)
     {
-        if (this->channels[i].getName() == channelName)
+        if (this->_channels[i].getName() == channelName)
         {
             (void)client;
             // this->channels[i].removeClient(client);

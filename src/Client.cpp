@@ -109,12 +109,12 @@ bool Client::checkNick(string &nick)
     return true;
 }
 
-string &Client::getNick(void)
+const string& Client::getNick(void) const
 {
     return this->_nick;
 }
 
-string &Client::getUsername(void)
+const string& Client::getUsername(void) const
 {
     return this->_username;
 }

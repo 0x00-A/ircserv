@@ -1,4 +1,6 @@
 .vscode
+irc/obj
+irc/ircserv
 obj
 ircserv
 .DS_Store

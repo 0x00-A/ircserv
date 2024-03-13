@@ -17,7 +17,8 @@
 # define ERR_NOTEXTTOSEND 412
 # define ERR_NOSUCHNICK 401
 # define ERR_TOOMANYTARGETS 407
-# define ERR_NOSUCHNICK 401
+# define ERR_NOSUCHCHANNEL 403
+# define ERR_CANNOTSENDTOCHAN 404
 
 
 # define RPL_WELCOME 001
@@ -96,8 +97,8 @@ public:
 	// bool 			isRegistered(void);
 	bool			checkNick(string &nick);
 
-	string&		getNick(void);
-	string&		getUsername(void);
+	const string&	getNick(void) const;
+	const string&	getUsername(void) const;
 
 };
 
