@@ -1,47 +1,93 @@
 #include "Channel.hpp"
 
-Channel::Channel(string channelName) : name(channelName) {}
+Channel::Channel(const string& channelName) : _name(channelName) {}
 
 Channel::~Channel() {}
 
-void Channel::join(Client &client)
+bool Channel::joinUser(const string& user)
 {
-    clients.push_back(&client);
-    cout << client.getNick() << " joined channel " << name << endl;
-}
-
-void Channel::leave(Client &client)
-{
-    std::vector<Client *>::iterator it = std::find(clients.begin(), clients.end(), &client);
-    if (it != clients.end())
+    if ((_users.insert(user)).second)
     {
-        clients.erase(it);
-        cout << client.getNick() << " left channel " << name << endl;
+        cout << user << " joined channel " << _name << endl;
+        return (true);
     }
+    cout << user << " already in channel " << _name << endl;
+    return (false);
 }
 
-void Channel::broadcastMessage(Client &sender, string message)
+bool Channel::isUserInChannel(const string &user) const
 {
-    cout << "[" << name << "] " << sender.getNick() << ": " << message << endl;
+    if (_users.find(user) != _users.end())
+        return (true);
+	return false;
 }
 
-void Channel::listClients()
+bool Channel::isUserOperator(const string &user) const
 {
-    cout << "Users in channel " << name << ": ";
+    if (!isUserInChannel(user))
+        return (false);
+    if (_operators.find(user) != _operators.end())
+        return (true);
+    return (false);
+}
 
-    for (std::vector<Client *>::iterator it = clients.begin(); it != clients.end(); it++)
+bool Channel::setUserAsOperator(const string &user)
+{
+    if (!isUserInChannel(user))
+        return (false);
+    _operators.insert(user);
+    return (true);
+}
+
+bool Channel::partUser(const string& user)
+{
+    if (_users.erase(user))     // returns Number of elements removed (0 or 1)
     {
-        cout << (*it)->getNick() << " ";
+        cout << user << " left channel " << _name << endl;
+        return (true);
+    }
+    cout << user << " is not in channel " << _name << endl;
+    return (false);
+}
+
+std::set<string> Channel::getUserList() const
+{
+    return (_users);
+}
+
+std::set<string> Channel::getOperatorList() const
+{
+	return (_operators);
+}
+
+// void Channel::broadcastMessage(Client &sender, string message)
+// {
+//     cout << "[" << name << "] " << sender.getNick() << ": " << message << endl;
+// }
+
+void Channel::printUsers()
+{
+    cout << "Users in channel " << _name << ": ";
+
+    for (std::set<string>::iterator it = _users.begin(); it != _users.end(); it++)
+    {
+        cout << *it << " ";
     }
     cout << endl;
 }
 
-string Channel::getName()
+void Channel::printOperators()
 {
-    return name;
+    cout << "Operators in channel " << _name << ": ";
+
+    for (std::set<string>::iterator it =_operators.begin(); it !=_operators.end(); it++)
+    {
+        cout << *it << " ";
+    }
+    cout << endl;
 }
 
-std::vector<Client *> &Channel::getClients()
+string Channel::getName() const
 {
-    return clients;
+    return _name;
 }

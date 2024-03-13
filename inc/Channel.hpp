@@ -6,25 +6,47 @@
 #include <vector>
 #include "Client.hpp"
 
+enum USER_TYPE {
+	NORMAL_USER,
+	OPERATOR
+};
+
 class Channel
 {
-    private:
-        string name;
-        std::vector<Client *> clients;
+	private:
+		string						_name;
+		string						_topic;
+		std::set<string>			_users;
+		std::set<string>			_operators;
 
-    public:
-        Channel(string channelName);
-        ~Channel();
+	public:
+		Channel(const string& channelName);
+		
+		~Channel();
 
-        // Channel operations
-        void join(Client &client);
-        void leave(Client &client);
-        void broadcastMessage(Client &sender, string message);
-        void listClients();
+		// Channel operations
+		bool	joinUser( const string& user );
 
-        // Getters
-        string getName();
-        std::vector<Client *> &getClients();
+		bool	isUserInChannel( const string& user ) const;
+
+		bool	isUserOperator( const string& user ) const;
+		
+		bool	setUserAsOperator( const string& user );
+		
+		bool	partUser( const string& user );
+
+
+		// void broadcastMessage(Client &sender, string message);
+
+
+		// Getters
+		string				getName() const;
+		std::set<string>	getUserList() const;
+		std::set<string>	getOperatorList() const;
+
+
+		void	printUsers( void );
+		void	printOperators( void );
 };
 
 #endif  // CHANNEL_HPP

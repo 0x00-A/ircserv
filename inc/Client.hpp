@@ -96,8 +96,8 @@ public:
 	// bool 			isRegistered(void);
 	bool			checkNick(string &nick);
 
-	string&		getNick(void);
-	string&		getUsername(void);
+	const string&	getNick(void) const;
+	const string&	getUsername(void) const;
 
 };
 

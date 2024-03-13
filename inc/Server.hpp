@@ -42,7 +42,10 @@ private:
 	std::vector<std::pair<string, int> >	_sendMsgClient;
 	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
-	std::vector<Channel> 		channels; 
+
+	//
+	std::vector<Channel> 		channels;
+	void broadcastMsg(const Client &sender, const string& msg, const Channel& chan);
 
 	int			handleNewConnection();
 

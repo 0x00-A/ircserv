@@ -26,6 +26,18 @@ Server::~Server()
 {
 }
 
+void Server::broadcastMsg(const Client &sender, const string &msg, const Channel &chan)
+{
+	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
+	{
+		if (chan.isUserInChannel(sender.getNick()))
+		{
+			// send message
+			(void)msg;
+		}
+	}
+}
+
 int Server::handleNewConnection()
 {
 	struct sockaddr_in	cliaddr;
