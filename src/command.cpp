@@ -131,11 +131,12 @@ void Server::join(Client &client)
     //                     "<channel> :Cannot join channel (+l)"
     // ERR_NOSUCHCHANNEL
     //                     "<channel name> :No such channel"
+    // ERR_INVITEONLYCHAN
+    //                     "<channel> :Cannot join channel (+i)"
+
     // ERR_BADCHANNELKEY
     //                     "<channel> :Cannot join channel (+k)"
-    // ERR_TOOMANYCHANNELS
-    //                     "<channel name> :You have joined too many \
-    //                      channels"
+
     if (!client.isConnected())
     {
         response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
@@ -144,6 +145,8 @@ void Server::join(Client &client)
         return;
     }
     initJoin(client);
+    
+
 
 }
 

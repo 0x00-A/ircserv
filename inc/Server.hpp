@@ -17,6 +17,7 @@
 # define RD_BUF_SIZE 512
 # define CHANNEL 1
 # define CLIENT 2
+# define NOSUCHCHANNEL 3
 
 class Server
 {
@@ -40,6 +41,7 @@ private:
 	// just added
 	std::vector<string> 					_params;
 	std::vector<std::pair<string, int> >	_sendMsgClient;
+    std::vector<std::pair<string, int> >	_parsChannels;
 	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 

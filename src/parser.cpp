@@ -134,6 +134,7 @@ void Server::initPrivmsg(Client &client)
 }
 void Server::initJoin(Client &client)
 {
+    std::set<std::string> seenChannels;
     string response;
     if (_params.size() < 2)
     {
@@ -147,11 +148,18 @@ void Server::initJoin(Client &client)
     string token;
     while (std::getline(ss, token, ','))
     {
-        if (token.front() == '#')
-            _sendMsgClient.push_back(std::make_pair(token, CHANNEL));
-        else
-            _sendMsgClient.push_back(std::make_pair(token, CLIENT));
+        if (seenChannels.count(token) > 0) 
+        {
+            response = ":ft_irc.1337.ma " + to_string(ERR_TOOMANYTARGETS) + \
+             " " +  client.getNick() + " :Duplicate recipients";
+            reply(client, response);
+            continue ;
+        }
+        seenChannels.insert(token);
 
+        if (token.front() == '#')
+            _parsChannels.push_back(std::make_pair(token, CHANNEL));
+        else
+            _parsChannels.push_back(std::make_pair(token, NOSUCHCHANNEL));
     }
-    _messagClient = _params[_params.size() - 1];
 }
