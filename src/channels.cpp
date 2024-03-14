@@ -34,7 +34,7 @@ void Server::leaveChannel(Client &client, string channelName)
     cerr << "Error: channel not found" << endl;
 }
 
-Server::channelIter Server::channelExists(const string &chan)
+Server::channelIter Server::doesChannelExist(const string &chan)
 {
     for (channelIter it = _channels.begin(); it < _channels.end(); it++)
     {
@@ -42,4 +42,14 @@ Server::channelIter Server::channelExists(const string &chan)
             return (it);
     }
 	return (_channels.end());
+}
+
+Server::clientIter Server::doesUserExit(const string &nick)
+{
+    for (clientIter it = _clients.begin(); it < _clients.end(); it++)
+    {
+        if (it->getNick() == nick)
+            return (it);
+    }
+	return (_clients.end());
 }

@@ -58,8 +58,8 @@ private:
 	int			getIndexOfClient(const Client& cli);
 	clientIter	getClientIterator(const Client& cli);
 
-	bool 		getModes( std::queue< std::pair<string, string> >& modes, Client& cli );
-	bool    	ValidMode( char& c );
+	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
+	// bool    	ValidMode( char& c );
 	// bool		checkThirdParam(std::queue<char> modes);
 
 public:
@@ -104,7 +104,8 @@ public:
         void joinChannel(Client& client, string channelName);
         void leaveChannel(Client& client, string channelName);
         // void listChannels();
-		channelIter	channelExists(const string& chan);
+		channelIter	doesChannelExist( const string& chan );
+		clientIter	doesUserExit( const string& nick );
 
         // send messg
 

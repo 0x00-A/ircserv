@@ -64,13 +64,12 @@ void Server::handleCommand(string& cmd, int id)
     }
     else if (_clients[id].isConnected())
     {
-        string response = ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNCOMMAND) + " " + \
-        _clients[id].getNick() + " " + _params[0]  + " :Unknown command";
-        reply(_clients[id], response);
+        throw ( ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNCOMMAND) + " " + \
+        _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }
-    this->_messagClient.clear();
-    this->_sendMsgClient.clear();
-    this->_params.clear();
+    // this->_messagClient.clear();
+    // this->_sendMsgClient.clear();
+    // this->_params.clear();
 }
 
 void Server::initPrivmsg(Client &client)

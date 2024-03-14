@@ -216,10 +216,6 @@ void	Server::start()
 					{
 						// accept incomming connections
 						ret = handleNewConnection();
-						// if (ret == 0)
-						// {
-						// 	_clients[_clients.size() - 1].setIndex(_clients.size() - 1);
-						// }
 
 					} while (ret != 1);
 				}
@@ -235,7 +231,17 @@ void	Server::start()
 					}
 					while ((cmd = getCommand(i-1)) != "")
 					{
-						handleCommand(cmd, i-1);
+						try
+						{
+							handleCommand(cmd, i-1);
+						}
+						catch ( string& res )
+						{
+							reply(_clients[i-1], res);
+						}
+						this->_messagClient.clear();
+						this->_sendMsgClient.clear();
+						this->_params.clear();
 					}
 				}
 			}

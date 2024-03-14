@@ -43,7 +43,7 @@ bool Channel::isUserOperator(const string &user) const
     return (false);
 }
 
-bool Channel::setUserAsOperator(const string &user)
+bool Channel::unsetChannelOperator(const string &user)
 {
     if (!isUserInChannel(user))
         return (false);
@@ -115,9 +115,9 @@ bool Channel::hasTopic(void) const
 	return (_hasTopic);
 }
 
-void Channel::setHasPasskey(void)
+void Channel::setHasPasskey(bool stat)
 {
-    _hasPasskey = true;
+    _hasPasskey = stat;
 }
 
 void Channel::setHasUserLimit(void)
@@ -138,6 +138,25 @@ void Channel::setHasTopic(void)
 bool Channel::hasMode(char mode) const
 {
 	return (_modes.find(mode) != string::npos);
+}
+
+string Channel::channelMmodeIs() const
+{
+    string s = _modes;
+    for (size_t i = 0; i < _modes.size(); i++)
+    {
+        if (_modes[i] == 'k')
+        {
+            s += " ";
+            s += this->getPasskey();
+        }
+        if (_modes[i] == 'l')
+        {
+            s += " ";
+            s += this->getUserLimit();
+        }
+    }
+    return (s);
 }
 
 void Channel::printUsers()
@@ -162,7 +181,16 @@ void Channel::printOperators()
     cout << endl;
 }
 
-bool Channel::setMode(const string& mode)
+bool Channel::unsetChannelOperator(const string &user)
+{
+    if (!isUserInChannel(user))
+        return (false);
+    _operators.insert(user);
+    cout << user << " is now an operator in channel " << _name << endl;
+    return (true);
+}
+
+bool Channel::setMode(const string &mode)
 {
     // if mode == "-o" > if param is in channel > add to operator list
 

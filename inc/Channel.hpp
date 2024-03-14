@@ -40,15 +40,17 @@ class Channel
 
 		bool				isUserOperator( const string& user ) const;	// -o
 		
-		bool				setUserAsOperator( const string& user );
+		bool				setChannelOperator( const string& user );
+		bool				unsetChannelOperator( const string& user );
 		
 		bool				setMode(const string& mode);
 		bool				hasMode( char mode ) const;
+		string				channelMmodeIs( void ) const;
 
 		void				setTopic(const string& topic);
 		void				setPasskey( const string& key );
 		bool				setUserLimit( string limit );
-		void				setInviteOnly();
+		// void				setInviteOnly();
 	
 		void				unsetTopic( void );
 		// void				unsetPasskey( const string& key );
@@ -70,9 +72,9 @@ class Channel
 		bool				hasInvite( void) const;
 		bool				hasTopic( void) const;
 
-		void				setHasPasskey( void );
+		void				setHasPasskey( bool stat );
 		void				setHasUserLimit( void );
-		void				setHasInvite( void);
+		void				setHasInvite( bool stat );
 		void				setHasTopic( void);
 		
 
