@@ -125,36 +125,26 @@ void Server::quit(Client &client)
 
 void Server::join(Client &client)
 {
-    (void)client;
-}
+    string response;
 
-string Server::trim_comma(const string &str)
-{
-    string result;
-    bool prev_is_comma = false;
-
-    for (size_t i = 0; i < str.size(); i++)
+    // ERR_CHANNELISFULL
+    //                     "<channel> :Cannot join channel (+l)"
+    // ERR_NOSUCHCHANNEL
+    //                     "<channel name> :No such channel"
+    // ERR_BADCHANNELKEY
+    //                     "<channel> :Cannot join channel (+k)"
+    // ERR_TOOMANYCHANNELS
+    //                     "<channel name> :You have joined too many \
+    //                      channels"
+    if (!client.isConnected())
     {
-        char c = str[i];
-        if (c == ',')
-        {
-            if (!prev_is_comma)
-            {
-                result += c;
-            }
-            prev_is_comma = true;
-        }
-        else
-        {
-            result += c;
-            prev_is_comma = false;
-        }
+        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+            client.getNick()  + " :You have not registered";
+        reply(client, response);
+        return;
     }
-    if (result[0] == ',')
-        result.erase(0, 1);
-    if (result[result.size() - 1] == ',')
-        result.erase(result.size() - 1, 1);
-    return result;
+    initJoin(client);
+
 }
 
 

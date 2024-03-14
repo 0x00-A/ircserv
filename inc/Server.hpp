@@ -76,10 +76,11 @@ public:
 	// ============================================================ //
 	 // parser functions
         // bool parseCommandClient(char *buffer, Client& client);
-        void handleCommand(string& cmd, int id);
-		void parseCommand(string& cmd);
-		string 	trim_comma(const string &str);
-		void	initPrivmsg(Client &client);
+        void 		handleCommand(string& cmd, int id);
+		void 		parseCommand(string& cmd);
+		string 		trim_comma(const string &str);
+		void		initPrivmsg(Client &client);
+		void 		initJoin(Client &client);
 
 
         // check nick clients
