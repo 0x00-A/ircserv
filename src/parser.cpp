@@ -135,7 +135,11 @@ void Server::initPrivmsg(Client &client)
 void Server::initJoin(Client &client)
 {
     string line;
-    string token;
+    string chan;
+    string key = "";
+    bool    keys = false;
+    std::stringstream ssk;
+
     std::set<std::string> seenChannels;
     string response;
     if (_params.size() < 2)
@@ -148,28 +152,26 @@ void Server::initJoin(Client &client)
     line = trim_comma(_params[1]);
     std::stringstream ss(line);
 
-    string key;
-    while (std::getline(ss, token, ','))
+    if (_params.size() > 2)
     {
-
-        if (_params.size() > 2)
-        {
-            line = trim_comma(_params[2]);
-            std::stringstream ss(line);
-            std::getline(ss, key, ',');
-        }
-        if (seenChannels.count(token) > 0) 
+        keys = true;
+        line = trim_comma(_params[2]);
+        ssk << line;
+    }
+    while (std::getline(ss, chan, ','))
+    {
+        key = "";
+        if (keys)
+            std::getline(ssk, key, ',');
+        if (seenChannels.count(chan) > 0) 
         {
             response = ":ft_irc.1337.ma " + to_string(ERR_TOOMANYTARGETS) + \
              " " +  client.getNick() + " :Duplicate recipients";
             reply(client, response);
             continue ;
         }
-        seenChannels.insert(token);
-        if (token.front() == '#')
-            _parsChannels.push_back(std::make_pair(token, CHANNEL));
-        else
-            _parsChannels.push_back(std::make_pair(token, NOSUCHCHANNEL));
+        seenChannels.insert(chan);
+        _parsChannels.push_back(std::make_pair(chan, key));
     }
 }
 

@@ -140,7 +140,7 @@ void Server::join(Client &client)
     initJoin(client);
     for (size_t i = 0; i < _parsChannels.size(); i++)
     {
-        if (_parsChannels[i].second == NOSUCHCHANNEL)
+        if (_parsChannels[i].first.front() != '#')
         {
             response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
@@ -148,7 +148,7 @@ void Server::join(Client &client)
         }
         else
         {
-            joinChannel(client, _parsChannels[i].first);
+            joinChannel(client, _parsChannels[i]);
         }
     }
 

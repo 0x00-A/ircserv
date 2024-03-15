@@ -42,7 +42,7 @@ private:
 	// just added
 	std::vector<string> 					_params;
 	std::vector<std::pair<string, int> >	_sendMsgClient;
-    std::vector<std::pair<string, int> >	_parsChannels;
+    std::vector<std::pair<string, string> >	_parsChannels;
 	std::vector<string>						_keys;
 	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
@@ -116,7 +116,7 @@ public:
         // channel member functions
 
         void addChannel(string channelName, Client &client);
-        void joinChannel(Client& client, string channelName);
+        void joinChannel(Client& client, std::pair<string, string> channel);
         void leaveChannel(Client& client, string channelName);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );

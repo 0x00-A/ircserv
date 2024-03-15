@@ -8,13 +8,13 @@
 //     this->_channels.back().setChannelOperator(client.getNick());
 // }
 
-void Server::joinChannel(Client &client, string channelName)
+void Server::joinChannel(Client &client, std::pair<string, string> channel)
 {
     string response;
 
     for (size_t i = 0; i < this->_channels.size(); i++)
     {
-        if (this->_channels[i].getName() == channelName)
+        if (this->_channels[i].getName() == channel.first)
         {
             if (_channels[i].hasUserLimit())
             {
@@ -28,17 +28,16 @@ void Server::joinChannel(Client &client, string channelName)
             {
                 // ERR_BADCHANNELKEY
                 //          "<channel> :Cannot join channel (+k)"
-                // if (_channels[i].getPasskey() == _keys[])
-                // {
-
-                // }
-
+                if (_channels[i].getPasskey() != channel.second)
+                {
+                    throw (":" + client.getIPAddr() + " " + client.getNick() + " " + channel.first + " :Cannot join channel (+K) - bad key");
+                }
             }
             this->_channels[i].joinUser(client.getNick());
             return ;
         }
     }
-    this->_channels.push_back(Channel(channelName, client.getNick()));
+    this->_channels.push_back(Channel(channel.first, client.getNick()));
 }
 
 // void Server::leaveChannel(Client &client, string channelName)
