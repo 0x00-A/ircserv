@@ -4,6 +4,7 @@ Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
 	// socket part
+	parsepasswd(_passwd);
 	_socket.listenSocket(_port);
 	_socket.setSocketNonBlocking();
 	_servfd = _socket.getfd();
@@ -14,12 +15,14 @@ Server::Server(const string& port, const string& passwd)
 	_pollfds.push_back(servPoll);
 
 	//
-	this->commandMap["PASS"] = &Server::pass;
-    this->commandMap["USER"] = &Server::user;
-    this->commandMap["NICK"] = &Server::nick;
-    this->commandMap["QUIT"] = &Server::quit;
-    this->commandMap["JOIN"] = &Server::join;
-    this->commandMap["PRIVMSG"] = &Server::privmsg;
+	this->commandMap["pass"] = &Server::pass;
+    this->commandMap["user"] = &Server::user;
+    this->commandMap["nick"] = &Server::nick;
+    this->commandMap["quit"] = &Server::quit;
+    this->commandMap["join"] = &Server::join;
+    this->commandMap["privmsg"] = &Server::privmsg;
+    this->commandMap["mode"] = &Server::mode;
+    this->commandMap["m"] = &Server::mode;
 }
 
 Server::~Server()
@@ -181,24 +184,22 @@ string Server::getCommand(int id)
 {
 	string& rdBuf = _clients[id].rdBuf();
 	size_t	pos;
+	string	cmd = "";
 
-	if (rdBuf.empty())
-		return ("");
-	pos = rdBuf.find("\n");
-	if (pos != string::npos) {
-
-		string cmd = rdBuf.substr(0, pos);
+	if (!rdBuf.empty() && ((pos = rdBuf.find("\n")) != string::npos))
+	{
+		cmd = rdBuf.substr(0, pos);
+		if ( cmd[pos - 1] == '\r')
+		{
+			cmd[pos - 1] = '\n';
+		}
 		cout << "cmd: " << cmd << endl;
-
 		rdBuf = rdBuf.substr(pos + 1);
-		// cout << "remain: " << rdBuf << endl;
-
-		return (cmd);
 	}
-	return ("");
+	return (cmd);
 }
 
-void	Server::start()
+void	Server::run()
 {
 	pollfdIter	it;
 	int			ret;
@@ -210,6 +211,7 @@ void	Server::start()
 	{
 		// printClients();
 		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
+		std::cout << "port: " << _port << std::endl;
 		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
 		{
 			perror("poll"); break;
@@ -227,10 +229,6 @@ void	Server::start()
 					{
 						// accept incomming connections
 						ret = handleNewConnection();
-						// if (ret == 0)
-						// {
-						// 	_clients[_clients.size() - 1].setIndex(_clients.size() - 1);
-						// }
 
 					} while (ret != 1);
 				}
@@ -246,7 +244,14 @@ void	Server::start()
 					}
 					while ((cmd = getCommand(i-1)) != "")
 					{
-						handleCommand(cmd, i-1);
+						try
+						{
+							handleCommand(cmd, i-1);
+						}
+						catch ( string& res )
+						{
+							reply(_clients[i-1], res);
+						}
 					}
 				}
 			}

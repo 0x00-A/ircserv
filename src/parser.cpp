@@ -46,15 +46,13 @@ void  Server::parseCommand(string &command)
     }
     if (!tmp.empty())
         this->_params.push_back(tmp);
-
-    // for (size_t i = 0; i < _params.size(); i++)
-    // {
-    //     cout << "p |" << _params[i] << "|" << endl;
-    // }
 }
 
 void Server::handleCommand(string& cmd, int id)
 {
+    this->_messagClient.clear();
+    this->_sendMsgClient.clear();
+    this->_params.clear();
     parseCommand(cmd);
     if (this->_params.empty()) return;
     cmdmapIter it = this->commandMap.find(this->_params[0]);
@@ -64,13 +62,12 @@ void Server::handleCommand(string& cmd, int id)
     }
     else if (_clients[id].isConnected())
     {
-        string response = ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNCOMMAND) + " " + \
-        _clients[id].getNick() + " " + _params[0]  + " :Unknown command";
-        reply(_clients[id], response);
+        throw ( ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNCOMMAND) + " " + \
+        _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }
-    this->_messagClient.clear();
-    this->_sendMsgClient.clear();
-    this->_params.clear();
+    // this->_messagClient.clear();
+    // this->_sendMsgClient.clear();
+    // this->_params.clear();
 }
 
 string Server::trim_comma(const string &str)
@@ -134,6 +131,8 @@ void Server::initPrivmsg(Client &client)
 }
 void Server::initJoin(Client &client)
 {
+    string line;
+    string token;
     std::set<std::string> seenChannels;
     string response;
     if (_params.size() < 2)
@@ -143,9 +142,8 @@ void Server::initJoin(Client &client)
         reply(client, response);
         return;
     }
-    string clients = trim_comma(_params[1]);
-    std::stringstream ss(clients);
-    string token;
+    line = trim_comma(_params[1]);
+    std::stringstream ss(line);
     while (std::getline(ss, token, ','))
     {
         if (seenChannels.count(token) > 0) 
@@ -161,4 +159,21 @@ void Server::initJoin(Client &client)
         else
             _parsChannels.push_back(std::make_pair(token, NOSUCHCHANNEL));
     }
+    if (!_params[2].empty())
+    {
+        token.clear();
+        line = trim_comma(_params[2]);
+        std::stringstream ss(line);
+        while (std::getline(ss, token, ','))
+        {
+            _keys.push_back(token);
+        }
+    }
+}
+
+void Server::parsepasswd(const string& passwd) const
+{
+    if (passwd.empty())
+        throw (std::invalid_argument("Invalid password."));
+    // TODO: check for spaces
 }

@@ -1,16 +1,18 @@
 #include "Channel.hpp"
 
-Channel::Channel(const string& channelName)
+Channel::Channel(const string& channelName, const string& admin)
 {
-		_name = channelName;
-		_modes = "+t";
-		_topic = "";
-		_userLimit = -1;		// or string?
-		_passkey = "";
-		_hasInvite = false;
-		_hasPasskey = false;
-		_hasLimit = false;
-		_hasTopic = false;
+    joinUser(admin);
+    setChannelOperator(admin);
+    _name = channelName;
+    _modes = "+t";
+    _topic = "";
+    _userLimit = -1;		// or string?
+    _passkey = "";
+    _hasInvite = false;
+    _hasPasskey = false;
+    _hasLimit = false;
+    _hasTopic = false;
 }
 
 Channel::~Channel() {}
@@ -43,12 +45,12 @@ bool Channel::isUserOperator(const string &user) const
     return (false);
 }
 
-bool Channel::setUserAsOperator(const string &user)
+bool Channel::unsetChannelOperator(const string &user)
 {
     if (!isUserInChannel(user))
         return (false);
-    _operators.insert(user);
-    cout << user << " is now an operator in channel " << _name << endl;
+    _operators.erase(user);
+    cout << user << " is no longer an operator in channel " << _name << endl;
     return (true);
 }
 
@@ -65,6 +67,9 @@ bool Channel::partUser(const string& user)
     return (false);
 }
 
+
+
+
 std::set<string> Channel::getUserList() const
 {
     return (_users);
@@ -75,12 +80,16 @@ std::set<string> Channel::getOperatorList() const
 	return (_operators);
 }
 
+
+
+
+
 string Channel::getPasskey(void) const
 {
 	return (_passkey);
 }
 
-int Channel::getUserLimit(void) const
+size_t Channel::getUserLimit(void) const
 {
 	return (_userLimit);
 }
@@ -90,10 +99,16 @@ string Channel::getTopic(void) const
 	return (_topic);
 }
 
+
+
+
 bool Channel::empty(void) const
 {
     return (_users.size() == 0);
 }
+
+
+
 
 bool Channel::hasPasskey(void) const
 {
@@ -110,24 +125,57 @@ bool Channel::hasInvite(void) const
 	return (_hasInvite);
 }
 
-void Channel::setHasPasskey(void)
+bool Channel::hasTopic(void) const
 {
-    _hasPasskey = true;
+	return (_hasTopic);
 }
 
-void Channel::setHasUserLimit(void)
+
+
+
+void Channel::setHasPasskey(bool stat)
 {
-    _hasLimit = true;
+    _hasPasskey = stat;
 }
 
-void Channel::setHasInvite(void)
+void Channel::setHasUserLimit(bool stat)
 {
-    _hasInvite = true;
+    _hasLimit = stat;
 }
 
-bool Channel::hasMode(const char& mode) const
+void Channel::setHasInvite(bool stat)
+{
+    _hasInvite = stat;
+}
+
+void Channel::setHasTopic(bool stat)
+{
+    _hasTopic = stat;
+}
+
+
+
+
+bool Channel::hasMode(char mode) const
 {
 	return (_modes.find(mode) != string::npos);
+}
+
+string Channel::channelMmodeIs() const
+{
+    string s = _modes;
+    for (size_t i = 0; i < _modes.size(); i++)
+    {
+        if (_modes[i] == 'k')
+        {
+            s += " " + this->getPasskey();
+        }
+        if (_modes[i] == 'l')
+        {
+            s += " " + std::to_string(this->getUserLimit());
+        }
+    }
+    return (s);
 }
 
 void Channel::printUsers()
@@ -152,10 +200,19 @@ void Channel::printOperators()
     cout << endl;
 }
 
-bool Channel::setMode(const string& mode, const string& param)
+bool Channel::setChannelOperator(const string &user)
+{
+    if (!isUserInChannel(user))
+        return (false);
+    _operators.insert(user);
+    cout << user << " is now an operator in channel " << _name << endl;
+    return (true);
+}
+
+bool Channel::setMode(const string &mode)
 {
     // if mode == "-o" > if param is in channel > add to operator list
-    (void)param;
+
     // this code is not tested !!!!
     if (mode[0] == '+')
     {
@@ -181,22 +238,29 @@ void Channel::setTopic(const string &topic)
 void Channel::setPasskey(const string &key)
 {
     _passkey = key;
+    _hasPasskey = true;
 }
 
-void Channel::setUserLimit(int limit)
+void Channel::setUserLimit(string limit)
 {
-    _userLimit = limit;
+    // TODO: parse limit
+    _userLimit = std::atoi(limit.c_str());
+    _hasLimit = true;
 }
 
-void Channel::setInviteOnly()
-{
-    _hasInvite = true;
-}
+
+
+
 
 void Channel::unsetTopic( void )
 {
     _topic = "";
     _hasTopic = false;
+}
+
+size_t Channel::getSize() const
+{
+    return (_users.size());
 }
 
 string Channel::getName() const

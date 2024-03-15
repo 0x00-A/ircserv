@@ -14,7 +14,7 @@ class Channel
 		std::set<string>			_users;
 		std::set<string>			_operators;
 		
-		string						_modes;
+		string						_modes;	// although there are booleans to check if a certain flag is set i used this also save order of flags in channel when printing
 
 
 		string						_topic;
@@ -29,7 +29,7 @@ class Channel
 
 	public:
 
-		Channel(const string& channelName);
+		Channel(const string& channelName, const string& admin);
 		
 		~Channel();
 
@@ -40,38 +40,42 @@ class Channel
 
 		bool				isUserOperator( const string& user ) const;	// -o
 		
-		bool				setUserAsOperator( const string& user );
+		bool				setChannelOperator( const string& user );
+		bool				unsetChannelOperator( const string& user );
 		
-		bool				setMode(const string& mode, const string& param);
-		bool				hasMode( const char& mode ) const;
+		bool				setMode(const string& mode);
+		bool				hasMode( char mode ) const;
+		string				channelMmodeIs( void ) const;
 
 		void				setTopic(const string& topic);
 		void				setPasskey( const string& key );
-		void				setUserLimit( int limit );
-		void				setInviteOnly();
+		void				setUserLimit( string limit );
+		// void				setInviteOnly();
 	
 		void				unsetTopic( void );
 		// void				unsetPasskey( const string& key );
 		// void				unsetUserLimit( int limit );
 		// void				unsetInviteOnly();
 
-
+		size_t				getSize() const;
 		string				getName() const;
 		string				getModes( void ) const;
 		std::set<string>	getUserList( void ) const;
 		std::set<string>	getOperatorList() const;
 		string				getPasskey( void ) const;
-		int					getUserLimit( void ) const;
+		size_t				getUserLimit( void ) const;
 		string				getTopic( void ) const;
 
 		bool				empty( void ) const;
 		bool				hasPasskey( void ) const;
 		bool				hasUserLimit( void ) const;
 		bool				hasInvite( void) const;
+		bool				hasTopic( void) const;
 
-		void				setHasPasskey( void );
-		void				setHasUserLimit( void );
-		void				setHasInvite( void);
+		void				setHasPasskey( bool stat );
+		void				setHasUserLimit( bool stat );
+		void				setHasInvite( bool stat );
+		void				setHasTopic( bool stat );
 		
 
 

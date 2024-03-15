@@ -1,9 +1,9 @@
 #include "Server.hpp"
 
-void Server::reply(Client &client, string const& reply)
+void Server::reply(Client &client, string const& msg)
 {
 
-    string response = reply + "\r\n";
+    string response = msg + "\r\n";
     // send(client.getSockfd(), response.c_str(), response.length(), 0);
 
     client.sdBuf().push(response);

@@ -28,6 +28,7 @@ public:
 	typedef std::vector<Client>::iterator clientIter;
 	typedef std::map<string, void (Server::*)(Client &)>::iterator cmdmapIter;
 	typedef	std::vector<Channel>::iterator channelIter;
+	typedef std::pair<string, string> strPair;
 
 private:
 
@@ -42,6 +43,7 @@ private:
 	std::vector<string> 					_params;
 	std::vector<std::pair<string, int> >	_sendMsgClient;
     std::vector<std::pair<string, int> >	_parsChannels;
+	std::vector<string>						_keys;
 	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 
@@ -60,8 +62,19 @@ private:
 	int			getIndexOfClient(const Client& cli);
 	clientIter	getClientIterator(const Client& cli);
 
-	bool 		getModes(std::queue<char>& modes);
-	bool    	ValidMode(char& c);
+	/***********************[ MODE ]***********************/
+	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
+
+	void		handleOperatorFlag( strPair&, string&, string&, channelIter&, Client& );
+	void		handleLimitFlag( strPair&, string&, string&, channelIter& );
+	void		handlePasskeyFlag( strPair&, string&, string&, channelIter& );
+	void		handleInviteFlag( strPair&, string&, channelIter& );
+	void		handleTopicFlag( strPair&, string&, channelIter& );
+	void		removeExtraPlusMinus( string& );
+
+
+	/***********************[ SERVER ]***********************/
+	void		parsepasswd( const string& passwd ) const;
 
 public:
 
@@ -69,7 +82,7 @@ public:
 
 	~Server();
 
-	void		start();
+	void		run();
 
 	// functions for debuging
 	void	printClients( void );
@@ -104,6 +117,10 @@ public:
 
         void addChannel(string channelName, Client &client);
         void joinChannel(Client& client, string channelName);
+        void leaveChannel(Client& client, string channelName);
+        // void listChannels();
+		channelIter	doesChannelExist( const string& chan );
+		clientIter	doesUserExit( const string& nick );
 
         // send messg
 		void 	reply(Client &client, string const& reply);
