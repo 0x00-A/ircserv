@@ -145,7 +145,6 @@ void Server::join(Client &client)
             response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
             reply(client, response);
-
         }
         else
         {
@@ -445,9 +444,9 @@ void    Server::mode(Client& client)
     string                                      modesave;
 
     // test with nick(aaa) channel(c)
-    // _channels.push_back(Channel("c"));
-    _channels.begin()->joinUser("aaa");
-    _channels.begin()->setChannelOperator("aaa");
+    _channels.push_back(Channel("c", "aaa"));
+    // _channels.begin()->joinUser("aaa");
+    // _channels.begin()->setChannelOperator("aaa");
 
     if (!client.isConnected())
     {

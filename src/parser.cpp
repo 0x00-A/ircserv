@@ -147,8 +147,17 @@ void Server::initJoin(Client &client)
     }
     line = trim_comma(_params[1]);
     std::stringstream ss(line);
+
+    string key;
     while (std::getline(ss, token, ','))
     {
+
+        if (_params.size() > 2)
+        {
+            line = trim_comma(_params[2]);
+            std::stringstream ss(line);
+            std::getline(ss, key, ',');
+        }
         if (seenChannels.count(token) > 0) 
         {
             response = ":ft_irc.1337.ma " + to_string(ERR_TOOMANYTARGETS) + \
@@ -161,16 +170,6 @@ void Server::initJoin(Client &client)
             _parsChannels.push_back(std::make_pair(token, CHANNEL));
         else
             _parsChannels.push_back(std::make_pair(token, NOSUCHCHANNEL));
-    }
-    if (_params.size() > 2)
-    {
-        token.clear();
-        line = trim_comma(_params[2]);
-        std::stringstream ss(line);
-        while (std::getline(ss, token, ','))
-        {
-            _keys.push_back(token);
-        }
     }
 }
 

@@ -20,7 +20,6 @@ void Server::joinChannel(Client &client, string channelName)
             {
                 if (_channels[i].getUserLimit() < _channels[i].getSize())
                 {
-                    // ERR_CHANNELISFULL
                     throw (":ft_irc.1337.ma "  + to_string(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
                 }
             }
@@ -29,8 +28,10 @@ void Server::joinChannel(Client &client, string channelName)
             {
                 // ERR_BADCHANNELKEY
                 //          "<channel> :Cannot join channel (+k)"
-                // getPasskey()
+                // if (_channels[i].getPasskey() == _keys[])
+                // {
 
+                // }
 
             }
             this->_channels[i].joinUser(client.getNick());

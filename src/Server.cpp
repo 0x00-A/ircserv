@@ -39,7 +39,7 @@ void Server::broadcastMsg(Client &sender, const string &msg, const Channel &chan
              " " +  sender.getNick() + " " + chan.getName() + " :Cannot send to channel";
             reply(sender, response);
 	}
-	else 
+	else
 	{
 		for (clientIter it = _clients.begin(); it < _clients.end(); it++)
 		{
