@@ -14,7 +14,7 @@ class Channel
 		std::set<string>			_users;
 		std::set<string>			_operators;
 		
-		string						_modes;
+		string						_modes;	// although there are booleans to check if a certain flag is set i used this also save order of flags in channel when printing
 
 
 		string						_topic;
@@ -49,7 +49,7 @@ class Channel
 
 		void				setTopic(const string& topic);
 		void				setPasskey( const string& key );
-		bool				setUserLimit( string limit );
+		void				setUserLimit( string limit );
 		// void				setInviteOnly();
 	
 		void				unsetTopic( void );
@@ -73,9 +73,9 @@ class Channel
 		bool				hasTopic( void) const;
 
 		void				setHasPasskey( bool stat );
-		void				setHasUserLimit( void );
+		void				setHasUserLimit( bool stat );
 		void				setHasInvite( bool stat );
-		void				setHasTopic( void);
+		void				setHasTopic( bool stat );
 		
 
 

@@ -297,12 +297,13 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         char c = _params[2][i];
         if (c == 'o' || c == 'l' || c == 'k' || c == 't' || c == 'i')
         {
-            if ( (c == 'o' || c == 'k' || (c == 'l' && sign == "+")) && !(k < _params.size()))
+            if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+")) && !(k < _params.size()))
             {
+                std::cout << ">>>>> " << k << " || " << _params.size() << " || " << sign << c << std::endl;
                 throw ( ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
-                client.getNick() + " " + _params[0]  + " :Not enough parameters" );
+                client.getNick() + " " + _params[0]  + " :Not enough parametersss" );
             }
-            if (c == 'o' || c == 'k' || c == 'l')
+            if (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
                 modes.push(std::make_pair(sign + _params[2].substr(i, 1), _params[k++]));
             else
                 modes.push(std::make_pair(sign + _params[2].substr(i, 1), ""));
@@ -316,22 +317,133 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
     return (true);
 }
 
-/* ERRORS
-//      >> mode #chan1 +ik
-//         +i+k   +ik
-*/
+void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave, channelIter &chan, Client& cli)
+{
+    if (doesUserExit(m.second) == _clients.end())
+    {
+        reply(cli, ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + " " + \
+            cli.getNick() + " " + m.second + " " + " :No such nick");
+    }
+    else if (!chan->isUserInChannel(m.second))
+    {
+        reply(cli, ":ft_irc.1337.ma " + to_string(ERR_USERNOTINCHANNEL) + " " + \
+            cli.getNick() + " " + _params[1] + " " + " :They aren't on that channel");
+    }
+    else
+    {
+        (m.first == "+o")? chan->setChannelOperator(m.second) : chan->unsetChannelOperator(m.second);
+        modesave += m.first;
+        paramsave += " " + m.second;
+    }
+}
+
+void Server::handleLimitFlag(strPair &m, string &modesave, string &paramsave, channelIter &chan)
+{
+    if (m.first == "+l")
+    {
+        if (std::atoi(m.second.c_str()) > 0)
+        {
+            chan->setMode(m.first);
+            chan->setHasUserLimit(true);
+            chan->setUserLimit(m.second);
+            modesave += m.first;
+            paramsave += " " + m.second;
+        }
+    }
+    else if (m.first == "-l")
+    {
+        if (chan->setMode(m.first))
+        {
+            chan->setHasUserLimit(false);
+            modesave += m.first;
+        }
+    }
+}
+
+void Server::handlePasskeyFlag(strPair &m, string &modesave, string &paramsave, channelIter &chan)
+{
+    if (m.first == "+k")
+    {
+        chan->setMode(m.first);
+        chan->setPasskey(m.second);
+        modesave += m.first;
+        paramsave += " " + m.second;
+    }
+    else if (m.first == "-k")
+    {
+        if (chan->hasPasskey())
+        {
+            chan->setMode(m.first);
+            chan->setHasPasskey(false);
+            modesave += m.first;
+            paramsave += " *";
+        }
+    }
+}
+
+void Server::handleInviteFlag(strPair &m, string &modesave, channelIter &chan)
+{
+    if (chan->setMode(m.first))
+    {
+        (m.first == "+i")? chan->setHasInvite(true) : chan->setHasInvite(false);
+        modesave += m.first;
+    }
+}
+
+void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan)
+{
+    if (chan->setMode(m.first))
+    {
+        (m.first == "+t") ? chan->setHasTopic(true) : chan->setHasTopic(true);
+        modesave += m.first;
+    }
+}
+
+void Server::removeExtraPlusMinus(string &s)
+{
+    bool sawPlus = false;
+    bool sawMinus = false;
+
+    for (size_t i = 0; i < s.size(); i++)
+    {
+        if (s[i] == '+' && !sawPlus)
+        {
+            sawPlus = true;
+            sawMinus = false;
+        }
+        else if (s[i] == '+' && sawPlus)
+        {
+            s.erase(i--, 1);
+        }
+        if (s[i] == '-' && !sawMinus)
+        {
+            sawMinus = true;
+            sawPlus = false;
+        }
+        else if (s[i] == '-' && sawMinus)
+        {
+            s.erase(i--, 1);
+        }
+    }
+}
 
 void    Server::mode(Client& client)
 {
-    std::queue<std::pair<string, string> >    modes;
-    channelIter         chan;
-    string              paramsave;
-    string              modesave;
+    std::queue<std::pair<string, string> >      modes;
+    channelIter                                 chan;
+    string                                      paramsave;
+    string                                      modesave;
 
-    _channels.push_back(Channel("#c"));
+    // test with nick(aaa) channel(c)
+    _channels.push_back(Channel("c"));
     _channels.begin()->joinUser("aaa");
-    _channels.begin()->setUserAsOperator("aaa");
+    _channels.begin()->setChannelOperator("aaa");
 
+    if (!client.isConnected())
+    {
+        throw (":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        client.getNick()  + " :You have not registered");
+    }
     if (_params.size() < 2)
     {
         throw (":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
@@ -356,94 +468,27 @@ void    Server::mode(Client& client)
     while (!modes.empty())
     {
         std::pair<string, string> m = modes.front();
-
-        if (m.first == "+o" || m.first == "-o")
-        {
-            if (doesUserExit(m.second) == _clients.end())
-            {
-                // mode #ch1 +o ddd // does't exist
-                // :silver.libera.chat 401 lalala ddd :No such nick/channel
-                throw ("");
-            }
-            if (!chan->isUserInChannel(m.second))
-            {
-                // mode #ch1 +o dddd   // is not in channel
-                // :silver.libera.chat 441 lalala dddd #ch1 :They aren't on that channel
-                throw ("");
-            }
-            (m.first == "+o")? chan->setChannelOperator(m.second) : chan->unsetChannelOperator(m.second);
-        }
-        else if (m.first == "+i")
-        {
-            chan->setInviteOnly(true);
-        }
-        else if (m.first == "-i")
-        {}
-        else if (m.first == "+k")
-        {}
-        else if (m.first == "-k")
-        {}
-        else if (m.first == "+l")
-        {}
-        else if (m.first == "-l")
-        {}
-        else if (m.first == "+t")
-        {}
-        else if (m.first == "-t")
-        {}
-
         switch (m.first[1])
         {
-            case 'o':
-                if (!chan->setUserAsOperator(m.second))
-                {
-                    throw (":ft_irc.1337.ma " + to_string(401) + " " + \
-                    client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
-                }
-                break;
-            case 'i':
-                chan->setInviteOnly();
-                break;
-            case 'k':
-                if (m.first[0] == '+')
-                {
-                    chan->setPasskey(m.second);
-                    chan->setHasPasskey(true);
-                }
-                if (m.first[0] == '-' && chan->hasPasskey())
-                {
-                    if (chan->getPasskey() == m.second)
-                    {
-                        chan->setPasskey("*");
-                        chan->setHasPasskey(false);
-                    }
-                }
-                break;
-            case 't':
-                chan->setTopic(m.second);
-                chan->setHasTopic();
-                break;
-            case 'l':
-                if (!chan->setUserLimit(m.second))
-                {
-                    modes.pop();
-                    continue;
-                }
-                chan->setHasInvite();
-                break;
-            default:
-                break;
-        }
-
-        if (chan->setMode(m.first) || m.first[1] == 'k')
-        {
-            modesave += m.first;
-            // if (!empty)
-            paramsave += " " + m.second;
+            case ('o'):
+            handleOperatorFlag(m, modesave, paramsave, chan, client);
+            break;
+            case ('l'):
+            handleLimitFlag(m, modesave, paramsave, chan);
+            break;
+            case ('k'):
+            handlePasskeyFlag(m, modesave, paramsave, chan);
+            break;
+            case ('i'):
+            handleInviteFlag(m, modesave, chan);
+            break;
+            case ('t'):
+            handleTopicFlag(m, modesave, chan);
+            break;
         }
         modes.pop();
     }
-    reply(client, " " + modesave + " " + paramsave);
+    removeExtraPlusMinus(modesave);
+    if (!modesave.empty())
+        throw ("nick!~user@ip " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
 }
-
-// TODO: problen in -k to change pass

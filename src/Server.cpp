@@ -21,6 +21,7 @@ Server::Server(const string& port, const string& passwd)
     this->commandMap["join"] = &Server::join;
     this->commandMap["privmsg"] = &Server::privmsg;
     this->commandMap["mode"] = &Server::mode;
+    this->commandMap["m"] = &Server::mode;
 }
 
 Server::~Server()

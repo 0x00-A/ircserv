@@ -47,8 +47,8 @@ bool Channel::unsetChannelOperator(const string &user)
 {
     if (!isUserInChannel(user))
         return (false);
-    _operators.insert(user);
-    cout << user << " is now an operator in channel " << _name << endl;
+    _operators.erase(user);
+    cout << user << " is no longer an operator in channel " << _name << endl;
     return (true);
 }
 
@@ -65,6 +65,9 @@ bool Channel::partUser(const string& user)
     return (false);
 }
 
+
+
+
 std::set<string> Channel::getUserList() const
 {
     return (_users);
@@ -74,6 +77,10 @@ std::set<string> Channel::getOperatorList() const
 {
 	return (_operators);
 }
+
+
+
+
 
 string Channel::getPasskey(void) const
 {
@@ -90,10 +97,16 @@ string Channel::getTopic(void) const
 	return (_topic);
 }
 
+
+
+
 bool Channel::empty(void) const
 {
     return (_users.size() == 0);
 }
+
+
+
 
 bool Channel::hasPasskey(void) const
 {
@@ -115,25 +128,31 @@ bool Channel::hasTopic(void) const
 	return (_hasTopic);
 }
 
+
+
+
 void Channel::setHasPasskey(bool stat)
 {
     _hasPasskey = stat;
 }
 
-void Channel::setHasUserLimit(void)
+void Channel::setHasUserLimit(bool stat)
 {
-    _hasLimit = true;
+    _hasLimit = stat;
 }
 
-void Channel::setHasInvite(void)
+void Channel::setHasInvite(bool stat)
 {
-    _hasInvite = true;
+    _hasInvite = stat;
 }
 
-void Channel::setHasTopic(void)
+void Channel::setHasTopic(bool stat)
 {
-    _hasTopic = true;
+    _hasTopic = stat;
 }
+
+
+
 
 bool Channel::hasMode(char mode) const
 {
@@ -147,13 +166,11 @@ string Channel::channelMmodeIs() const
     {
         if (_modes[i] == 'k')
         {
-            s += " ";
-            s += this->getPasskey();
+            s += " " + this->getPasskey();
         }
         if (_modes[i] == 'l')
         {
-            s += " ";
-            s += this->getUserLimit();
+            s += " " + std::to_string(this->getUserLimit());
         }
     }
     return (s);
@@ -181,7 +198,7 @@ void Channel::printOperators()
     cout << endl;
 }
 
-bool Channel::unsetChannelOperator(const string &user)
+bool Channel::setChannelOperator(const string &user)
 {
     if (!isUserInChannel(user))
         return (false);
@@ -219,19 +236,19 @@ void Channel::setTopic(const string &topic)
 void Channel::setPasskey(const string &key)
 {
     _passkey = key;
+    _hasPasskey = true;
 }
 
-bool Channel::setUserLimit(string limit)
+void Channel::setUserLimit(string limit)
 {
     // TODO: parse limit
     _userLimit = std::atoi(limit.c_str());
-    return (true);
+    _hasLimit = true;
 }
 
-void Channel::setInviteOnly()
-{
-    _hasInvite = true;
-}
+
+
+
 
 void Channel::unsetTopic( void )
 {

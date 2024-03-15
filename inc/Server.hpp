@@ -27,6 +27,7 @@ public:
 	typedef std::vector<Client>::iterator clientIter;
 	typedef std::map<string, void (Server::*)(Client &)>::iterator cmdmapIter;
 	typedef	std::vector<Channel>::iterator channelIter;
+	typedef std::pair<string, string> strPair;
 
 private:
 
@@ -58,9 +59,15 @@ private:
 	int			getIndexOfClient(const Client& cli);
 	clientIter	getClientIterator(const Client& cli);
 
+	/***********************[ MODE ]***********************/
 	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
-	// bool    	ValidMode( char& c );
-	// bool		checkThirdParam(std::queue<char> modes);
+
+	void		handleOperatorFlag( strPair&, string&, string&, channelIter&, Client& );
+	void		handleLimitFlag( strPair&, string&, string&, channelIter& );
+	void		handlePasskeyFlag( strPair&, string&, string&, channelIter& );
+	void		handleInviteFlag( strPair&, string&, channelIter& );
+	void		handleTopicFlag( strPair&, string&, channelIter& );
+	void		removeExtraPlusMinus( string& );
 
 public:
 
