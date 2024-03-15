@@ -322,12 +322,12 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     if (doesUserExit(m.second) == _clients.end())
     {
         reply(cli, ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + " " + \
-            cli.getNick() + " " + m.second + " " + " :No such nick");
+            cli.getNick() + " " + m.second + " :No such nick");
     }
     else if (!chan->isUserInChannel(m.second))
     {
         reply(cli, ":ft_irc.1337.ma " + to_string(ERR_USERNOTINCHANNEL) + " " + \
-            cli.getNick() + " " + _params[1] + " " + " :They aren't on that channel");
+            cli.getNick() + " " + _params[1] + " :They aren't on that channel");
     }
     else
     {
