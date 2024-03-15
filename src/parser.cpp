@@ -46,11 +46,6 @@ void  Server::parseCommand(string &command)
     }
     if (!tmp.empty())
         this->_params.push_back(tmp);
-
-    // for (size_t i = 0; i < _params.size(); i++)
-    // {
-    //     cout << "p |" << _params[i] << "|" << endl;
-    // }
 }
 
 void Server::handleCommand(string& cmd, int id)
@@ -101,4 +96,11 @@ void Server::initPrivmsg(Client &client)
 
     }
     _messagClient = _params[_params.size() - 1];
+}
+
+void Server::parsepasswd(const string& passwd) const
+{
+    if (passwd.empty())
+        throw (std::invalid_argument("Invalid password."));
+    // TODO: check for spaces
 }

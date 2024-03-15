@@ -69,13 +69,17 @@ private:
 	void		handleTopicFlag( strPair&, string&, channelIter& );
 	void		removeExtraPlusMinus( string& );
 
+
+	/***********************[ SERVER ]***********************/
+	void		parsepasswd( const string& passwd ) const;
+
 public:
 
 	Server( const string& port, const string& passwd );
 
 	~Server();
 
-	void		start();
+	void		run();
 
 	// functions for debuging
 	void	printClients( void );

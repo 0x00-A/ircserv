@@ -11,6 +11,8 @@
 # include <iomanip>
 # include <set>
 # include <queue>
+# include <exception>
+
 
 using std::string;
 using std::cout;

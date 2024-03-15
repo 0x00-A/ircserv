@@ -4,6 +4,7 @@ Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
 	// socket part
+	parsepasswd(_passwd);
 	_socket.listenSocket(_port);
 	_socket.setSocketNonBlocking();
 	_servfd = _socket.getfd();
@@ -171,24 +172,22 @@ string Server::getCommand(int id)
 {
 	string& rdBuf = _clients[id].rdBuf();
 	size_t	pos;
+	string	cmd = "";
 
-	if (rdBuf.empty())
-		return ("");
-	pos = rdBuf.find("\n");
-	if (pos != string::npos) {
-
-		string cmd = rdBuf.substr(0, pos);
+	if (!rdBuf.empty() && ((pos = rdBuf.find("\n")) != string::npos))
+	{
+		cmd = rdBuf.substr(0, pos);
+		if ( cmd[pos - 1] == '\r')
+		{
+			cmd[pos - 1] = '\n';
+		}
 		cout << "cmd: " << cmd << endl;
-
 		rdBuf = rdBuf.substr(pos + 1);
-		// cout << "remain: " << rdBuf << endl;
-
-		return (cmd);
 	}
-	return ("");
+	return (cmd);
 }
 
-void	Server::start()
+void	Server::run()
 {
 	pollfdIter	it;
 	int			ret;
@@ -200,6 +199,7 @@ void	Server::start()
 	{
 		// printClients();
 		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
+		std::cout << "port: " << _port << std::endl;
 		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
 		{
 			perror("poll"); break;

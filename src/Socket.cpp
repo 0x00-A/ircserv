@@ -25,9 +25,9 @@ void Socket::listenSocket(const string port)
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;		// fill in my IP for me
 
-	if ( (n = getaddrinfo("127.0.0.1", port.c_str(), &hints, &res)))	// return 0 on success
+	if ( (n = getaddrinfo(NULL, port.c_str(), &hints, &res)))	// return 0 on success
 	{
-		gai_strerror(n);
+		cerr << "getaddrinfo error: " + string(gai_strerror(n)) << endl;
 		exit(1);
 	}
 	ressave = res;
