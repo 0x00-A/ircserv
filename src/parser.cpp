@@ -53,6 +53,9 @@ void Server::handleCommand(string& cmd, int id)
     this->_messagClient.clear();
     this->_sendMsgClient.clear();
     this->_params.clear();
+    _keys.clear();
+    _parsChannels.clear();
+
     parseCommand(cmd);
     if (this->_params.empty()) return;
     cmdmapIter it = this->commandMap.find(this->_params[0]);
@@ -159,7 +162,7 @@ void Server::initJoin(Client &client)
         else
             _parsChannels.push_back(std::make_pair(token, NOSUCHCHANNEL));
     }
-    if (!_params[2].empty())
+    if (_params.size() > 2)
     {
         token.clear();
         line = trim_comma(_params[2]);

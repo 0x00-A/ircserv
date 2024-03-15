@@ -127,8 +127,6 @@ void Server::join(Client &client)
 {
     string response;
 
-    // ERR_NOSUCHCHANNEL
-    //                     "<channel name> :No such channel"
     // ERR_INVITEONLYCHAN
     //                     "<channel> :Cannot join channel (+i)"
 
@@ -143,13 +141,17 @@ void Server::join(Client &client)
     for (size_t i = 0; i < _parsChannels.size(); i++)
     {
         if (_parsChannels[i].second == NOSUCHCHANNEL)
-        joinChannel(client, _parsChannels[i].first);
+        {
+            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + \
+            " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
+            reply(client, response);
+
+        }
+        else
+        {
+            joinChannel(client, _parsChannels[i].first);
+        }
     }
-    
-
-    // check here is full 
-    // if ()
-
 
 }
 
@@ -443,7 +445,7 @@ void    Server::mode(Client& client)
     string                                      modesave;
 
     // test with nick(aaa) channel(c)
-    _channels.push_back(Channel("c"));
+    // _channels.push_back(Channel("c"));
     _channels.begin()->joinUser("aaa");
     _channels.begin()->setChannelOperator("aaa");
 
