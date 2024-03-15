@@ -98,9 +98,14 @@ void Server::initPrivmsg(Client &client)
     _messagClient = _params[_params.size() - 1];
 }
 
-void Server::parsepasswd(const string& passwd) const
+void Server::parseargs() const
 {
-    if (passwd.empty())
-        throw (std::invalid_argument("Invalid password."));
-    // TODO: check for spaces
+    if (_passwd.empty())
+        throw (std::invalid_argument("Invalid password"));
+    char * endptr;
+    double d = std::strtod(_port.c_str(), &endptr);
+    if (*endptr)
+        throw (std::invalid_argument("Invalid port number"));
+    if (d <= 0 || d > 65535)
+        throw (std::invalid_argument("Port range not valid"));
 }

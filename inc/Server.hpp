@@ -71,7 +71,7 @@ private:
 
 
 	/***********************[ SERVER ]***********************/
-	void		parsepasswd( const string& passwd ) const;
+	void		parseargs( void ) const;
 
 public:
 
@@ -88,15 +88,15 @@ public:
 	// ============================================================ //
 	 // parser functions
         // bool parseCommandClient(char *buffer, Client& client);
-        void handleCommand(string& cmd, int id);
-		void parseCommand(string& cmd);
+        void	handleCommand(string& cmd, int id);
+		void	parseCommand(string& cmd);
 		string 	trim_comma(const string &str);
 		void	initPrivmsg(Client &client);
 
 
         // check nick clients
-        bool checkAlreadyNick(string &nick);
-		void checkSpamClient(Client& client);
+        bool	checkAlreadyNick(string &nick);
+		void	checkSpamClient(Client& client);
 		// bool checkNickFormeClient(Client &client);
 
         // command member functions

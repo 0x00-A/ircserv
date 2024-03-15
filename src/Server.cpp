@@ -4,7 +4,7 @@ Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
 	// socket part
-	parsepasswd(_passwd);
+	parseargs();
 	_socket.listenSocket(_port);
 	_socket.setSocketNonBlocking();
 	_servfd = _socket.getfd();
