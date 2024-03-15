@@ -102,7 +102,7 @@ public:
 
         // channel member functions
 
-        void addChannel(string channelName);
+        void addChannel(string channelName, Client &client);
         void joinChannel(Client& client, string channelName);
 
         // send messg

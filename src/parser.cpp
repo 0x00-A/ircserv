@@ -156,7 +156,6 @@ void Server::initJoin(Client &client)
             continue ;
         }
         seenChannels.insert(token);
-
         if (token.front() == '#')
             _parsChannels.push_back(std::make_pair(token, CHANNEL));
         else

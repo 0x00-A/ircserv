@@ -145,7 +145,10 @@ void Server::join(Client &client)
         return;
     }
     initJoin(client);
-    
+    joinChannel(client, _parsChannels[0].first);
+
+    // check here is full 
+    // if ()
 
 
 }
