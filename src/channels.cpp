@@ -16,21 +16,27 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
     {
         if (this->_channels[i].getName() == channel.first)
         {
+            if (_channels[i].hasInvite())
+            {
+                /// here for check client invite 
+            }
+            if (_channels[i].hasPasskey()  && !_channels[i].hasInvite())
+            {
+                if (_channels[i].getPasskey() != channel.second)
+                {
+                    response =  (":" + client.getIPAddr() + " "  + to_string(ERR_BADCHANNELKEY) + client.getNick() \
+                    + " " + channel.first + " :Cannot join channel (+K) - bad key");
+                    reply(client, response);
+                    return ;
+                }
+            }
             if (_channels[i].hasUserLimit())
             {
                 if (_channels[i].getUserLimit() < _channels[i].getSize())
                 {
-                    throw (":ft_irc.1337.ma "  + to_string(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
-                }
-            }
-
-            if (_channels[i].hasPasskey())
-            {
-                // ERR_BADCHANNELKEY
-                //          "<channel> :Cannot join channel (+k)"
-                if (_channels[i].getPasskey() != channel.second)
-                {
-                    throw (":" + client.getIPAddr() + " " + client.getNick() + " " + channel.first + " :Cannot join channel (+K) - bad key");
+                    response =  (":ft_irc.1337.ma "  + to_string(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
+                    reply(client, response);
+                    return ;
                 }
             }
             this->_channels[i].joinUser(client.getNick());
@@ -38,6 +44,15 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
         }
     }
     this->_channels.push_back(Channel(channel.first, client.getNick()));
+
+    response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + channel.first;
+    reply(client, response);
+    response = ":ft_irc.1337.ma MODE " + channel.first + " +" + _channels.back().getModes();
+    reply(client, response);
+    response = ":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  channel.first + " :@" + client.getNick();
+    reply(client, response);
+    response = ":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  channel.first + " :End of /NAMES list";
+    reply(client, response);
 }
 
 // void Server::leaveChannel(Client &client, string channelName)

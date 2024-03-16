@@ -127,9 +127,6 @@ void Server::join(Client &client)
 {
     string response;
 
-    // ERR_INVITEONLYCHAN
-    //                     "<channel> :Cannot join channel (+i)"
-
     if (!client.isConnected())
     {
         response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
