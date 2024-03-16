@@ -18,7 +18,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
         {
             if (_channels[i].hasInvite())
             {
-                /// here for check client invite 
+                /// here for check client invite after salat dohr
             }
             if (_channels[i].hasPasskey()  && !_channels[i].hasInvite())
             {
