@@ -463,7 +463,7 @@ void    Server::mode(Client& client)
     if (_params.size() == 2)
     {
         throw (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->channelMmodeIs());
+        client.getNick() + " " + _params[1] + " " + chan->channelModeIs());
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))

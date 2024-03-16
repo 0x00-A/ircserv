@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include "Client.hpp"
+#include <ctime>
 
 class Channel
 {
@@ -25,6 +26,9 @@ class Channel
 		bool						_hasPasskey;
 		bool						_hasLimit;
 		bool						_hasTopic;
+		string 						_creationTime;
+
+		void						setCreationTime( void );
 
 
 	public:
@@ -45,7 +49,7 @@ class Channel
 		
 		bool				setMode(const string& mode);
 		bool				hasMode( char mode ) const;
-		string				channelMmodeIs( void ) const;
+		string				channelModeIs( void ) const;
 
 		void				setTopic(const string& topic);
 		void				setPasskey( const string& key );
@@ -65,6 +69,8 @@ class Channel
 		string				getPasskey( void ) const;
 		size_t				getUserLimit( void ) const;
 		string				getTopic( void ) const;
+		string				getCreationTime( void ) const;
+
 
 		bool				empty( void ) const;
 		bool				hasPasskey( void ) const;

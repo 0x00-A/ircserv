@@ -1,6 +1,23 @@
 #include "Channel.hpp"
 
-Channel::Channel(const string& channelName, const string& admin)
+void Channel::setCreationTime(void)
+{
+    std::time_t res = std::time(NULL);
+
+    char *timePtr = std::ctime(&res);
+
+    if (!timePtr)
+    {
+        cerr << "error time" << endl;
+        _creationTime = "";
+    }
+    else
+    {
+        _creationTime = timePtr;
+    }
+}
+
+Channel::Channel(const string &channelName, const string &admin)
 {
     joinUser(admin);
     setChannelOperator(admin);
@@ -99,8 +116,10 @@ string Channel::getTopic(void) const
 	return (_topic);
 }
 
-
-
+string Channel::getCreationTime() const
+{
+    return (_creationTime);
+}
 
 bool Channel::empty(void) const
 {
@@ -161,7 +180,7 @@ bool Channel::hasMode(char mode) const
 	return (_modes.find(mode) != string::npos);
 }
 
-string Channel::channelMmodeIs() const
+string Channel::channelModeIs() const
 {
     string s = _modes;
     for (size_t i = 0; i < _modes.size(); i++)

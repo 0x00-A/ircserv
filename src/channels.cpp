@@ -1,12 +1,5 @@
 #include "Server.hpp"
 
-// void Server::addChannel(string channelName, Client &client)
-// {
-//     Channel newChannel(channelName);
-//     this->_channels.push_back(newChannel);
-//     this->_channels.back().joinUser(client.getNick());
-//     this->_channels.back().setChannelOperator(client.getNick());
-// }
 
 void Server::joinChannel(Client &client, std::pair<string, string> channel)
 {
@@ -45,29 +38,16 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
     }
     this->_channels.push_back(Channel(channel.first, client.getNick()));
 
+
     response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + channel.first;
     reply(client, response);
-    response = ":ft_irc.1337.ma MODE " + channel.first + " +" + _channels.back().getModes();
+    response = ":ft_irc.1337.ma MODE " + channel.first + " " + _channels.back().channelModeIs();
     reply(client, response);
     response = ":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  channel.first + " :@" + client.getNick();
     reply(client, response);
     response = ":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  channel.first + " :End of /NAMES list";
     reply(client, response);
 }
-
-// void Server::leaveChannel(Client &client, string channelName)
-// {
-//     for (size_t i = 0; i < this->_channels.size(); i++)
-//     {
-//         if (this->_channels[i].getName() == channelName)
-//         {
-//             (void)client;
-//             // this->channels[i].removeClient(client);
-//             return;
-//         }
-//     }
-//     cerr << "Error: channel not found" << endl;
-// }
 
 Server::channelIter Server::doesChannelExist(const string &chan)
 {

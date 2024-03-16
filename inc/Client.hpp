@@ -101,8 +101,10 @@ class Client
 		bool getHasPassed();
 		bool getHasUsedNick();
 		bool getHasUsedUser();
+		// string clientIdentifier( void ) const;
 		// bool 			isRegistered(void);
 		bool checkNick(string &nick);
+
 
 		const string &getNick(void) const;
 		const string &getUsername(void) const;
