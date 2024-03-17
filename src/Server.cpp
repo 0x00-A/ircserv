@@ -200,7 +200,7 @@ void	Server::run()
 		// printClients();
 		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
 		std::cout << "port: " << _port << std::endl;
-		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
+		if(poll(_pollfds.data(), _pollfds.size(), -1) == -1)
 		{
 			perror("poll"); break;
 		}
@@ -288,7 +288,6 @@ void Server::cleanUnusedClients()
 		if (_pollfds[i].fd == -1)
 		{
 			disconnectClient(i - 1);
-			cout << "Done cleaning all sockets" << endl;
 		}
 	}
 }

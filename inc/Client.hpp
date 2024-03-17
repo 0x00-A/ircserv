@@ -26,6 +26,7 @@
 
 # define RPL_WELCOME 001
 # define RPL_CHANNELMODEIS 324
+# define RPL_CREATIONTIME 329
 
 
 class Client

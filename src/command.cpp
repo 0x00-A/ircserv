@@ -456,8 +456,10 @@ void    Server::mode(Client& client)
     }
     if (_params.size() == 2)
     {
-        throw (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->channelMmodeIs());
+        reply(client, (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->channelMmodeIs()));
+        throw (":ft_irc.1337.ma " + to_string(RPL_CREATIONTIME) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->getCreationTime();
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))
