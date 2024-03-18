@@ -21,6 +21,7 @@ Channel::Channel(const string &channelName, const string &admin)
 {
     joinUser(admin);
     setChannelOperator(admin);
+    _admin = admin;
     _name = channelName;
     _modes = "+t";
     _topic = "";
@@ -275,6 +276,11 @@ void Channel::unsetTopic( void )
 {
     _topic = "";
     _hasTopic = false;
+}
+
+string Channel::getAdmin() const
+{
+    return (_admin);
 }
 
 size_t Channel::getSize() const

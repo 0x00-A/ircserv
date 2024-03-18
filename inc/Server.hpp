@@ -118,6 +118,8 @@ public:
         void addChannel(string channelName, Client &client);
         void joinChannel(Client& client, std::pair<string, string> channel);
         void leaveChannel(Client& client, string channelName);
+		string clientIdentifier(Client &client, string& ch, Channel& channel);
+		void	joinedAChannel(Client& client, Channel& channel);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );
 		clientIter	doesUserExit( const string& nick );

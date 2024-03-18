@@ -12,6 +12,7 @@ class Channel
 	private:
 
 		string						_name;
+		string						_admin;
 		std::set<string>			_users;
 		std::set<string>			_operators;
 		
@@ -61,6 +62,7 @@ class Channel
 		// void				unsetUserLimit( int limit );
 		// void				unsetInviteOnly();
 
+		string				getAdmin() const;
 		size_t				getSize() const;
 		string				getName() const;
 		string				getModes( void ) const;

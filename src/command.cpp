@@ -337,6 +337,7 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     }
     else
     {
+        cout << "oooo>>>: " << m.second << "||" << cli.getNick() << endl;
         (m.first == "+o")? chan->setChannelOperator(m.second) : chan->unsetChannelOperator(m.second);
         modesave += m.first;
         paramsave += " " + m.second;

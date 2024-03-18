@@ -101,7 +101,7 @@ class Client
 		bool getHasPassed();
 		bool getHasUsedNick();
 		bool getHasUsedUser();
-		// string clientIdentifier( void ) const;
+		string clientIdentifier(Client &clinet, string& ch, string& modes);
 		// bool 			isRegistered(void);
 		bool checkNick(string &nick);
 
