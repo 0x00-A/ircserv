@@ -19,9 +19,9 @@ using std::cout;
 using std::cerr;
 using std::perror;
 using std::endl;
-using std::to_string;
 
 
+std::string intToString(int num);
 // # include <cstdlib>
 // # include <cstdio>
 

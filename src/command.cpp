@@ -6,14 +6,14 @@ void Server::pass(Client &client)
 
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_ALREADYREGISTRED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_ALREADYREGISTRED) + " " + \
             client.getNick()  + " :You may not reregister";
         reply(client, response);
         return ;
     }
     if (this->_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
             client.getNick()  + " " + this->_params[0] + " :Not enough parameters";
         reply(client, response);
         return;
@@ -24,7 +24,7 @@ void Server::pass(Client &client)
     }
     else
     {
-        response = ":ft_irc.1337.ma " + to_string(RPL_WELCOME) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(RPL_WELCOME) + " " + \
             client.getNick()  + " " + this->_params[1] + " :Password incorrect";
         reply(client, response);
     }
@@ -36,35 +36,36 @@ void Server::nick(Client &client)
 
     if (client.getHasPassed() == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
     }
     if (this->_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NONICKNAMEGIVEN) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NONICKNAMEGIVEN) + " " + \
             client.getNick()  + " :No nickname given";
         reply(client, response);
         return;
     }
     if (client.checkNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_ERRONEUSNICKNAME) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_ERRONEUSNICKNAME) + " " + \
             client.getNick()  + " :Erroneus nickname";
         reply(client, response);
         return;
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NICKNAMEINUSE) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NICKNAMEINUSE) + " " + \
             client.getNick()  + " :Nickname is already in use";
         reply(client, response);
 
     }
     if (client.getHasUsedNick() == true)
     {
-        response = ":" + client.getNick() + "!@ " + this->_params[0] + " :" +  this->_params[1];
+        // :cv!~ds@197.230.30.146 NICK :rel-isma
+        response = ":" + client.getNick() + "!~"  + client.getUsername()  + "@" + client.getIPAddr() + " NICK :" +  this->_params[1];
         reply(client, response);
     }
     client.setNick(this->_params[1]);
@@ -75,7 +76,7 @@ void Server::nick(Client &client)
     }
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(RPL_WELCOME) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(RPL_WELCOME) + " " + \
             client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
         reply(client, response);
     }
@@ -88,14 +89,14 @@ void Server::user(Client &client)
 
     if (client.getHasPassed() == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
     }
     if (this->_params.size() < 5)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
             client.getNick()  + " " + this->_params[0] + " :Not enough parameters";
         reply(client, response);
         return;
@@ -108,7 +109,7 @@ void Server::user(Client &client)
     }
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(RPL_WELCOME) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(RPL_WELCOME) + " " + \
             client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
         reply(client, response);
     }
@@ -129,7 +130,7 @@ void Server::join(Client &client)
 
     if (!client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
@@ -139,7 +140,7 @@ void Server::join(Client &client)
     {
         if (_parsChannels[i].first.front() != '#')
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + \
+            response = ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
             reply(client, response);
         }
@@ -161,7 +162,7 @@ void Server::privmsg(Client &client)
 
     if (!client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
@@ -172,7 +173,7 @@ void Server::privmsg(Client &client)
         found = false;
         if (seenNicks.count(_sendMsgClient[i].first) > 0) 
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_TOOMANYTARGETS) + \
+            response = ":ft_irc.1337.ma " + intToString(ERR_TOOMANYTARGETS) + \
              " " +  client.getNick() + " :Duplicate recipients";
             reply(client, response);
             continue ;
@@ -206,13 +207,13 @@ void Server::privmsg(Client &client)
         }
         if (!found && (_sendMsgClient[i].second == CLIENT))
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
+            response = ":ft_irc.1337.ma " + intToString(ERR_NOSUCHNICK) + \
             " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick/channel";
             reply(client, response);
         }
         if (!found && (_sendMsgClient[i].second == CHANNEL))
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + \
+            response = ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such channel";
             reply(client, response);
         }
@@ -306,7 +307,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
             if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+")) && !(k < _params.size()))
             {
                 std::cout << ">>>>> " << k << " || " << _params.size() << " || " << sign << c << std::endl;
-                throw ( ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+                throw ( ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
                 client.getNick() + " " + _params[0]  + " :Not enough parametersss" );
             }
             if (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
@@ -316,7 +317,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         }
         else
         {
-            throw ( ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNMODE) + " " + client.getNick() + \
+            throw ( ":ft_irc.1337.ma " + intToString(ERR_UNKNOWNMODE) + " " + client.getNick() + \
             " " + _params[2].substr(i, 1) + " :is an unknown mode char to me" );
         }
     }
@@ -327,12 +328,12 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
 {
     if (doesUserExit(m.second) == _clients.end())
     {
-        reply(cli, ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + " " + \
+        reply(cli, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHNICK) + " " + \
             cli.getNick() + " " + m.second + " " + " :No such nick");
     }
     else if (!chan->isUserInChannel(m.second))
     {
-        reply(cli, ":ft_irc.1337.ma " + to_string(ERR_USERNOTINCHANNEL) + " " + \
+        reply(cli, ":ft_irc.1337.ma " + intToString(ERR_USERNOTINCHANNEL) + " " + \
             cli.getNick() + " " + _params[1] + " " + " :They aren't on that channel");
     }
     else
@@ -448,28 +449,28 @@ void    Server::mode(Client& client)
 
     if (!client.isConnected())
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
         client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
         client.getNick() + " " + _params[0]  + " :Not enough parameters");
     }
     if ( (chan = doesChannelExist(_params[1])) == _channels.end())
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + " " + \
         client.getNick() + " " + _params[1]  + " :No such channel");
     }
     if (_params.size() == 2)
     {
-        throw (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(RPL_CHANNELMODEIS) + " " + \
         client.getNick() + " " + _params[1] + " " + chan->channelModeIs());
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_CHANOPRIVSNEEDED) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_CHANOPRIVSNEEDED) + " " + \
         client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
     }
     while (!modes.empty())

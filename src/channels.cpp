@@ -7,8 +7,8 @@ string Server::clientIdentifier(Client &client, string& ch, Channel& channel)
 
     response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + ch + "\n" + \
 	":ft_irc.1337.ma MODE " + ch + " " + channel.channelModeIs() + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch + ":"  + client.getNick() + " :@" + channel.getAdmin() + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch + " :End of /NAMES list";
+	":ft_irc.1337.ma " + intToString(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch + ":"  + client.getNick() + " :@" + channel.getAdmin() + "\n" + \
+	":ft_irc.1337.ma " + intToString(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch + " :End of /NAMES list";
 	return response;
 }
 
@@ -39,19 +39,16 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 	{
 		if (this->_channels[i].getName() == channel.first)
 		{
-			if (_channels[i].isUserInChannel(client.getNick()))
-			{
-				return ;
-			}
+			if (_channels[i].isUserInChannel(client.getNick())) return;
 			if (_channels[i].hasInvite())
 			{
-				/// here for check client invite after salat dohr
+				/// here for check client invite after add cmd invite 
 			}
 			if (_channels[i].hasPasskey()  && !_channels[i].hasInvite())
 			{
 				if (_channels[i].getPasskey() != channel.second)
 				{
-					response =  (":" + client.getIPAddr() + " "  + to_string(ERR_BADCHANNELKEY) + client.getNick() \
+					response =  (":" + client.getIPAddr() + " "  + intToString(ERR_BADCHANNELKEY) + client.getNick() \
 					+ " " + channel.first + " :Cannot join channel (+K) - bad key");
 					reply(client, response);
 					return ;
@@ -61,7 +58,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getUserLimit() < _channels[i].getSize())
 				{
-					response =  (":ft_irc.1337.ma "  + to_string(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
+					response =  (":ft_irc.1337.ma "  + intToString(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
 					reply(client, response);
 					return ;
 				}

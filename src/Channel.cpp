@@ -192,7 +192,7 @@ string Channel::channelModeIs() const
         }
         if (_modes[i] == 'l')
         {
-            s += " " + std::to_string(this->getUserLimit());
+            s += " " + intToString(this->getUserLimit());
         }
     }
     return (s);

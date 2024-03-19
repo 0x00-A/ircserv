@@ -1,5 +1,24 @@
 #include "Server.hpp"
 
+#include <cctype>
+#include <string>
+
+std::string intToString(int num)
+{
+    std::stringstream ss;
+    ss << num;
+    return ss.str();
+}
+
+std::string Server::to_upper(const std::string& str) 
+{
+    std::string result; 
+	for (size_t i = 1; i < str.size() ; i++)
+        result += (char)toupper(str[i]);
+    return result;
+}
+
+
 Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
@@ -27,30 +46,6 @@ Server::Server(const string& port, const string& passwd)
 
 Server::~Server()
 {
-}
-
-void Server::broadcastMsg(Client &sender, const string &msg, const Channel &chan)
-{
-
-	string response;
-	if (chan.isUserInChannel(sender.getNick()) == false)
-	{
-			response = ":ft_irc.1337.ma " + to_string(ERR_CANNOTSENDTOCHAN) + \
-             " " +  sender.getNick() + " " + chan.getName() + " :Cannot send to channel";
-            reply(sender, response);
-	}
-	else
-	{
-		for (clientIter it = _clients.begin(); it < _clients.end(); it++)
-		{
-			if (chan.isUserInChannel(it->getNick()))
-			{
-				response = ":"  + sender.getNick() + "!~" + sender.getUsername()  + "@" + \
-						sender.getIPAddr() + " PRIVMSG " + it->getNick() + " :" +  msg;
-				reply(*it, response);
-			}
-		}
-	}
 }
 
 int Server::handleNewConnection()
