@@ -64,7 +64,6 @@ void Server::nick(Client &client)
     }
     if (client.getHasUsedNick() == true)
     {
-        // :cv!~ds@197.230.30.146 NICK :rel-isma
         response = ":" + client.getNick() + "!~"  + client.getUsername()  + "@" + client.getIPAddr() + " NICK :" +  this->_params[1];
         reply(client, response);
     }
