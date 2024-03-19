@@ -5,7 +5,6 @@ void Channel::setCreationTime(void)
     std::time_t res = std::time(NULL);
 
     char *timePtr = std::ctime(&res);
-
     if (!timePtr)
     {
         cerr << "error time" << endl;
@@ -21,6 +20,7 @@ Channel::Channel(const string &channelName, const string &admin)
 {
     joinUser(admin);
     setChannelOperator(admin);
+    setCreationTime();
     _admin = admin;
     _name = channelName;
     _modes = "+t";
@@ -49,9 +49,7 @@ bool Channel::joinUser(const string& user)
 
 bool Channel::isUserInChannel(const string &user) const
 {
-    if (_users.find(user) != _users.end())
-        return (true);
-	return false;
+    return (_users.find(user) != _users.end());
 }
 
 bool Channel::isUserOperator(const string &user) const

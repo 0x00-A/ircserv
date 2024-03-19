@@ -49,18 +49,18 @@ private:
 
 	//
 	std::vector<Channel> 		_channels;
-	void broadcastMsg(Client &sender, const string& msg, const Channel& chan);
+	void broadcastMsg( Client &sender, const string& msg, const Channel& chan );
 
-	int			handleNewConnection();
-	int			handleRead(int id);
-	int			handleWrite(int id);
-	string		getCommand(int id);
-	void		disconnectClient(int id);
-	void		cleanUnusedClients();
+	int			handleNewConnection( void );
+	int			handleRead( int id );
+	int			handleWrite( int id );
+	string		getCommand( int id );
+	void		disconnectClient( int id );
+	void		cleanUnusedClients( void );
 	void		closeAllOpenSockets( void );
-	int			getIndexOfClient(const clientIter& currIter);
-	int			getIndexOfClient(const Client& cli);
-	clientIter	getClientIterator(const Client& cli);
+	int			getIndexOfClient( const clientIter& currIter );
+	int			getIndexOfClient( const Client& cli );
+	clientIter	getClientIterator( const Client& cli );
 
 	/***********************[ MODE ]***********************/
 	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
@@ -74,7 +74,7 @@ private:
 
 
 	/***********************[ SERVER ]***********************/
-	void		parsepasswd( const string& passwd ) const;
+	void		parseargs( void ) const;
 
 public:
 
@@ -101,8 +101,8 @@ public:
 
 
         // check nick clients
-        bool checkAlreadyNick(string &nick);
-		void checkSpamClient(Client& client);
+        bool	checkAlreadyNick(string &nick);
+		void	checkSpamClient(Client& client);
 		// bool checkNickFormeClient(Client &client);
 
         // command member functions

@@ -12,7 +12,11 @@
 # include <set>
 # include <queue>
 # include <exception>
-
+# include <cstdio>
+# include <string>
+# include <string.h>
+# include <cstdlib>
+# include <cerrno>
 
 using std::string;
 using std::cout;
@@ -28,5 +32,7 @@ std::string intToString(int num);
 // # include <string>
 // # include <vector>
 // # include <unistd.h>
+
+std::string	to_string(int n);
 
 #endif //IRCSERV_HPP

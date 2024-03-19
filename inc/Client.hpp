@@ -25,6 +25,14 @@
 #define RPL_NAMREPLY 353
 #define RPL_ENDOFNAMES 366
 
+# define ERR_NOSUCHCHANNEL 403
+# define ERR_UNKNOWNMODE 472
+# define ERR_CHANOPRIVSNEEDED 482
+# define ERR_USERNOTINCHANNEL 441
+
+# define RPL_WELCOME 001
+# define RPL_CHANNELMODEIS 324
+# define RPL_CREATIONTIME 329
 #define ERR_NOSUCHCHANNEL 403
 #define ERR_UNKNOWNMODE 472
 #define ERR_CHANOPRIVSNEEDED 482
@@ -62,11 +70,6 @@ class Client
 		Client();
 
 	public:
-		bool operator==(const Client &rhs)
-		{
-
-			return (this->_clifd == rhs._clifd);
-		}
 
 		Client(const string &ip, int port, int sockfd);
 

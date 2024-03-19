@@ -69,9 +69,6 @@ void Server::handleCommand(string& cmd, int id)
         throw ( ":ft_irc.1337.ma " + intToString(ERR_UNKNOWNCOMMAND) + " " + \
         _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }
-    // this->_messagClient.clear();
-    // this->_sendMsgClient.clear();
-    // this->_params.clear();
 }
 
 string Server::trim_comma(const string &str)
@@ -125,7 +122,7 @@ void Server::initPrivmsg(Client &client)
     string token;
     while (std::getline(ss, token, ','))
     {
-        if (token.front() == '#')
+        if (token[0] == '#')
             _sendMsgClient.push_back(std::make_pair(token, CHANNEL));
         else
             _sendMsgClient.push_back(std::make_pair(token, CLIENT));
@@ -176,9 +173,14 @@ void Server::initJoin(Client &client)
     }
 }
 
-void Server::parsepasswd(const string& passwd) const
+void Server::parseargs() const
 {
-    if (passwd.empty())
-        throw (std::invalid_argument("Invalid password."));
-    // TODO: check for spaces
+    if (_passwd.empty())
+        throw (std::invalid_argument("Invalid password"));
+    char * endptr;
+    double d = std::strtod(_port.c_str(), &endptr);
+    if (*endptr)
+        throw (std::invalid_argument("Invalid port number"));
+    if (d <= 0 || d > 65535)
+        throw (std::invalid_argument("Port range not valid"));
 }

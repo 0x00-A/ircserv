@@ -137,7 +137,7 @@ void Server::join(Client &client)
     initJoin(client);
     for (size_t i = 0; i < _parsChannels.size(); i++)
     {
-        if (_parsChannels[i].first.front() != '#')
+        if (_parsChannels[i].first[0] != '#')
         {
             response = ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
@@ -178,7 +178,7 @@ void Server::privmsg(Client &client)
             continue ;
         }
         seenNicks.insert(_sendMsgClient[i].first);
-        if (_sendMsgClient[i].first.front() == '#')
+        if (_sendMsgClient[i].first[0] == '#')
         {
             for (size_t k = 0; k < _channels.size(); k++)
             {
@@ -327,13 +327,13 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
 {
     if (doesUserExit(m.second) == _clients.end())
     {
-        reply(cli, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHNICK) + " " + \
-            cli.getNick() + " " + m.second + " " + " :No such nick");
+        reply(cli, ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + " " + \
+            cli.getNick() + " " + m.second + " :No such nick");
     }
     else if (!chan->isUserInChannel(m.second))
     {
-        reply(cli, ":ft_irc.1337.ma " + intToString(ERR_USERNOTINCHANNEL) + " " + \
-            cli.getNick() + " " + _params[1] + " " + " :They aren't on that channel");
+        reply(cli, ":ft_irc.1337.ma " + to_string(ERR_USERNOTINCHANNEL) + " " + \
+            cli.getNick() + " " + _params[1] + " :They aren't on that channel");
     }
     else
     {
@@ -463,8 +463,10 @@ void    Server::mode(Client& client)
     }
     if (_params.size() == 2)
     {
-        throw (":ft_irc.1337.ma " + intToString(RPL_CHANNELMODEIS) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->channelModeIs());
+        reply(client, (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
+        throw (":ft_irc.1337.ma " + to_string(RPL_CREATIONTIME) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))

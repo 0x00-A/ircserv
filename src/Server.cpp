@@ -5,7 +5,7 @@
 
 std::string intToString(int num)
 {
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << num;
     return ss.str();
 }
@@ -23,7 +23,7 @@ Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
 	// socket part
-	parsepasswd(_passwd);
+	parseargs();
 	_socket.listenSocket(_port);
 	_socket.setSocketNonBlocking();
 	_servfd = _socket.getfd();
@@ -80,7 +80,7 @@ int Server::handleNewConnection()
 	}
 	// Add the new client socket to _clients and _pollfds
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
-	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
+	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN), .revents = 0});
 
 	cout << "client connected - fd: " << connfd << endl;
 	return (0);
@@ -207,7 +207,7 @@ void	Server::run()
 		// printClients();
 		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
 		std::cout << "port: " << _port << std::endl;
-		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
+		if(poll(_pollfds.data(), _pollfds.size(), -1) == -1)
 		{
 			perror("poll"); break;
 		}
@@ -292,7 +292,6 @@ void Server::cleanUnusedClients()
 		if (_pollfds[i].fd == -1)
 		{
 			disconnectClient(i - 1);
-			cout << "Done cleaning all sockets" << endl;
 		}
 	}
 }
@@ -315,7 +314,13 @@ int Server::getIndexOfClient(const Client &cli)
 
 Server::clientIter Server::getClientIterator(const Client &cli)
 {
-    return (std::find(_clients.begin(), _clients.end(), cli));
+    // return (std::find(_clients.begin(), _clients.end(), cli));
+	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
+	{
+		if (it->getSockfd() == cli.getSockfd())
+			return (it);
+	}
+	return (_clients.end());
 }
 
 int Server::getIndexOfClient(const clientIter& currIter)
