@@ -4,6 +4,7 @@ void Server::pass(Client &client)
 {
     string response;
 
+    std::cout << "receive pass command" << std::endl;
     if (client.isConnected())
     {
         response = ":ft_irc.1337.ma " + intToString(ERR_ALREADYREGISTRED) + " " + \
@@ -34,6 +35,7 @@ void Server::nick(Client &client)
 {
     string response;
 
+    std::cout << "receive nick command\n";
     if (client.getHasPassed() == false)
     {
         response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
@@ -60,7 +62,7 @@ void Server::nick(Client &client)
         response = ":ft_irc.1337.ma " + intToString(ERR_NICKNAMEINUSE) + " " + \
             client.getNick()  + " :Nickname is already in use";
         reply(client, response);
-
+        return;
     }
     if (client.getHasUsedNick() == true)
     {
@@ -75,8 +77,9 @@ void Server::nick(Client &client)
     }
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + intToString(RPL_WELCOME) + " " + \
+        response = ":ft_irc.1337.ma 001 " + \
             client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
+        std::cout << response << '\n';
         reply(client, response);
     }
 }
@@ -86,6 +89,7 @@ void Server::user(Client &client)
 {
     string response;
 
+    std::cout << "receive user command\n";
     if (client.getHasPassed() == false)
     {
         response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
@@ -108,16 +112,17 @@ void Server::user(Client &client)
     }
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + intToString(RPL_WELCOME) + " " + \
+        // #define RPL_WELCOME(nick, hostname) ":" + hostname + " 001 " + nick + " :Welcome " + nick + " to the ft_irc network !\r\n"
+        response = ":ft_irc.1337.ma 001 " + \
             client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
+        std::cout << response << '\n';
         reply(client, response);
     }
 }
 
 void Server::quit(Client &client)
 {
-    string response = ":" + client.getNick() + "-!" + client.getUsername() + \
-        "@" + client.getIPAddr() + " QUIT :Quit: Bye for now!\r\n";
+    string response = ":" + client.getNick() + "-!" + client.getUsername() + "@" + client.getIPAddr() + " QUIT :Quit: Bye for now!\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
     client.closeSocket();
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
@@ -182,7 +187,7 @@ void Server::privmsg(Client &client)
         {
             for (size_t k = 0; k < _channels.size(); k++)
             {
-                if (_sendMsgClient[k].first == _channels[k].getName())
+                if (_sendMsgClient[i].first == _channels[k].getName())
                 {
                     found = true;
                     broadcastMsg(client, _messagClient, _channels[k]);
@@ -197,8 +202,8 @@ void Server::privmsg(Client &client)
                 if (_sendMsgClient[i].first == _clients[j].getNick())
                 {
                     found = true;
-                    response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@" + \
-                    client.getIPAddr() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
+                    response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@127.0.0.1" + \
+                    /*client.getIPAddr()*/ + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
                     reply(_clients[j], response);
                     break ;
                 }

@@ -7,7 +7,7 @@ string Server::clientIdentifier(Client &client, string& ch, Channel& channel)
 
     response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + ch + "\n" + \
 	":ft_irc.1337.ma MODE " + ch + " " + channel.channelModeIs() + "\n" + \
-	":ft_irc.1337.ma " + intToString(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch + ":"  + client.getNick() + " :@" + channel.getAdmin() + "\n" + \
+	":ft_irc.1337.ma " + intToString(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch + " :"  + client.getNick() + " @" + channel.getAdmin() + "\n" + \
 	":ft_irc.1337.ma " + intToString(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch + " :End of /NAMES list";
 	return response;
 }

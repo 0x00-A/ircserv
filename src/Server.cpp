@@ -34,14 +34,14 @@ Server::Server(const string& port, const string& passwd)
 	_pollfds.push_back(servPoll);
 
 	//
-	this->commandMap["pass"] = &Server::pass;
-    this->commandMap["user"] = &Server::user;
-    this->commandMap["nick"] = &Server::nick;
-    this->commandMap["quit"] = &Server::quit;
-    this->commandMap["join"] = &Server::join;
-    this->commandMap["privmsg"] = &Server::privmsg;
-    this->commandMap["mode"] = &Server::mode;
-    this->commandMap["m"] = &Server::mode;
+	this->commandMap["PASS"] = &Server::pass;
+    this->commandMap["USER"] = &Server::user;
+    this->commandMap["NICK"] = &Server::nick;
+    this->commandMap["QUIT"] = &Server::quit;
+    this->commandMap["JOIN"] = &Server::join;
+    this->commandMap["PRIVMSG"] = &Server::privmsg;
+    this->commandMap["MODE"] = &Server::mode;
+    this->commandMap["M"] = &Server::mode;
 }
 
 Server::~Server()
@@ -71,6 +71,7 @@ int Server::handleNewConnection()
 		return (1);
 	}
 	// set socket to be Non-blocking
+	// forbiden flags = fcntl(connfd, F_GETFL)
 	if ( (flags = fcntl(connfd, F_GETFL)) == -1
 		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
 	{
@@ -205,8 +206,8 @@ void	Server::run()
 	while (true)
 	{
 		// printClients();
-		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
-		std::cout << "port: " << _port << std::endl;
+		// cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
+		// std::cout << "port: " << _port << std::endl;
 		if(poll(_pollfds.data(), _pollfds.size(), -1) == -1)
 		{
 			perror("poll"); break;
@@ -219,7 +220,7 @@ void	Server::run()
 				if (_pollfds[i].fd == _servfd)
 				{
 					
-					cout << "Server has incomming connection(s)" << endl;
+					// cout << "Server has incomming connection(s)" << endl;
 					do
 					{
 						// accept incomming connections
@@ -230,7 +231,7 @@ void	Server::run()
 				else
 				{
 					// handle existing connections
-					cout << "fd " << _pollfds[i].fd << " is readable" << endl;
+					// cout << "fd " << _pollfds[i].fd << " is readable" << endl;
 					ret = handleRead(i-1);
 					if (ret == -1)
 					{
@@ -259,7 +260,7 @@ void	Server::run()
 				/*  don’t have anything to write would just waste CPU cycles. 	              */
 				/******************************************************************************/
 			
-				cout << "fd " << _pollfds[i].fd << " is writeable" << endl;
+				// cout << "fd " << _pollfds[i].fd << " is writeable" << endl;
 				ret = handleWrite(i-1);
 				if (ret == -1)
 				{
