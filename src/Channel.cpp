@@ -1,16 +1,36 @@
 #include "Channel.hpp"
 
-Channel::Channel(const string& channelName)
+void Channel::setCreationTime(void)
 {
-		_name = channelName;
-		_modes = "+t";
-		_topic = "";
-		_userLimit = -1;		// or string?
-		_passkey = "";
-		_hasInvite = false;
-		_hasPasskey = false;
-		_hasLimit = false;
-		_hasTopic = false;
+    std::time_t res = std::time(NULL);
+
+    char *timePtr = std::ctime(&res);
+
+    if (!timePtr)
+    {
+        cerr << "error time" << endl;
+        _creationTime = "";
+    }
+    else
+    {
+        _creationTime = timePtr;
+    }
+}
+
+Channel::Channel(const string &channelName, const string &admin)
+{
+    joinUser(admin);
+    setChannelOperator(admin);
+    _admin = admin;
+    _name = channelName;
+    _modes = "+t";
+    _topic = "";
+    _userLimit = -1;		// or string?
+    _passkey = "";
+    _hasInvite = false;
+    _hasPasskey = false;
+    _hasLimit = false;
+    _hasTopic = false;
 }
 
 Channel::~Channel() {}
@@ -29,9 +49,7 @@ bool Channel::joinUser(const string& user)
 
 bool Channel::isUserInChannel(const string &user) const
 {
-    if (_users.find(user) != _users.end())
-        return (true);
-	return false;
+    return (_users.find(user) != _users.end());
 }
 
 bool Channel::isUserOperator(const string &user) const
@@ -87,7 +105,7 @@ string Channel::getPasskey(void) const
 	return (_passkey);
 }
 
-int Channel::getUserLimit(void) const
+size_t Channel::getUserLimit(void) const
 {
 	return (_userLimit);
 }
@@ -97,8 +115,10 @@ string Channel::getTopic(void) const
 	return (_topic);
 }
 
-
-
+string Channel::getCreationTime() const
+{
+    return (_creationTime);
+}
 
 bool Channel::empty(void) const
 {
@@ -159,7 +179,7 @@ bool Channel::hasMode(char mode) const
 	return (_modes.find(mode) != string::npos);
 }
 
-string Channel::channelMmodeIs() const
+string Channel::channelModeIs() const
 {
     string s = _modes;
     for (size_t i = 0; i < _modes.size(); i++)
@@ -170,7 +190,7 @@ string Channel::channelMmodeIs() const
         }
         if (_modes[i] == 'l')
         {
-            s += " " + std::to_string(this->getUserLimit());
+            s += " " + to_string(this->getUserLimit());
         }
     }
     return (s);
@@ -254,6 +274,16 @@ void Channel::unsetTopic( void )
 {
     _topic = "";
     _hasTopic = false;
+}
+
+string Channel::getAdmin() const
+{
+    return (_admin);
+}
+
+size_t Channel::getSize() const
+{
+    return (_users.size());
 }
 
 string Channel::getName() const

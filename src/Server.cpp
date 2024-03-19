@@ -29,14 +29,26 @@ Server::~Server()
 {
 }
 
-void Server::broadcastMsg(const Client &sender, const string &msg, const Channel &chan)
+void Server::broadcastMsg(Client &sender, const string &msg, const Channel &chan)
 {
-	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
+
+	string response;
+	if (chan.isUserInChannel(sender.getNick()) == false)
 	{
-		if (chan.isUserInChannel(sender.getNick()))
+			response = ":ft_irc.1337.ma " + to_string(ERR_CANNOTSENDTOCHAN) + \
+             " " +  sender.getNick() + " " + chan.getName() + " :Cannot send to channel";
+            reply(sender, response);
+	}
+	else
+	{
+		for (clientIter it = _clients.begin(); it < _clients.end(); it++)
 		{
-			// send message
-			(void)msg;
+			if (chan.isUserInChannel(it->getNick()))
+			{
+				response = ":"  + sender.getNick() + "!~" + sender.getUsername()  + "@" + \
+						sender.getIPAddr() + " PRIVMSG " + it->getNick() + " :" +  msg;
+				reply(*it, response);
+			}
 		}
 	}
 }
@@ -73,7 +85,7 @@ int Server::handleNewConnection()
 	}
 	// Add the new client socket to _clients and _pollfds
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
-	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
+	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN), .revents = 0});
 
 	cout << "client connected - fd: " << connfd << endl;
 	return (0);
@@ -240,9 +252,6 @@ void	Server::run()
 						{
 							reply(_clients[i-1], res);
 						}
-						this->_messagClient.clear();
-						this->_sendMsgClient.clear();
-						this->_params.clear();
 					}
 				}
 			}
@@ -310,7 +319,13 @@ int Server::getIndexOfClient(const Client &cli)
 
 Server::clientIter Server::getClientIterator(const Client &cli)
 {
-    return (std::find(_clients.begin(), _clients.end(), cli));
+    // return (std::find(_clients.begin(), _clients.end(), cli));
+	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
+	{
+		if (it->getSockfd() == cli.getSockfd())
+			return (it);
+	}
+	return (_clients.end());
 }
 
 int Server::getIndexOfClient(const clientIter& currIter)

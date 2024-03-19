@@ -108,7 +108,7 @@ void Server::user(Client &client)
     }
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NICKNAMEINUSE) + " " + \
+        response = ":ft_irc.1337.ma " + to_string(RPL_WELCOME) + " " + \
             client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
         reply(client, response);
     }
@@ -116,7 +116,6 @@ void Server::user(Client &client)
 
 void Server::quit(Client &client)
 {
-    // :dan-!d@localhost QUIT :Quit: Bye for now!
     string response = ":" + client.getNick() + "-!" + client.getUsername() + \
         "@" + client.getIPAddr() + " QUIT :Quit: Bye for now!\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
@@ -126,50 +125,42 @@ void Server::quit(Client &client)
 
 void Server::join(Client &client)
 {
-    (void)client;
-}
+    string response;
 
-string Server::trim_comma(const string &str)
-{
-    string result;
-    bool prev_is_comma = false;
-
-    for (string::size_type i = 0; i < str.size(); i++)
+    if (!client.isConnected())
     {
-        char c = str[i];
-        if (c == ',')
+        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+            client.getNick()  + " :You have not registered";
+        reply(client, response);
+        return;
+    }
+    initJoin(client);
+    for (size_t i = 0; i < _parsChannels.size(); i++)
+    {
+        if (_parsChannels[i].first[0] != '#')
         {
-            if (!prev_is_comma)
-            {
-                result += c;
-            }
-            prev_is_comma = true;
+            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + \
+            " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
+            reply(client, response);
         }
         else
         {
-            result += c;
-            prev_is_comma = false;
+            joinChannel(client, _parsChannels[i]);
         }
     }
-    if (result[0] == ',')
-        result.erase(0, 1);
-    if (result[result.size() - 1] == ',')
-        result.erase(result.size() - 1, 1);
-    return result;
+
 }
 
 
 void Server::privmsg(Client &client)
 {
-    // ERR_CANNOTSENDTOCHAN >> if don't find client in channel  
-    // ERR_NOTOPLEVEL 
-
     std::set<std::string> seenNicks;
     bool found = false;
     string response;
+
+
     if (!client.isConnected())
     {
-        //  :stockholm.se.quakenet.org 451 *  :You have not registered
         response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
@@ -187,26 +178,41 @@ void Server::privmsg(Client &client)
             continue ;
         }
         seenNicks.insert(_sendMsgClient[i].first);
-        for (size_t j = 0; j < _clients.size(); j++)
+        if (_sendMsgClient[i].first[0] == '#')
         {
-            if (_sendMsgClient[i].first == _clients[j].getNick())
+            for (size_t k = 0; k < _channels.size(); k++)
             {
-                found = true;
-                response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@" + \
-                 client.getIPAddr() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
-                reply(_clients[j], response);
-                break ;
+                if (_sendMsgClient[k].first == _channels[k].getName())
+                {
+                    found = true;
+                    broadcastMsg(client, _messagClient, _channels[k]);
+                    break ;
+                }
+            }
+        }
+        else
+        {
+            for (size_t j = 0; j < _clients.size(); j++)
+            {
+                if (_sendMsgClient[i].first == _clients[j].getNick())
+                {
+                    found = true;
+                    response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@" + \
+                    client.getIPAddr() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
+                    reply(_clients[j], response);
+                    break ;
+                }
             }
         }
         if (!found && (_sendMsgClient[i].second == CLIENT))
         {
             response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
-            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick";
+            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick/channel";
             reply(client, response);
         }
         if (!found && (_sendMsgClient[i].second == CHANNEL))
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
+            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such channel";
             reply(client, response);
         }
@@ -331,6 +337,7 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     }
     else
     {
+        cout << "oooo>>>: " << m.second << "||" << cli.getNick() << endl;
         (m.first == "+o")? chan->setChannelOperator(m.second) : chan->unsetChannelOperator(m.second);
         modesave += m.first;
         paramsave += " " + m.second;
@@ -435,9 +442,9 @@ void    Server::mode(Client& client)
     string                                      modesave;
 
     // test with nick(aaa) channel(c)
-    _channels.push_back(Channel("c"));
-    _channels.begin()->joinUser("aaa");
-    _channels.begin()->setChannelOperator("aaa");
+    _channels.push_back(Channel("c", "aaa"));
+    // _channels.begin()->joinUser("aaa");
+    // _channels.begin()->setChannelOperator("aaa");
 
     if (!client.isConnected())
     {
@@ -457,9 +464,9 @@ void    Server::mode(Client& client)
     if (_params.size() == 2)
     {
         reply(client, (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->channelMmodeIs()));
+        client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
         throw (":ft_irc.1337.ma " + to_string(RPL_CREATIONTIME) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->getCreationTime();
+        client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))

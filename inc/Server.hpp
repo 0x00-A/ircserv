@@ -17,6 +17,7 @@
 # define RD_BUF_SIZE 512
 # define CHANNEL 1
 # define CLIENT 2
+# define NOSUCHCHANNEL 3
 
 class Server
 {
@@ -41,23 +42,25 @@ private:
 	// just added
 	std::vector<string> 					_params;
 	std::vector<std::pair<string, int> >	_sendMsgClient;
+    std::vector<std::pair<string, string> >	_parsChannels;
+	std::vector<string>						_keys;
 	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 
 	//
 	std::vector<Channel> 		_channels;
-	void broadcastMsg(const Client &sender, const string& msg, const Channel& chan);
+	void broadcastMsg( Client &sender, const string& msg, const Channel& chan );
 
-	int			handleNewConnection();
-	int			handleRead(int id);
-	int			handleWrite(int id);
-	string		getCommand(int id);
-	void		disconnectClient(int id);
-	void		cleanUnusedClients();
+	int			handleNewConnection( void );
+	int			handleRead( int id );
+	int			handleWrite( int id );
+	string		getCommand( int id );
+	void		disconnectClient( int id );
+	void		cleanUnusedClients( void );
 	void		closeAllOpenSockets( void );
-	int			getIndexOfClient(const clientIter& currIter);
-	int			getIndexOfClient(const Client& cli);
-	clientIter	getClientIterator(const Client& cli);
+	int			getIndexOfClient( const clientIter& currIter );
+	int			getIndexOfClient( const Client& cli );
+	clientIter	getClientIterator( const Client& cli );
 
 	/***********************[ MODE ]***********************/
 	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
@@ -88,10 +91,11 @@ public:
 	// ============================================================ //
 	 // parser functions
         // bool parseCommandClient(char *buffer, Client& client);
-        void	handleCommand(string& cmd, int id);
-		void	parseCommand(string& cmd);
-		string 	trim_comma(const string &str);
-		void	initPrivmsg(Client &client);
+        void 		handleCommand(string& cmd, int id);
+		void 		parseCommand(string& cmd);
+		string 		trim_comma(const string &str);
+		void		initPrivmsg(Client &client);
+		void 		initJoin(Client &client);
 
 
         // check nick clients
@@ -111,15 +115,16 @@ public:
 
         // channel member functions
 
-        void createChannel(string channelName);
-        void joinChannel(Client& client, string channelName);
+        void addChannel(string channelName, Client &client);
+        void joinChannel(Client& client, std::pair<string, string> channel);
         void leaveChannel(Client& client, string channelName);
+		string clientIdentifier(Client &client, string& ch, Channel& channel);
+		void	joinedAChannel(Client& client, Channel& channel);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );
 		clientIter	doesUserExit( const string& nick );
 
         // send messg
-
 		void 	reply(Client &client, string const& reply);
 
 };
