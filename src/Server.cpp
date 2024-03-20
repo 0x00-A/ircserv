@@ -22,9 +22,10 @@ std::string Server::to_upper(const std::string& str)
 Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
-	// socket part
 	parseargs();
-	_socket.listenSocket(_port);
+	// socket part
+	_socket.bindSocket(_port);
+	_socket.listenSocket();
 	_socket.setSocketNonBlocking();
 	_servfd = _socket.getfd();
 	// First entry in the _pollfds array is used for the listening socket
@@ -34,14 +35,16 @@ Server::Server(const string& port, const string& passwd)
 	_pollfds.push_back(servPoll);
 
 	//
-	this->commandMap["PASS"] = &Server::pass;
-    this->commandMap["USER"] = &Server::user;
-    this->commandMap["NICK"] = &Server::nick;
-    this->commandMap["QUIT"] = &Server::quit;
-    this->commandMap["JOIN"] = &Server::join;
-    this->commandMap["PRIVMSG"] = &Server::privmsg;
-    this->commandMap["MODE"] = &Server::mode;
-    this->commandMap["M"] = &Server::mode;
+	this->commandMap["pass"] = &Server::pass;
+    this->commandMap["user"] = &Server::user;
+    this->commandMap["nick"] = &Server::nick;
+    this->commandMap["n"] = &Server::nick;
+    this->commandMap["quit"] = &Server::quit;
+    this->commandMap["join"] = &Server::join;
+    this->commandMap["j"] = &Server::join;
+    this->commandMap["privmsg"] = &Server::privmsg;
+    this->commandMap["mode"] = &Server::mode;
+    this->commandMap["m"] = &Server::mode;
 }
 
 Server::~Server()
@@ -322,6 +325,17 @@ Server::clientIter Server::getClientIterator(const Client &cli)
 			return (it);
 	}
 	return (_clients.end());
+}
+
+Server::clientIter Server::getClientIterator(const string &nick)
+{
+	clientIter it;
+	for (it = _clients.begin(); it < _clients.end(); it++)
+	{
+		if ((it->getNick() == nick) || ("@" + it->getNick() == nick))
+			return (it);
+	}
+	return (it);
 }
 
 int Server::getIndexOfClient(const clientIter& currIter)

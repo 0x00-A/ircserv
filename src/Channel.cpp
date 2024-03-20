@@ -49,34 +49,34 @@ bool Channel::joinUser(const string& user)
 
 bool Channel::isUserInChannel(const string &user) const
 {
-    return (_users.find(user) != _users.end());
+    return (_users.find(user) != _users.end() || _users.find("@" + user) != _users.end() );
 }
 
 bool Channel::isUserOperator(const string &user) const
 {
-    if (!isUserInChannel(user))
-        return (false);
-    if (_operators.find(user) != _operators.end())
-        return (true);
-    return (false);
+    // if (!isUserInChannel(user))
+    //     return (false);
+    // if (_operators.find(user) != _operators.end())
+    //     return (true);
+    // return (false);
+    return (_users.find("@" + user) != _users.end());
 }
 
 bool Channel::unsetChannelOperator(const string &user)
 {
-    if (!isUserInChannel(user))
+    if (!isUserInChannel(user) || !isUserOperator(user))
         return (false);
-    _operators.erase(user);
+    _users.erase("@" + user);
+    _users.insert(user);
     cout << user << " is no longer an operator in channel " << _name << endl;
     return (true);
 }
 
 bool Channel::partUser(const string& user)
 {
-    if (_users.erase(user))     // returns Number of elements removed (0 or 1)
+    if (_users.erase(user) || _users.erase("@" + user))     // returns Number of elements removed (0 or 1)
     {
         cout << user << " left channel " << _name << endl;
-        if (isUserOperator(user))
-            _operators.erase(user);
         return (true);
     }
     cout << user << " is not in channel " << _name << endl;
@@ -90,15 +90,6 @@ std::set<string> Channel::getUserList() const
 {
     return (_users);
 }
-
-std::set<string> Channel::getOperatorList() const
-{
-	return (_operators);
-}
-
-
-
-
 
 string Channel::getPasskey(void) const
 {
@@ -207,22 +198,14 @@ void Channel::printUsers()
     cout << endl;
 }
 
-void Channel::printOperators()
-{
-    cout << "Operators in channel " << _name << ": ";
-
-    for (std::set<string>::iterator it =_operators.begin(); it !=_operators.end(); it++)
-    {
-        cout << *it << " ";
-    }
-    cout << endl;
-}
-
 bool Channel::setChannelOperator(const string &user)
 {
     if (!isUserInChannel(user))
         return (false);
-    _operators.insert(user);
+    if (isUserOperator(user))
+        return (false);
+    _users.erase(user);
+    _users.insert("@" + user);
     cout << user << " is now an operator in channel " << _name << endl;
     return (true);
 }

@@ -49,7 +49,8 @@ private:
 
 	//
 	std::vector<Channel> 		_channels;
-	void broadcastMsg( Client &sender, const string& msg, const Channel& chan );
+
+	void 		broadcastMsg( Client &sender, const string& msg, const Channel& chan );
 
 	int			handleNewConnection( void );
 	int			handleRead( int id );
@@ -61,6 +62,7 @@ private:
 	int			getIndexOfClient( const clientIter& currIter );
 	int			getIndexOfClient( const Client& cli );
 	clientIter	getClientIterator( const Client& cli );
+	clientIter	getClientIterator( const string& nick );
 
 	/***********************[ MODE ]***********************/
 	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
@@ -117,10 +119,10 @@ public:
 
         // channel member functions
 
-        void addChannel(string channelName, Client &client);
+        // void addChannel(string channelName, Client &client);
         void joinChannel(Client& client, std::pair<string, string> channel);
-        void leaveChannel(Client& client, string channelName);
-		string clientIdentifier(Client &client, string& ch, Channel& channel);
+        // void leaveChannel(Client& client, string channelName);
+		string	channelWelcomeMessages(Client &client, Channel& channel);
 		void	joinedAChannel(Client& client, Channel& channel);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );
