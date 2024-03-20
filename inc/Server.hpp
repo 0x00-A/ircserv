@@ -49,7 +49,8 @@ private:
 
 	//
 	std::vector<Channel> 		_channels;
-	void broadcastMsg( Client &sender, const string& msg, const Channel& chan );
+
+	void 		broadcastMsg( Client &sender, const string& msg, const Channel& chan );
 
 	int			handleNewConnection( void );
 	int			handleRead( int id );

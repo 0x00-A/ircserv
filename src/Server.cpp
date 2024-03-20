@@ -3,9 +3,10 @@
 Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
-	// socket part
 	parseargs();
-	_socket.listenSocket(_port);
+	// socket part
+	_socket.bindSocket(_port);
+	_socket.listenSocket();
 	_socket.setSocketNonBlocking();
 	_servfd = _socket.getfd();
 	// First entry in the _pollfds array is used for the listening socket
