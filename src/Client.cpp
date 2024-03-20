@@ -13,7 +13,7 @@ Client::Client(const string &ip, int port, int sockfd)
 	_real = "";
 	_hostname = "";
 	_recvBuf = "";
-	_isRegistered = false;
+	// _isRegistered = false;
 	_isOperator = false;
 	_hasPassed = false;
 	_hasUsedNick = false;  
@@ -22,8 +22,6 @@ Client::Client(const string &ip, int port, int sockfd)
 
 Client::~Client()
 {
-	// leave channels
-	// close fd
 }
 
 int Client::getSockfd(void) const
@@ -73,17 +71,20 @@ void Client::setHasUsedUser(bool value)
 
 bool Client::getHasPassed()
 {
-    return this->_hasPassed;
+    return (true);
+    // return this->_hasPassed;
 }
 
 bool Client::getHasUsedNick()
 {
-    return this->_hasUsedNick;
+    return (true);
+    // return this->_hasUsedNick;
 }
 
 bool Client::getHasUsedUser()
 {
-    return this->_hasUsedUser;
+    return (true);
+    // return this->_hasUsedUser;
 }
 
 bool Client::checkNick(string &nick)
@@ -110,6 +111,11 @@ bool Client::checkNick(string &nick)
     return true;
 }
 
+string Client::identifier(void)
+{
+	return (":" + getNick() + "!~" + getUsername() + "@" + getIPAddr());
+}
+
 const string& Client::getNick(void) const
 {
     return this->_nick;
@@ -132,5 +138,6 @@ void Client::setUsername(string username)
 
 bool Client::isConnected()
 {
-    return (_hasUsedNick && _hasUsedUser && _hasPassed);
+    return (true);
+    // return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }

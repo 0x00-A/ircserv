@@ -328,6 +328,17 @@ Server::clientIter Server::getClientIterator(const Client &cli)
 	return (_clients.end());
 }
 
+Server::clientIter Server::getClientIterator(const string &nick)
+{
+	clientIter it;
+	for (it = _clients.begin(); it < _clients.end(); it++)
+	{
+		if ((it->getNick() == nick) || ("@" + it->getNick() == nick))
+			return (it);
+	}
+	return (it);
+}
+
 int Server::getIndexOfClient(const clientIter& currIter)
 {
     clientIter	beginIter = _clients.begin();

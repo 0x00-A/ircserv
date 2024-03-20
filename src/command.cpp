@@ -116,8 +116,7 @@ void Server::user(Client &client)
 
 void Server::quit(Client &client)
 {
-    string response = ":" + client.getNick() + "-!" + client.getUsername() + \
-        "@" + client.getIPAddr() + " QUIT :Quit: Bye for now!\r\n";
+    string response = client.identifier() + " QUIT :Quit: Bye for now!\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
     client.closeSocket();
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
@@ -197,8 +196,7 @@ void Server::privmsg(Client &client)
                 if (_sendMsgClient[i].first == _clients[j].getNick())
                 {
                     found = true;
-                    response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@" + \
-                    client.getIPAddr() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
+                    response = client.identifier() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
                     reply(_clients[j], response);
                     break ;
                 }
@@ -305,7 +303,6 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         {
             if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+")) && !(k < _params.size()))
             {
-                std::cout << ">>>>> " << k << " || " << _params.size() << " || " << sign << c << std::endl;
                 throw ( ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
                 client.getNick() + " " + _params[0]  + " :Not enough parametersss" );
             }
@@ -337,7 +334,6 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     }
     else
     {
-        cout << "oooo>>>: " << m.second << "||" << cli.getNick() << endl;
         (m.first == "+o")? chan->setChannelOperator(m.second) : chan->unsetChannelOperator(m.second);
         modesave += m.first;
         paramsave += " " + m.second;
@@ -499,5 +495,5 @@ void    Server::mode(Client& client)
     }
     removeExtraPlusMinus(modesave);
     if (!modesave.empty())
-        throw ("nick!~user@ip " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
+        throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
 }

@@ -1,33 +1,43 @@
 #include "Server.hpp"
 
 
-string Server::clientIdentifier(Client &client, string& ch, Channel& channel)
+string Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
     string response;
 
-    response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + ch + "\n" + \
-	":ft_irc.1337.ma MODE " + ch + " " + channel.channelModeIs() + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch + ":"  + client.getNick() + " :@" + channel.getAdmin() + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch + " :End of /NAMES list";
+    response = client.identifier() + " JOIN " + ch.getName() + "\n" + \
+	":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs() + "\n" + \
+	":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch.getName() + ":"  + client.getNick() + " :@" + ch.getAdmin() + "\n" + \
+	":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list";
 	return response;
 }
 
 void Server::joinedAChannel(Client& client, Channel& channel)
 {
-	string response;
-	std::set<string>	operators;
+	string 				response;
+	std::set<string>	users;
+	clientIter			cliIter;
 
-	operators = channel.getOperatorList();
+	// operators = channel.getOperatorList();
+	users = channel.getUserList();
+	channel.printUsers();
     response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + channel.getName();
-	for (std::set<string>::iterator it = operators.begin(); it != operators.end(); it++)
-	{	
-		for (size_t j = 0; j < _clients.size() ; j++)
+	for (std::set<string>::iterator it = users.begin(); it != users.end(); it++)
+	{
+		if ((*it)[0] != '@')
+			continue;
+		cliIter = getClientIterator(*it);
+		if (cliIter != _clients.end())
 		{
-			if (*it == _clients[j].getNick())
-			{
-				reply(_clients[j], response);
-			}
+			reply(*cliIter, response);
 		}
+		// for (size_t j = 0; j < _clients.size() ; j++)
+		// {
+		// 	if (*it == _clients[j].getNick())
+		// 	{
+		// 		reply(_clients[j], response);
+		// 	}
+		// }
 	}
 }
 
@@ -45,7 +55,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			}
 			if (_channels[i].hasInvite())
 			{
-				/// here for check client invite after salat dohr
+				/// here for check client invite after salat dohr (lawah salat l3id)
 			}
 			if (_channels[i].hasPasskey()  && !_channels[i].hasInvite())
 			{
@@ -59,7 +69,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			}
 			if (_channels[i].hasUserLimit())
 			{
-				if (_channels[i].getUserLimit() < _channels[i].getSize())
+				if (_channels[i].getUserLimit() <= _channels[i].getSize())	// changed < to <=
 				{
 					response =  (":ft_irc.1337.ma "  + to_string(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
 					reply(client, response);
@@ -67,13 +77,13 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 				}
 			}
 			this->_channels[i].joinUser(client.getNick());
-			reply(client, clientIdentifier(client, channel.first, _channels[i]));
+			reply(client, channelWelcomeMessages(client, _channels[i]));
 			joinedAChannel(client, _channels[i]);
 			return ;
 		}
 	}
 	this->_channels.push_back(Channel(channel.first, client.getNick()));
-	reply(client, clientIdentifier(client, channel.first, _channels.back()));
+	reply(client, channelWelcomeMessages(client, _channels.back()));
 }
 
 Server::channelIter Server::doesChannelExist(const string &chan)

@@ -1,1 +1,7 @@
 :nel-baz!~naim@197.230.30.146 JOIN #dfgh
+
+:Cannot join channel (+l) - channel is full, try again later
+
+if someone join  a channel it is sent to all users not just operators also +o -o nick
+
+problem: if a user joined a channel and then changed the nick name the data in channels he is currently in is not updated

@@ -53,7 +53,7 @@ class Client
 		string 	_hostname;
 
 		bool 	_isOperator;
-		bool 	_isRegistered;
+		// bool 	_isRegistered;
 
 		// track the commands
 		bool 	_hasPassed;
@@ -100,11 +100,15 @@ class Client
 		void setHasPassed(bool value);
 		void setHasUsedNick(bool value);
 		void setHasUsedUser(bool value);
+		
 		bool isConnected();
+		
 		bool getHasPassed();
 		bool getHasUsedNick();
 		bool getHasUsedUser();
-		string clientIdentifier(Client &clinet, string& ch, string& modes);
+		
+		string identifier( void );
+
 		// bool 			isRegistered(void);
 		bool checkNick(string &nick);
 
