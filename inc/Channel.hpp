@@ -2,10 +2,13 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
+
+#include "ircserv.hpp"
 #include <iostream>
 #include <vector>
 #include "Client.hpp"
 #include <ctime>
+
 
 class Channel
 {

@@ -23,6 +23,7 @@ using std::cout;
 using std::cerr;
 using std::perror;
 using std::endl;
+using std::stringstream;
 
 
 std::string intToString(int num);

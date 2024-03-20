@@ -1,8 +1,8 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include <Channel.hpp>
 #include "ircserv.hpp"
-// # include "message.hpp"
 
 #define ERR_NEEDMOREPARAMS 461
 #define ERR_ALREADYREGISTRED 462
@@ -24,53 +24,50 @@
 #define ERR_BADCHANNELKEY 475
 #define RPL_NAMREPLY 353
 #define RPL_ENDOFNAMES 366
-
-# define ERR_NOSUCHCHANNEL 403
-# define ERR_UNKNOWNMODE 472
-# define ERR_CHANOPRIVSNEEDED 482
-# define ERR_USERNOTINCHANNEL 441
-
-# define RPL_WELCOME 001
-# define RPL_CHANNELMODEIS 324
-# define RPL_CREATIONTIME 329
 #define ERR_NOSUCHCHANNEL 403
 #define ERR_UNKNOWNMODE 472
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_USERNOTINCHANNEL 441
-
 #define RPL_WELCOME 001
 #define RPL_CHANNELMODEIS 324
+#define RPL_CREATIONTIME 329
+#define ERR_NOSUCHCHANNEL 403
+#define ERR_UNKNOWNMODE 472
+#define ERR_CHANOPRIVSNEEDED 482
+#define ERR_USERNOTINCHANNEL 441
+#define RPL_WELCOME 001
+#define RPL_CHANNELMODEIS 324
+
 
 class Client
 {
 	private:
-		string 	_ip;
-		int 	_port;
+		string _ip;
+		int _port;
 
-		string 	_nick;
-		string 	_username;
-		string 	_real;
-		string 	_hostname;
+		string _nick;
+		string _username;
+		string _real;
+		string _hostname;
 
-		bool 	_isOperator;
+		// bool 	_isOperator;
 		// bool 	_isRegistered;
 
 		// track the commands
-		bool 	_hasPassed;
-		bool 	_hasUsedNick;
-		bool 	_hasUsedUser;
+		bool _hasPassed;
+		bool _hasUsedNick;
+		bool _hasUsedUser;
 
-		string 	_recvBuf;
+		string _recvBuf;
 		std::queue<string> _sendBuf;
 
 		int _clifd;
 
-		std::set<string> 	_channels; // channels user currently in
+		// std::vector<Channel> _channels; // channels user currently in
 
 		Client();
 
 	public:
-
 		Client(const string &ip, int port, int sockfd);
 
 		~Client();
@@ -94,6 +91,7 @@ class Client
 
 		///////////////////////////////////////////
 
+		// void setChannels(Channel &channel);
 		void setNick(string nick);
 		void setUsername(string username);
 
@@ -111,8 +109,9 @@ class Client
 
 		// bool 			isRegistered(void);
 		bool checkNick(string &nick);
+		string clientInfo(void);
 
-
+		// std::set<Channel> getChannels(void);
 		const string &getNick(void) const;
 		const string &getUsername(void) const;
 };

@@ -3,16 +3,16 @@
 #include <cctype>
 #include <string>
 
-std::string intToString(int num)
+string intToString(int num)
 {
     std::ostringstream ss;
     ss << num;
     return ss.str();
 }
 
-std::string Server::to_upper(const std::string& str) 
+string Server::to_upper(const string& str) 
 {
-    std::string result; 
+    string result; 
 	for (size_t i = 1; i < str.size() ; i++)
         result += (char)toupper(str[i]);
     return result;

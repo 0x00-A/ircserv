@@ -12,6 +12,7 @@
 # include "Channel.hpp"
 # include "Socket.hpp"
 
+
 # define SA struct sockaddr
 
 # define RD_BUF_SIZE 512
@@ -95,8 +96,8 @@ public:
         // bool parseCommandClient(char *buffer, Client& client);
         void 		handleCommand(string& cmd, int id);
 		void 		parseCommand(string& cmd);
-		std::string to_upper(const std::string& str);
-		// std::string intToString(int num);
+		string to_upper(const string& str);
+		// string intToString(int num);
 		string 		trim_comma(const string &str);
 		void		initPrivmsg(Client &client);
 		void 		initJoin(Client &client);

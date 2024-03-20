@@ -1,5 +1,4 @@
 #include "Client.hpp"
-#include "Client.hpp"
 
 Client::Client()
 {
@@ -14,7 +13,7 @@ Client::Client(const string &ip, int port, int sockfd)
 	_hostname = "";
 	_recvBuf = "";
 	// _isRegistered = false;
-	_isOperator = false;
+	// _isOperator = false;
 	_hasPassed = false;
 	_hasUsedNick = false;  
 	_hasUsedUser = false;
@@ -116,7 +115,12 @@ string Client::identifier(void)
 	return (":" + getNick() + "!~" + getUsername() + "@" + getIPAddr());
 }
 
-const string& Client::getNick(void) const
+// std::set<Channel> Client::getChannels(void)
+// {
+//     return (_channels);
+// }
+
+const string &Client::getNick(void) const
 {
     return this->_nick;
 }
@@ -125,6 +129,11 @@ const string& Client::getUsername(void) const
 {
     return this->_username;
 }
+
+// void Client::setChannels(Channel &channel)
+// {
+//     _channels.insert(channel);
+// }
 
 void Client::setNick(string nick)
 {
@@ -140,4 +149,11 @@ bool Client::isConnected()
 {
     return (true);
     // return (_hasUsedNick && _hasUsedUser && _hasPassed);
+}
+
+string  Client::clientInfo()
+{
+    string response;
+    response = ":" + _nick + "!~"  + _username  + "@" + _ip;
+    return response;
 }

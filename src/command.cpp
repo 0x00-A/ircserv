@@ -34,43 +34,64 @@ void Server::pass(Client &client)
 void Server::nick(Client &client)
 {
     string response;
+    std::set<Channel> channels;
+    std::set<string> users;
 
     std::cout << "receive nick command\n";
     if (client.getHasPassed() == false)
     {
-        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
-            client.getNick()  + " :You have not registered";
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
     }
     if (this->_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + intToString(ERR_NONICKNAMEGIVEN) + " " + \
-            client.getNick()  + " :No nickname given";
+        response = ":ft_irc.1337.ma " + intToString(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given";
         reply(client, response);
         return;
     }
     if (client.checkNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + intToString(ERR_ERRONEUSNICKNAME) + " " + \
-            client.getNick()  + " :Erroneus nickname";
+        response = ":ft_irc.1337.ma " + intToString(ERR_ERRONEUSNICKNAME) + " " + client.getNick()  + " :Erroneus nickname";
         reply(client, response);
         return;
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + intToString(ERR_NICKNAMEINUSE) + " " + \
-            client.getNick()  + " :Nickname is already in use";
+        response = ":ft_irc.1337.ma " + intToString(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use";
         reply(client, response);
         return;
     }
-    if (client.getHasUsedNick() == true)
+    if (client.getHasUsedNick() == true && !client.isConnected())
     {
         response = ":" + client.getNick() + "!~"  + client.getUsername()  + "@" + client.getIPAddr() + " NICK :" +  this->_params[1];
         reply(client, response);
     }
     client.setNick(this->_params[1]);
     client.setHasUsedNick(true);
+    // if (client.isConnected())
+    // {
+    //     response = client.clientInfo() + " NICK :" + client.getNick();
+    //     reply(client, response);
+    //     channels = client.getChannels();
+    //     std::vector<Channel>::iterator it = _channels.begin();
+    //     for (; it != _channels.end(); it++)
+    //     {
+    //         channelIter it =  std::find(_channels.begin(), _channels.end(), it);
+    //         if (it != _channels.end())
+    //         {
+    //             users = it->getUserList();
+    //             std::set<string>::iterator itU = users.begin();
+    //             for (; itU != users.end() ; itU++)
+    //             {
+                    
+    //                 reply(client, response);
+    //             }
+                
+    //         }
+    //     }
+        
+    // }
     if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);
@@ -112,7 +133,6 @@ void Server::user(Client &client)
     }
     if (client.isConnected())
     {
-        // #define RPL_WELCOME(nick, hostname) ":" + hostname + " 001 " + nick + " :Welcome " + nick + " to the ft_irc network !\r\n"
         response = ":ft_irc.1337.ma 001 " + \
             client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
         std::cout << response << '\n';
@@ -159,7 +179,7 @@ void Server::join(Client &client)
 
 void Server::privmsg(Client &client)
 {
-    std::set<std::string> seenNicks;
+    std::set<string> seenNicks;
     bool found = false;
     string response;
 

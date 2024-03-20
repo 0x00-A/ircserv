@@ -31,7 +31,7 @@ bool Server::checkAlreadyNick(string &nick)
 void  Server::parseCommand(string &command)
 {
     size_t pos;
-    std::stringstream ss;
+    stringstream ss;
     string token, tmp = "";
 
     if ( (pos = command.find(" :")) != string::npos)
@@ -106,7 +106,7 @@ void Server::initPrivmsg(Client &client)
     if (_params.size() < 2)
     {
         response = ":ft_irc.1337.ma " + intToString(ERR_NORECIPIENT) + " " + \
-            client.getNick()  + " ::No recipient given (" + _params[0] + ")";
+            client.getNick()  + " :No recipient given (" + _params[0] + ")";
         reply(client, response);
         return;
     }
@@ -118,7 +118,7 @@ void Server::initPrivmsg(Client &client)
         return;
     }
     string clients = trim_comma(_params[1]);
-    std::stringstream ss(clients);
+    stringstream ss(clients);
     string token;
     while (std::getline(ss, token, ','))
     {
@@ -136,9 +136,9 @@ void Server::initJoin(Client &client)
     string chan;
     string key = "";
     bool    keys = false;
-    std::stringstream ssk;
+    stringstream ssk;
 
-    std::set<std::string> seenChannels;
+    std::set<string> seenChannels;
     string response;
     if (_params.size() < 2)
     {
@@ -148,7 +148,7 @@ void Server::initJoin(Client &client)
         return;
     }
     line = trim_comma(_params[1]);
-    std::stringstream ss(line);
+    stringstream ss(line);
 
     if (_params.size() > 2)
     {
