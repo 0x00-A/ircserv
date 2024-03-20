@@ -22,6 +22,7 @@ int Socket::getfd()
 void Socket::bindSocket(string port)
 {
 	struct sockaddr_in	servaddr;
+	const int	enable = 1;
 
 	// fill in an Internet socket address structure with the server's IP address and port number
 	bzero(&servaddr, sizeof(struct sockaddr_in));
@@ -30,6 +31,10 @@ void Socket::bindSocket(string port)
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); // remove htonl? // INADDR_ANY allows the server to accept a client connection on any interface
 
 	// TODO: Add setsockop() to reuse address
+	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)))
+	{
+		perror("setsockopt");
+	}
 
 	// bind The server's port to the socket
 	if (bind(_sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
