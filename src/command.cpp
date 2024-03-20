@@ -34,7 +34,6 @@ void Server::pass(Client &client)
 void Server::nick(Client &client)
 {
     string response;
-    std::set<Channel> channels;
     std::set<string> users;
 
     std::cout << "receive nick command\n";
@@ -69,29 +68,28 @@ void Server::nick(Client &client)
     }
     client.setNick(this->_params[1]);
     client.setHasUsedNick(true);
-    // if (client.isConnected())
-    // {
-    //     response = client.clientInfo() + " NICK :" + client.getNick();
-    //     reply(client, response);
-    //     channels = client.getChannels();
-    //     std::vector<Channel>::iterator it = _channels.begin();
-    //     for (; it != _channels.end(); it++)
-    //     {
-    //         channelIter it =  std::find(_channels.begin(), _channels.end(), it);
-    //         if (it != _channels.end())
-    //         {
-    //             users = it->getUserList();
-    //             std::set<string>::iterator itU = users.begin();
-    //             for (; itU != users.end() ; itU++)
-    //             {
+    if (client.isConnected())
+    {
+        response = client.clientInfo() + " NICK :" + client.getNick();
+        reply(client, response);
+        // std::vector<Channel>::iterator it = _channels.begin();
+        // for (; it != _channels.end(); it++)
+        // {
+        //     channelIter it =  std::find(_channels.begin(), _channels.end(), it);
+        //     if (it != _channels.end())
+        //     {
+        //         users = it->getUserList();
+        //         std::set<string>::iterator itU = users.begin();
+        //         for (; itU != users.end() ; itU++)
+        //         {
                     
-    //                 reply(client, response);
-    //             }
+        //             reply(client, response);
+        //         }
                 
-    //         }
-    //     }
+        //     }
+        // }
         
-    // }
+    }
     if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);

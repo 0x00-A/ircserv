@@ -63,7 +63,7 @@ class Client
 
 		int _clifd;
 
-		// std::vector<Channel> _channels; // channels user currently in
+		std::set<string> _channels; // channels user currently in
 
 		Client();
 
@@ -91,7 +91,7 @@ class Client
 
 		///////////////////////////////////////////
 
-		// void setChannels(Channel &channel);
+		void setChannels(string &channel);
 		void setNick(string nick);
 		void setUsername(string username);
 
@@ -111,7 +111,7 @@ class Client
 		bool checkNick(string &nick);
 		string clientInfo(void);
 
-		// std::set<Channel> getChannels(void);
+		std::set<string> getChannels(void);
 		const string &getNick(void) const;
 		const string &getUsername(void) const;
 };

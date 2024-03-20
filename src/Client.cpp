@@ -115,10 +115,10 @@ string Client::identifier(void)
 	return (":" + getNick() + "!~" + getUsername() + "@" + getIPAddr());
 }
 
-// std::set<Channel> Client::getChannels(void)
-// {
-//     return (_channels);
-// }
+std::set<string> Client::getChannels(void)
+{
+    return (_channels);
+}
 
 const string &Client::getNick(void) const
 {
@@ -130,10 +130,10 @@ const string& Client::getUsername(void) const
     return this->_username;
 }
 
-// void Client::setChannels(Channel &channel)
-// {
-//     _channels.insert(channel);
-// }
+void Client::setChannels(string &channel)
+{
+    _channels.insert(channel);
+}
 
 void Client::setNick(string nick)
 {
