@@ -101,8 +101,10 @@ Server::channelIter Server::doesChannelExist(const string &chan)
 }
 
 
-Server::clientIter Server::doesUserExit(const string &nick)
+Server::clientIter Server::doesUserExit( string nick)
 {
+	if (nick[0] == '@')
+		nick.erase(0,1);
 	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
 	{
 		if (it->getNick() == nick)

@@ -85,16 +85,18 @@ void Server::nick(Client &client)
                 for ( ; itUser != users.end(); itUser++)
                 {
                     clientIter itClient = doesUserExit(*itUser);
+
                     if (itClient != _clients.end())
                     {
                         reply(*itClient, response);
                     }
                 }
             }
-            else {
+            else 
+            {
                 continue;
             }
-            itCha
+            itCha->swapUser(client.getNick(), this->_params[1]);
         } 
     }
     client.setNick(this->_params[1]);

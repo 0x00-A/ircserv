@@ -128,7 +128,7 @@ public:
 		void	joinedAChannel(Client& client, Channel& channel);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );
-		clientIter	doesUserExit( const string& nick );
+		clientIter	doesUserExit( string nick );
 
         // send messg
 		void 	reply(Client &client, string const& reply);
