@@ -66,17 +66,16 @@ void Server::nick(Client &client)
         response = ":" + client.getNick() + "!~"  + client.getUsername()  + "@" + client.getIPAddr() + " NICK :" +  this->_params[1];
         reply(client, response);
     }
-    client.setNick(this->_params[1]);
-    client.setHasUsedNick(true);
     if (client.isConnected())
     {
-        response = client.clientInfo() + " NICK :" + client.getNick();
+        response = client.clientInfo() + " NICK :" + this->_params[1];
         reply(client, response);
 
         channelsJ = client.getChannels();
         std::set<string>::iterator it = channelsJ.begin();
         for ( ; it != channelsJ.end(); it++)
         {
+
             channelIter itCha = doesChannelExist(*it);
             if (itCha != _channels.end())
             {
@@ -85,24 +84,24 @@ void Server::nick(Client &client)
                 std::set<string>::iterator itUser = users.begin();
                 for ( ; itUser != users.end(); itUser++)
                 {
-                    /// 
+                    clientIter itClient = doesUserExit(*itUser);
+                    if (itClient != _clients.end())
+                    {
+                        reply(*itClient, response);
+                    }
                 }
-                
-
             }
-        }
-        
+            else {
+                continue;
+            }
+            itCha
+        } 
     }
+    client.setNick(this->_params[1]);
+    client.setHasUsedNick(true);
     if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);
-    }
-    if (client.isConnected())
-    {
-        response = ":ft_irc.1337.ma 001 " + \
-            client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
-        std::cout << response << '\n';
-        reply(client, response);
     }
 }
 

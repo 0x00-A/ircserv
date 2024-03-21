@@ -64,6 +64,7 @@ private:
 	int			getIndexOfClient( const Client& cli );
 	clientIter	getClientIterator( const Client& cli );
 	clientIter	getClientIterator( const string& nick );
+	string		getMembers(Channel& ch);
 
 	/***********************[ MODE ]***********************/
 	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );

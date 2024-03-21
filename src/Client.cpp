@@ -70,20 +70,17 @@ void Client::setHasUsedUser(bool value)
 
 bool Client::getHasPassed()
 {
-    return (true);
-    // return this->_hasPassed;
+    return this->_hasPassed;
 }
 
 bool Client::getHasUsedNick()
 {
-    return (true);
-    // return this->_hasUsedNick;
+    return this->_hasUsedNick;
 }
 
 bool Client::getHasUsedUser()
 {
-    return (true);
-    // return this->_hasUsedUser;
+    return this->_hasUsedUser;
 }
 
 bool Client::checkNick(string &nick)
@@ -147,8 +144,7 @@ void Client::setUsername(string username)
 
 bool Client::isConnected()
 {
-    return (true);
-    // return (_hasUsedNick && _hasUsedUser && _hasPassed);
+    return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }
 
 string  Client::clientInfo()

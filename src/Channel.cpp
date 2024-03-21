@@ -83,8 +83,18 @@ bool Channel::partUser(const string& user)
     return (false);
 }
 
-
-
+void Channel::swapUser(const string &oldUser, const string &newUser)
+{
+    std::set<string>::iterator itUser = _users.begin();
+    for ( ; itUser != _users.end(); itUser++)
+    {
+        if (*itUser == oldUser)
+        {
+            _users.erase(oldUser);
+            _users.insert(newUser);
+        }
+    }
+}
 
 std::set<string> Channel::getUserList() const
 {

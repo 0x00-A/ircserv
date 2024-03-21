@@ -1,14 +1,29 @@
 #include "Server.hpp"
 
 
+string		Server::getMembers(Channel& ch)
+{
+    string response;
+
+	std::set<string>  members = ch.getUserList();
+	std::set<string>::iterator it = members.begin();
+	for ( ; it != members.end(); it++)
+	{
+		response += " " + *it;
+	}
+	if (response[0] == ' ')
+		response.erase(0, 1);
+	return response;
+
+}
 string Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
     string response;
 
     response = client.identifier() + " JOIN " + ch.getName() + "\n" + \
 	":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs() + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch.getName() + ":"  + client.getNick() + " :@" + ch.getAdmin() + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list";
+	":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch.getName() + " :"  + getMembers(ch) + "\n" + \
+	":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
 	return response;
 }
 
@@ -85,6 +100,7 @@ Server::channelIter Server::doesChannelExist(const string &chan)
 	return (_channels.end());
 }
 
+
 Server::clientIter Server::doesUserExit(const string &nick)
 {
 	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
@@ -94,3 +110,5 @@ Server::clientIter Server::doesUserExit(const string &nick)
 	}
 	return (_clients.end());
 }
+
+

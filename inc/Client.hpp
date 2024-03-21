@@ -68,6 +68,7 @@ class Client
 		Client();
 
 	public:
+
 		Client(const string &ip, int port, int sockfd);
 
 		~Client();
