@@ -30,7 +30,7 @@ int main() {
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
         error("ERROR on binding"); // Bind the socket to an address
 
-    listen(sockfd, 50000); // Listen for connections, with a max backlog of 5
+    listen(sockfd, 5); // Listen for connections, with a max backlog of 5
     clilen = sizeof(cli_addr); // Get the size of the client address
 
     while(1) {
@@ -44,6 +44,13 @@ int main() {
         if (n <= 0) break; // Break the loop if read error or client disconnects
 
         std::cout << "Here is the message: " << buffer << std::endl; // Print the message
+        // Write something in the console and send it to the client
+        std::string message;
+        std::cout << "Enter a message to the client: ";
+        std::getline(std::cin, message);
+
+        n = write(newsockfd, message.c_str(), message.length());
+        if (n < 0) error("ERROR writing to socket");
     }
     close(newsockfd); // Close the client socket after done with the communication
     }

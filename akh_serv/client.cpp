@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     
     while (true) {
         char buffer[256];
-        std::cout << "> ";
+        std::cout << "Enter a message to the server: ";
         std::cin.getline(buffer, 256); // Read input from the user
         if (std::cin.eof()) { // Check for EOF (Ctrl+D)
             break; // Exit the loop if EOF is detected
@@ -53,15 +53,15 @@ int main(int argc, char *argv[]) {
         write(sockfd, buffer, strlen(buffer)); // Send the input to the server
         memset(buffer, 0, 256); // Clear the buffer
         // Optionally, wait for and read a response from the server
+        while(!buffer)    
+            std::cout << "Waiting server reply!\n";
         read(sockfd, buffer, 255); // Read the server's response (optional)
         std::cout << "Server reply: " << buffer << std::endl; // Print the server's response
         memset(buffer, 0, 256); // Clear the buffer again
-        std::cout << "buffer: " << buffer << '\n'
+        // std::cout << "buffer: " << buffer << '\n';
     }
 
     close(sockfd); // Close the socket
     std::cout << "Connection closed." << std::endl;
     return 0; // End the program
 }
-
-
