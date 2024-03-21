@@ -69,35 +69,40 @@ void Server::nick(Client &client)
     if (client.isConnected())
     {
         response = client.clientInfo() + " NICK :" + this->_params[1];
-        reply(client, response);
-
         channelsJ = client.getChannels();
-        std::set<string>::iterator it = channelsJ.begin();
-        for ( ; it != channelsJ.end(); it++)
+        if (channelsJ.empty())
         {
-
-            channelIter itCha = doesChannelExist(*it);
-            if (itCha != _channels.end())
+            cout << ">>>>DDDD" << endl;
+            reply(client, response);
+        }
+        else
+        {
+            std::set<string>::iterator it = channelsJ.begin();
+            for ( ; it != channelsJ.end(); it++)
             {
-                std::set<string> users;
-                users = itCha->getUserList();
-                std::set<string>::iterator itUser = users.begin();
-                for ( ; itUser != users.end(); itUser++)
+                channelIter itCha = doesChannelExist(*it);
+                if (itCha != _channels.end())
                 {
-                    clientIter itClient = doesUserExit(*itUser);
-
-                    if (itClient != _clients.end())
+                    std::set<string> users;
+                    users = itCha->getUserList();
+                    std::set<string>::iterator itUser = users.begin();
+                    for ( ; itUser != users.end(); itUser++)
                     {
-                        reply(*itClient, response);
+                        clientIter itClient = doesUserExit(*itUser);
+
+                        if (itClient != _clients.end())
+                        {
+                            reply(*itClient, response);
+                        }
                     }
                 }
-            }
-            else 
-            {
-                continue;
-            }
-            itCha->swapUser(client.getNick(), this->_params[1]);
-        } 
+                else 
+                {
+                    continue;
+                }
+                itCha->swapUser(client.getNick(), this->_params[1]);
+            } 
+        }
     }
     client.setNick(this->_params[1]);
     client.setHasUsedNick(true);
