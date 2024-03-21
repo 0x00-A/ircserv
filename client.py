@@ -32,7 +32,7 @@ def connect_to_server(host, port, i):
 
 if __name__ == "__main__":
     host = 'localhost'  # Change this to your server's IP address
-    port = 123  # Change this to the port your server is listening on
+    port = 1  # Change this to the port your server is listening on
     for i in range(5000):
         connect_to_server(host, port, i)
     a = input()
