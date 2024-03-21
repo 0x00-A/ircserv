@@ -34,7 +34,7 @@ void Server::pass(Client &client)
 void Server::nick(Client &client)
 {
     string response;
-    std::set<string> users;
+    std::set<string> channelsJ;
 
     std::cout << "receive nick command\n";
     if (client.getHasPassed() == false)
@@ -72,22 +72,25 @@ void Server::nick(Client &client)
     {
         response = client.clientInfo() + " NICK :" + client.getNick();
         reply(client, response);
-        // std::vector<Channel>::iterator it = _channels.begin();
-        // for (; it != _channels.end(); it++)
-        // {
-        //     channelIter it =  std::find(_channels.begin(), _channels.end(), it);
-        //     if (it != _channels.end())
-        //     {
-        //         users = it->getUserList();
-        //         std::set<string>::iterator itU = users.begin();
-        //         for (; itU != users.end() ; itU++)
-        //         {
-                    
-        //             reply(client, response);
-        //         }
+
+        channelsJ = client.getChannels();
+        std::set<string>::iterator it = channelsJ.begin();
+        for ( ; it != channelsJ.end(); it++)
+        {
+            channelIter itCha = doesChannelExist(*it);
+            if (itCha != _channels.end())
+            {
+                std::set<string> users;
+                users = itCha->getUserList();
+                std::set<string>::iterator itUser = users.begin();
+                for ( ; itUser != users.end(); itUser++)
+                {
+                    /// 
+                }
                 
-        //     }
-        // }
+
+            }
+        }
         
     }
     if (_clients.size() > 1 && client.getHasUsedUser())
