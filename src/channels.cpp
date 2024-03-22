@@ -30,24 +30,18 @@ void Server::channelWelcomeMessages(Client &client, Channel& ch)
 
     response = client.identifier() + " JOIN " + ch.getName();
 	reply(client, response);
+
 	response = ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs();
 	reply(client, response);
-	response = channelInfo(client.getNick(), ch.getName()) + getMembers(ch);
 
+	response = channelInfo(client.getNick(), ch.getName()) + getMembers(ch);
     int numChunks = response.length() / 512;
-    if (response.length() % 512 != 0)
-	{
-        numChunks++; 
-    }
-    for (int i = 0; i < numChunks; i++)
-	{
+    if (response.length() % 512 != 0) numChunks++;
+    for (int i = 0; i < numChunks; i++) {
         string chunk = response.substr(i * 512, 512);
         reply(client, chunk);
     }
-
-	reply(client, response);
-
-
+	
 	response = ":ft_irc.1337.ma " + itos(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
 	reply(client, response);
 }

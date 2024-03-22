@@ -109,12 +109,12 @@ void Server::disconnectClient(int id)
 
 int Server::handleRead(int id)
 {
-	char		readbuf[512];
+	char		readbuf[513];
 	ssize_t		bytesread;
 
 	do
 	{
-		bytesread = read(_clients[id].getSockfd(), readbuf, sizeof(readbuf));
+		bytesread = read(_clients[id].getSockfd(), readbuf, sizeof(readbuf) - 1);
 		if (bytesread < 0)
 		{
 			if (errno != EWOULDBLOCK && errno != EAGAIN)

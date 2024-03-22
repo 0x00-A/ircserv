@@ -114,6 +114,7 @@ class Server
 		void join(Client &client);
 		void privmsg(Client &client);
 		void mode(Client &client);
+		
 
 		// channel member functions
 
