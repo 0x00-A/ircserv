@@ -34,8 +34,7 @@ void Server::pass(Client &client)
 void Server::nick(Client &client)
 {
     string response;
-    std::set<Channel> channels;
-    std::set<string> users;
+    std::set<string> channelsJ;
 
     std::cout << "receive nick command\n";
     if (client.getHasPassed() == false)
@@ -67,41 +66,49 @@ void Server::nick(Client &client)
         response = ":" + client.getNick() + "!~"  + client.getUsername()  + "@" + client.getIPAddr() + " NICK :" +  this->_params[1];
         reply(client, response);
     }
+    if (client.isConnected())
+    {
+        response = client.clientInfo() + " NICK :" + this->_params[1];
+        channelsJ = client.getChannels();
+        if (channelsJ.empty())
+        {
+            reply(client, response);
+        }
+        else
+        {
+            std::set<string>::iterator it = channelsJ.begin();
+            for ( ; it != channelsJ.end(); it++)
+            {
+                channelIter itCha = doesChannelExist(*it);
+                if (itCha != _channels.end())
+                {
+                    std::set<string> users;
+                    users = itCha->getUserList();
+                    std::set<string>::iterator itUser = users.begin();
+                    for ( ; itUser != users.end(); itUser++)
+                    {
+                        clientIter itClient = doesUserExit(*itUser);
+
+                        if (itClient != _clients.end())
+                        {
+                            reply(*itClient, response);
+                        }
+                    }
+                }
+                else 
+                {
+                    continue;
+                }
+                itCha->swapUser(client.getNick(), this->_params[1]);
+            } 
+        }
+    }
     client.setNick(this->_params[1]);
     client.setHasUsedNick(true);
-    // if (client.isConnected())
-    // {
-    //     response = client.clientInfo() + " NICK :" + client.getNick();
-    //     reply(client, response);
-    //     channels = client.getChannels();
-    //     std::vector<Channel>::iterator it = _channels.begin();
-    //     for (; it != _channels.end(); it++)
-    //     {
-    //         channelIter it =  std::find(_channels.begin(), _channels.end(), it);
-    //         if (it != _channels.end())
-    //         {
-    //             users = it->getUserList();
-    //             std::set<string>::iterator itU = users.begin();
-    //             for (; itU != users.end() ; itU++)
-    //             {
-                    
-    //                 reply(client, response);
-    //             }
-                
-    //         }
-    //     }
-        
-    // }
+    if (client.isConnected()) welcomeClient(client);
     if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);
-    }
-    if (client.isConnected())
-    {
-        response = ":ft_irc.1337.ma 001 " + \
-            client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
-        std::cout << response << '\n';
-        reply(client, response);
     }
 }
 
@@ -110,7 +117,13 @@ void Server::user(Client &client)
 {
     string response;
 
-    std::cout << "receive user command\n";
+     if (client.isConnected())
+    {
+        response = ":ft_irc.1337.ma " + intToString(ERR_ALREADYREGISTRED) + " " + \
+            client.getNick()  + " :You may not reregister";
+        reply(client, response);
+        return ;
+    }
     if (client.getHasPassed() == false)
     {
         response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
@@ -131,13 +144,7 @@ void Server::user(Client &client)
     {
         checkSpamClient(client);
     }
-    if (client.isConnected())
-    {
-        response = ":ft_irc.1337.ma 001 " + \
-            client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
-        std::cout << response << '\n';
-        reply(client, response);
-    }
+    if (client.isConnected())  welcomeClient(client);
 }
 
 void Server::quit(Client &client)

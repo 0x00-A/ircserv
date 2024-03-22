@@ -70,20 +70,17 @@ void Client::setHasUsedUser(bool value)
 
 bool Client::getHasPassed()
 {
-    return (true);
-    // return this->_hasPassed;
+    return this->_hasPassed;
 }
 
 bool Client::getHasUsedNick()
 {
-    return (true);
-    // return this->_hasUsedNick;
+    return this->_hasUsedNick;
 }
 
 bool Client::getHasUsedUser()
 {
-    return (true);
-    // return this->_hasUsedUser;
+    return this->_hasUsedUser;
 }
 
 bool Client::checkNick(string &nick)
@@ -115,10 +112,10 @@ string Client::identifier(void)
 	return (":" + getNick() + "!~" + getUsername() + "@" + getIPAddr());
 }
 
-// std::set<Channel> Client::getChannels(void)
-// {
-//     return (_channels);
-// }
+std::set<string> Client::getChannels(void)
+{
+    return (_channels);
+}
 
 const string &Client::getNick(void) const
 {
@@ -130,10 +127,10 @@ const string& Client::getUsername(void) const
     return this->_username;
 }
 
-// void Client::setChannels(Channel &channel)
-// {
-//     _channels.insert(channel);
-// }
+void Client::setChannels(string &channel)
+{
+    _channels.insert(channel);
+}
 
 void Client::setNick(string nick)
 {
@@ -147,8 +144,7 @@ void Client::setUsername(string username)
 
 bool Client::isConnected()
 {
-    return (true);
-    // return (_hasUsedNick && _hasUsedUser && _hasPassed);
+    return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }
 
 string  Client::clientInfo()

@@ -39,6 +39,7 @@ private:
 	std::vector<struct pollfd>	_pollfds;
 	std::vector<Client>			_clients;
 	Socket						_socket;
+	string 						_startTime;
 
 	// just added
 	std::vector<string> 					_params;
@@ -64,6 +65,7 @@ private:
 	int			getIndexOfClient( const Client& cli );
 	clientIter	getClientIterator( const Client& cli );
 	clientIter	getClientIterator( const string& nick );
+	string		getMembers(Channel& ch);
 
 	/***********************[ MODE ]***********************/
 	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
@@ -86,7 +88,12 @@ public:
 	~Server();
 
 	void		run();
+	void		setStartTime( void );
+	string		getStartTime( void ) const;
 
+
+	
+	void	welcomeClient(Client &client);
 	// functions for debuging
 	void	printClients( void );
 	void	printpollfds( void );
@@ -127,7 +134,7 @@ public:
 		void	joinedAChannel(Client& client, Channel& channel);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );
-		clientIter	doesUserExit( const string& nick );
+		clientIter	doesUserExit( string nick );
 
         // send messg
 		void 	reply(Client &client, string const& reply);

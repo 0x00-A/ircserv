@@ -28,15 +28,17 @@
 #define ERR_UNKNOWNMODE 472
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_USERNOTINCHANNEL 441
-#define RPL_WELCOME 001
 #define RPL_CHANNELMODEIS 324
 #define RPL_CREATIONTIME 329
 #define ERR_NOSUCHCHANNEL 403
 #define ERR_UNKNOWNMODE 472
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_USERNOTINCHANNEL 441
-#define RPL_WELCOME 001
 #define RPL_CHANNELMODEIS 324
+#define RPL_WELCOME 001
+#define RPL_YOURHOST 002
+#define RPL_CREATED 003
+#define RPL_MYINFO 004
 
 
 class Client
@@ -63,11 +65,12 @@ class Client
 
 		int _clifd;
 
-		// std::vector<Channel> _channels; // channels user currently in
+		std::set<string> _channels; // channels user currently in
 
 		Client();
 
 	public:
+
 		Client(const string &ip, int port, int sockfd);
 
 		~Client();
@@ -91,7 +94,7 @@ class Client
 
 		///////////////////////////////////////////
 
-		// void setChannels(Channel &channel);
+		void setChannels(string &channel);
 		void setNick(string nick);
 		void setUsername(string username);
 
@@ -111,7 +114,7 @@ class Client
 		bool checkNick(string &nick);
 		string clientInfo(void);
 
-		// std::set<Channel> getChannels(void);
+		std::set<string> getChannels(void);
 		const string &getNick(void) const;
 		const string &getUsername(void) const;
 };

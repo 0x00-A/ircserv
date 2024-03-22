@@ -37,12 +37,16 @@ class Channel
 
 	public:
 
+		// iterator here 
+		typedef	std::set<string>::iterator setIter;
+
 		Channel(const string& channelName, const string& admin);
 		
 		~Channel();
 
 		bool				joinUser( const string& user );
 		bool				partUser( const string& user );
+		void 				swapUser(const string &oldUser, const string &newUser);
 
 		bool				isUserInChannel( const string& user ) const;
 
@@ -88,6 +92,7 @@ class Channel
 		void				setHasInvite( bool stat );
 		void				setHasTopic( bool stat );
 		
+
 
 
 		void				printUsers( void );
