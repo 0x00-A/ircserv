@@ -12,3 +12,21 @@ problem: if a user joined a channel and then changed the nick name the data in c
 
 
 + remove deconnected users from channels
+
+
+if channel already exist (join)
+:u4!~x@197.230.30.146 JOIN #ch1
+:mercury.libera.chat 332 u4 #ch1 :dsdssdsssssdsdsdsd
+:mercury.libera.chat 333 u4 #ch1 u1!~x@197.230.30.146 1711076841
+:mercury.libera.chat 353 u4 @ #ch1 :u4 u3 @u1
+:mercury.libera.chat 366 u4 #ch1 :End of /NAMES list.
+
+
+
+###### messages are broadcasted to other clients to keep them informed about channel events and user interactions
+	+ User Joins a Channel
+	+ User Parts (Leaves) a Channel
+	+ User Quits the Server
+	+ Channel Topic Changes
+	+ Channel Modes Changes
+	+ Private Messages (Queries)

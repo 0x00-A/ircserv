@@ -368,6 +368,8 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     else
     {
         (m.first == "+o")? chan->setChannelOperator(m.second) : chan->unsetChannelOperator(m.second);
+        // :u1!~x@197.230.30.146 MODE #ch1 -o u4
+        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first + " " + m.second, *chan);
         modesave += m.first;
         paramsave += " " + m.second;
     }
