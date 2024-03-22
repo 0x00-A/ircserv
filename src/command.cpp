@@ -72,7 +72,6 @@ void Server::nick(Client &client)
         channelsJ = client.getChannels();
         if (channelsJ.empty())
         {
-            cout << ">>>>DDDD" << endl;
             reply(client, response);
         }
         else
@@ -106,6 +105,7 @@ void Server::nick(Client &client)
     }
     client.setNick(this->_params[1]);
     client.setHasUsedNick(true);
+    if (client.isConnected()) welcomeClient(client);
     if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);
@@ -117,7 +117,13 @@ void Server::user(Client &client)
 {
     string response;
 
-    std::cout << "receive user command\n";
+     if (client.isConnected())
+    {
+        response = ":ft_irc.1337.ma " + intToString(ERR_ALREADYREGISTRED) + " " + \
+            client.getNick()  + " :You may not reregister";
+        reply(client, response);
+        return ;
+    }
     if (client.getHasPassed() == false)
     {
         response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
@@ -138,13 +144,7 @@ void Server::user(Client &client)
     {
         checkSpamClient(client);
     }
-    if (client.isConnected())
-    {
-        response = ":ft_irc.1337.ma 001 " + \
-            client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
-        std::cout << response << '\n';
-        reply(client, response);
-    }
+    if (client.isConnected())  welcomeClient(client);
 }
 
 void Server::quit(Client &client)

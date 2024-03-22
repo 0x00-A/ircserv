@@ -39,6 +39,7 @@ private:
 	std::vector<struct pollfd>	_pollfds;
 	std::vector<Client>			_clients;
 	Socket						_socket;
+	string 						_startTime;
 
 	// just added
 	std::vector<string> 					_params;
@@ -87,7 +88,12 @@ public:
 	~Server();
 
 	void		run();
+	void		setStartTime( void );
+	string		getStartTime( void ) const;
 
+
+	
+	void	welcomeClient(Client &client);
 	// functions for debuging
 	void	printClients( void );
 	void	printpollfds( void );

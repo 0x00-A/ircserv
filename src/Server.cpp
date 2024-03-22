@@ -5,9 +5,9 @@
 
 string intToString(int num)
 {
-    std::ostringstream ss;
-    ss << num;
-    return ss.str();
+    std::ostringstream oss;
+    oss << std::setw(3) << std::setfill('0') << num;
+    return oss.str();
 }
 
 string Server::to_upper(const string& str) 
@@ -206,6 +206,7 @@ void	Server::run()
 
 
 	cout << "Server running" << endl;
+	setStartTime();
 	while (true)
 	{
 		// printClients();
@@ -287,6 +288,27 @@ void	Server::run()
 		cleanUnusedClients();
 	}
 	closeAllOpenSockets();
+}
+
+void Server::setStartTime(void)
+{
+	std::time_t res = std::time(NULL);
+
+    char *timePtr = std::ctime(&res);
+    if (!timePtr)
+    {
+        cerr << "error time" << endl;
+        _startTime = "";
+    }
+    else
+    {
+        _startTime = timePtr;
+    }
+}
+
+string Server::getStartTime(void) const
+{
+    return (_startTime);
 }
 
 void Server::cleanUnusedClients()
