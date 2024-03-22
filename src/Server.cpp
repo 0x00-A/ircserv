@@ -95,14 +95,16 @@ void Server::disconnectClient(int id)
 
 	clientIter			cli_it;
 	pollfdIter			poll_it;
-
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 
 	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
+	exitUserFromChannels(cli_it);
 	cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
+
+	
 }
 
 int Server::handleRead(int id)

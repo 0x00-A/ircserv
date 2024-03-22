@@ -4,4 +4,11 @@
 
 if someone join  a channel it is sent to all users not just operators also +o -o nick
 
+the channel ceases to exist when the last client leaves it
+
+Channels also contain a topic. The topic is a line shown to all users when they join the channel, and all users in the channel are notified when the topic of a channel is changed.
+
 problem: if a user joined a channel and then changed the nick name the data in channels he is currently in is not updated
+
+
++ remove deconnected users from channels

@@ -101,16 +101,34 @@ Server::channelIter Server::doesChannelExist(const string &chan)
 }
 
 
-Server::clientIter Server::doesUserExit( string nick)
+Server::clientIter Server::doesUserExit(const string nick)
 {
-	if (nick[0] == '@')
-		nick.erase(0,1);
 	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
 	{
-		if (it->getNick() == nick)
+		if (it->getNick() == nick || ("@" + it->getNick()) == nick)
 			return (it);
 	}
 	return (_clients.end());
 }
 
+void Server::removeUserFromChannel(const string user, const string chan)
+{
+	channelIter it = doesChannelExist(chan);
+	if (it != _channels.end())
+	{
+		it->partUser(user);
+		if (it->getSize() <= 0)
+		{
+			_channels.erase(it);
+		}
+	}
+}
 
+void Server::exitUserFromChannels(clientIter cli)
+{
+	std::set<string> chans = cli->getChannels();
+	for (std::set<string>::iterator it = chans.begin(); it != chans.end(); it++)
+	{
+		removeUserFromChannel(cli->getNick(), *it);
+	}
+}

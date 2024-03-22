@@ -134,7 +134,10 @@ public:
 		void	joinedAChannel(Client& client, Channel& channel);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );
-		clientIter	doesUserExit( string nick );
+		clientIter	doesUserExit( const string nick );
+		void		removeUserFromChannel( const string user, const string chan );
+
+		void		exitUserFromChannels(clientIter cli);
 
         // send messg
 		void 	reply(Client &client, string const& reply);

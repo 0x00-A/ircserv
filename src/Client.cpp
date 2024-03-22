@@ -70,16 +70,19 @@ void Client::setHasUsedUser(bool value)
 
 bool Client::getHasPassed()
 {
+    // return (true);
     return this->_hasPassed;
 }
 
 bool Client::getHasUsedNick()
 {
+    // return (true);
     return this->_hasUsedNick;
 }
 
 bool Client::getHasUsedUser()
 {
+    // return (true);
     return this->_hasUsedUser;
 }
 
@@ -132,6 +135,20 @@ void Client::setChannels(string &channel)
     _channels.insert(channel);
 }
 
+// void Client::exitFromChannels()
+// {
+//     std::vector<string>::iterator it = _channels.begin();
+//     for (it; it < _channels.end(); it++)
+//     {
+        
+//     }
+// }
+
+// void Client::setChannels(Channel &channel)
+// {
+//     _channels.insert(channel);
+// }
+
 void Client::setNick(string nick)
 {
     this->_nick = nick;
@@ -144,6 +161,7 @@ void Client::setUsername(string username)
 
 bool Client::isConnected()
 {
+    // return (true);
     return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }
 

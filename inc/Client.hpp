@@ -117,6 +117,8 @@ class Client
 		std::set<string> getChannels(void);
 		const string &getNick(void) const;
 		const string &getUsername(void) const;
+
+		void	exitFromChannels();
 };
 
 #endif // CLIENT_HPP
