@@ -30,3 +30,9 @@ if channel already exist (join)
 	+ Channel Topic Changes
 	+ Channel Modes Changes
 	+ Private Messages (Queries)
+
+PASS 200
+NICK REL
+USER U2 0 * FD
+PRIVMSG DS,#HKDJS,#JKDS :DSH JDHSF DSJHF
+

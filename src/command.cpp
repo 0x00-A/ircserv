@@ -74,10 +74,7 @@ void Server::nick(Client &client)
     }
     client.setNick(this->_params[1]);
     client.setHasUsedNick(true);
-    if (client.isConnected() && !welcome)
-    {
-        welcomeClient(client);
-    }
+    if (client.isConnected() && !welcome) welcomeClient(client);
     if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);
@@ -121,7 +118,42 @@ void Server::user(Client &client)
 
 void Server::quit(Client &client)
 {
-    string response = client.identifier() + " QUIT :Quit: Bye for now!\r\n";
+    string response;
+    std::set<string> channelsJ;
+
+    response = client.clientInfo() + " QUIT :Client Quit";
+    channelsJ = client.getChannels();
+
+    if (channelsJ.empty())
+        reply(client, response);
+    else
+    {
+        std::set<string>::iterator it = channelsJ.begin();
+        for ( ; it != channelsJ.end(); it++)
+        {
+            channelIter itCha = doesChannelExist(*it);
+            if (itCha != _channels.end())
+            {
+                std::set<string> users;
+                users = itCha->getUserList();
+                std::set<string>::iterator itUser = users.begin();
+                for ( ; itUser != users.end(); itUser++)
+                {
+                    clientIter itClient = doesUserExit(*itUser);
+
+                    if (itClient != _clients.end())
+                    {
+                        reply(*itClient, response);
+                    }
+                }
+            }
+        } 
+    }
+
+    // send befor closing ...
+    response += "\r\n";
+    send(client.getSockfd(), response.c_str(), response.length(), 0);
+    response = "ERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
     client.closeSocket();
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
