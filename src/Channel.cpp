@@ -195,7 +195,7 @@ string Channel::channelModeIs() const
         }
         if (_modes[i] == 'l')
         {
-            s += " " + intToString(this->getUserLimit());
+            s += " " + itos(this->getUserLimit());
         }
     }
     return (s);

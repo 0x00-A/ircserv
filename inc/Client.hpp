@@ -94,7 +94,7 @@ class Client
 
 		///////////////////////////////////////////
 
-		void setChannels(string &channel);
+		void addChannels(string &channel);
 		void setNick(string nick);
 		void setUsername(string username);
 

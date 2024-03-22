@@ -130,7 +130,7 @@ const string& Client::getUsername(void) const
     return this->_username;
 }
 
-void Client::setChannels(string &channel)
+void Client::addChannels(string &channel)
 {
     _channels.insert(channel);
 }
@@ -144,7 +144,7 @@ void Client::setChannels(string &channel)
 //     }
 // }
 
-// void Client::setChannels(Channel &channel)
+// void Client::addChannels(Channel &channel)
 // {
 //     _channels.insert(channel);
 // }

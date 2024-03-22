@@ -66,7 +66,7 @@ void Server::handleCommand(string& cmd, int id)
     }
     else if (_clients[id].isConnected())
     {
-        throw ( ":ft_irc.1337.ma " + intToString(ERR_UNKNOWNCOMMAND) + " " + \
+        throw ( ":ft_irc.1337.ma " + itos(ERR_UNKNOWNCOMMAND) + " " + \
         _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }
 }
@@ -105,14 +105,14 @@ void Server::initPrivmsg(Client &client)
     string response;
     if (_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + intToString(ERR_NORECIPIENT) + " " + \
+        response = ":ft_irc.1337.ma " + itos(ERR_NORECIPIENT) + " " + \
             client.getNick()  + " :No recipient given (" + _params[0] + ")";
         reply(client, response);
         return;
     }
     if (_params.size() < 3)
     {
-        response = ":ft_irc.1337.ma " + intToString(ERR_NOTEXTTOSEND) + " " + \
+        response = ":ft_irc.1337.ma " + itos(ERR_NOTEXTTOSEND) + " " + \
             client.getNick()  + " ::No text to send";
         reply(client, response);
         return;
@@ -142,7 +142,7 @@ void Server::initJoin(Client &client)
     string response;
     if (_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
+        response = ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
             client.getNick() + " JOIN" + " :Not enough parameters";
         reply(client, response);
         return;
@@ -163,7 +163,7 @@ void Server::initJoin(Client &client)
             std::getline(ssk, key, ',');
         if (seenChannels.count(chan) > 0) 
         {
-            response = ":ft_irc.1337.ma " + intToString(ERR_TOOMANYTARGETS) + \
+            response = ":ft_irc.1337.ma " + itos(ERR_TOOMANYTARGETS) + \
              " " +  client.getNick() + " :Duplicate recipients";
             reply(client, response);
             continue ;

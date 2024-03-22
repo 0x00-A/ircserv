@@ -16,15 +16,18 @@ string		Server::getMembers(Channel& ch)
 	return response;
 
 }
-string Server::channelWelcomeMessages(Client &client, Channel& ch)
+void Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
     string response;
 
-    response = client.identifier() + " JOIN " + ch.getName() + "\n" + \
-	":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs() + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch.getName() + " :"  + getMembers(ch) + "\n" + \
-	":ft_irc.1337.ma " + to_string(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
-	return response;
+    response = client.identifier() + " JOIN " + ch.getName();
+	reply(client, response);
+	response = ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs();
+	reply(client, response);
+	response = ":ft_irc.1337.ma " + itos(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch.getName() + " :"  + getMembers(ch);
+	reply(client, response);
+	response = ":ft_irc.1337.ma " + itos(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
+	reply(client, response);
 }
 
 void Server::joinedAChannel(Client& client, Channel& channel)
@@ -41,6 +44,7 @@ void Server::joinedAChannel(Client& client, Channel& channel)
 		cliIter = getClientIterator(*it);
 		if (cliIter != _clients.end())
 		{
+			if (cliIter->getNick() == *it) continue;
 			reply(*cliIter, response);
 		}
 	}
@@ -63,7 +67,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getPasskey() != channel.second)
 				{
-					response =  (":" + client.getIPAddr() + " "  + intToString(ERR_BADCHANNELKEY) + client.getNick() \
+					response =  (":" + client.getIPAddr() + " "  + itos(ERR_BADCHANNELKEY) + client.getNick() \
 					+ " " + channel.first + " :Cannot join channel (+K) - bad key");
 					reply(client, response);
 					return ;
@@ -73,21 +77,21 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getUserLimit() <= _channels[i].getSize())
 				{
-					response =  (":ft_irc.1337.ma "  + intToString(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
+					response =  (":ft_irc.1337.ma "  + itos(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
 					reply(client, response);
 					return ;
 				}
 			}
 			this->_channels[i].joinUser(client.getNick());
-			client.setChannels(channel.first);
-			reply(client, channelWelcomeMessages(client, _channels[i]));
+			client.addChannels(channel.first);
+			channelWelcomeMessages(client, _channels[i]);
 			joinedAChannel(client, _channels[i]);
 			return ;
 		}
 	}
 	this->_channels.push_back(Channel(channel.first, client.getNick()));
-	client.setChannels(channel.first);
-	reply(client, channelWelcomeMessages(client, _channels.back()));
+	client.addChannels(channel.first);
+	channelWelcomeMessages(client, _channels.back());
 }
 
 Server::channelIter Server::doesChannelExist(const string &chan)

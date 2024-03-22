@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <string>
+#include <ctime>
 // #include <cpprest/http_client.h>
 // #include <cpprest/json.h>
 
@@ -31,6 +32,25 @@
 //     return utility::conversions::to_utf8string(json_response[0][U("translations")][0][U("text")].as_string());
 // }
 
+std::string _startTime;
+void setStartTime(void)
+{
+
+	std::time_t res = std::time(NULL);
+
+    char *timePtr = std::ctime(&res);
+    if (!timePtr)
+    {
+        // cerr << "error time" << endl;
+        _startTime = "";
+    }
+    else
+    {
+        _startTime = timePtr;
+		_startTime.erase(_startTime.size() - 1, 1);
+    }
+}
+
 int main() {
     // std::string text_to_translate = "Hello, how are you?";
     // std::string target_language = "fr"; // French
@@ -39,9 +59,9 @@ int main() {
     // std::string translated_text = TranslateText(text_to_translate, target_language, api_key);
     // std::cout << "Translated text: " << translated_text << std::endl;
 
-    std::string s = ":copper.libera.chat 353 lalala = #c :lalala nero1086 lentement varioust Fingel ntwk harrykar X-Scale SystemError Brainium gnomesort pragma- divine byteskeptical kentucky44448 seninha Leonarbro bitbinge oneeyedalien_ Thedarkb Inline wbooze korg815 kitsunenokenja jjakob Feuermagier hammond_ Coop Cindy DPA famine__ ic56 sumpwa mountaingoat uso jargon syscall-42 neutroniak nostar emanuele6 dustinm gokkun Biolunar raym foul_owl mechap elastic_dog phongjaa AmR mima gr33n7007h Everything rtypo asarandi AbleBacon";
-
-    std::cout << s.size() << std::endl;
+    setStartTime();
+    std::cout << _startTime.size() << std::endl;
+    std::cout << ">> " << _startTime[_startTime.size() - 1] << "|" << std::endl;
     return 0;
 }
 

@@ -26,7 +26,7 @@ using std::endl;
 using std::stringstream;
 
 
-std::string intToString(int num);
+std::string itos(int num);
 // # include <cstdlib>
 // # include <cstdio>
 
@@ -34,6 +34,5 @@ std::string intToString(int num);
 // # include <vector>
 // # include <unistd.h>
 
-std::string	to_string(int n);
 
 #endif //IRCSERV_HPP

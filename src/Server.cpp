@@ -3,7 +3,7 @@
 #include <cctype>
 #include <string>
 
-string intToString(int num)
+string itos(int num)
 {
     std::ostringstream oss;
     oss << std::setw(3) << std::setfill('0') << num;
@@ -305,6 +305,7 @@ void Server::setStartTime(void)
     else
     {
         _startTime = timePtr;
+		_startTime.erase(_startTime.size() - 1, 1);
     }
 }
 
