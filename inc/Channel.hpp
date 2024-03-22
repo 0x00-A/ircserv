@@ -2,17 +2,22 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
+
+#include "ircserv.hpp"
 #include <iostream>
 #include <vector>
 #include "Client.hpp"
+#include <ctime>
+
 
 class Channel
 {
 	private:
 
 		string						_name;
+		string						_admin;
 		std::set<string>			_users;
-		std::set<string>			_operators;
+		// std::set<string>			_operators;
 		
 		string						_modes;	// although there are booleans to check if a certain flag is set i used this also save order of flags in channel when printing
 
@@ -25,16 +30,23 @@ class Channel
 		bool						_hasPasskey;
 		bool						_hasLimit;
 		bool						_hasTopic;
+		string 						_creationTime;
+
+		void						setCreationTime( void );
 
 
 	public:
 
-		Channel(const string& channelName);
+		// iterator here 
+		typedef	std::set<string>::iterator setIter;
+
+		Channel(const string& channelName, const string& admin);
 		
 		~Channel();
 
 		bool				joinUser( const string& user );
 		bool				partUser( const string& user );
+		void 				swapUser(const string &oldUser, const string &newUser);
 
 		bool				isUserInChannel( const string& user ) const;
 
@@ -45,7 +57,7 @@ class Channel
 		
 		bool				setMode(const string& mode);
 		bool				hasMode( char mode ) const;
-		string				channelMmodeIs( void ) const;
+		string				channelModeIs( void ) const;
 
 		void				setTopic(const string& topic);
 		void				setPasskey( const string& key );
@@ -57,14 +69,17 @@ class Channel
 		// void				unsetUserLimit( int limit );
 		// void				unsetInviteOnly();
 
-
+		string				getAdmin() const;
+		size_t				getSize() const;
 		string				getName() const;
 		string				getModes( void ) const;
 		std::set<string>	getUserList( void ) const;
-		std::set<string>	getOperatorList() const;
+		// std::set<string>	getOperatorList() const;
 		string				getPasskey( void ) const;
-		int					getUserLimit( void ) const;
+		size_t				getUserLimit( void ) const;
 		string				getTopic( void ) const;
+		string				getCreationTime( void ) const;
+
 
 		bool				empty( void ) const;
 		bool				hasPasskey( void ) const;
@@ -79,8 +94,8 @@ class Channel
 		
 
 
+
 		void				printUsers( void );
-		void				printOperators( void );
 
 };
 

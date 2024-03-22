@@ -1,0 +1,32 @@
+:nel-baz!~naim@197.230.30.146 JOIN #dfgh
+
+:Cannot join channel (+l) - channel is full, try again later
+
+if someone join  a channel it is sent to all users not just operators also +o -o nick
+
+the channel ceases to exist when the last client leaves it
+
+Channels also contain a topic. The topic is a line shown to all users when they join the channel, and all users in the channel are notified when the topic of a channel is changed.
+
+problem: if a user joined a channel and then changed the nick name the data in channels he is currently in is not updated
+
+
++ remove deconnected users from channels
+
+
+if channel already exist (join)
+:u4!~x@197.230.30.146 JOIN #ch1
+:mercury.libera.chat 332 u4 #ch1 :dsdssdsssssdsdsdsd
+:mercury.libera.chat 333 u4 #ch1 u1!~x@197.230.30.146 1711076841
+:mercury.libera.chat 353 u4 @ #ch1 :u4 u3 @u1
+:mercury.libera.chat 366 u4 #ch1 :End of /NAMES list.
+
+
+
+###### messages are broadcasted to other clients to keep them informed about channel events and user interactions
+	+ User Joins a Channel
+	+ User Parts (Leaves) a Channel
+	+ User Quits the Server
+	+ Channel Topic Changes
+	+ Channel Modes Changes
+	+ Private Messages (Queries)

@@ -12,8 +12,8 @@ Client::Client(const string &ip, int port, int sockfd)
 	_real = "";
 	_hostname = "";
 	_recvBuf = "";
-	_isRegistered = false;
-	_isOperator = false;
+	// _isRegistered = false;
+	// _isOperator = false;
 	_hasPassed = false;
 	_hasUsedNick = false;  
 	_hasUsedUser = false;
@@ -21,8 +21,6 @@ Client::Client(const string &ip, int port, int sockfd)
 
 Client::~Client()
 {
-	// leave channels
-	// close fd
 }
 
 int Client::getSockfd(void) const
@@ -72,16 +70,19 @@ void Client::setHasUsedUser(bool value)
 
 bool Client::getHasPassed()
 {
+    // return (true);
     return this->_hasPassed;
 }
 
 bool Client::getHasUsedNick()
 {
+    // return (true);
     return this->_hasUsedNick;
 }
 
 bool Client::getHasUsedUser()
 {
+    // return (true);
     return this->_hasUsedUser;
 }
 
@@ -109,7 +110,17 @@ bool Client::checkNick(string &nick)
     return true;
 }
 
-const string& Client::getNick(void) const
+string Client::identifier(void)
+{
+	return (":" + getNick() + "!~" + getUsername() + "@" + getIPAddr());
+}
+
+std::set<string> Client::getChannels(void)
+{
+    return (_channels);
+}
+
+const string &Client::getNick(void) const
 {
     return this->_nick;
 }
@@ -118,6 +129,25 @@ const string& Client::getUsername(void) const
 {
     return this->_username;
 }
+
+void Client::setChannels(string &channel)
+{
+    _channels.insert(channel);
+}
+
+// void Client::exitFromChannels()
+// {
+//     std::vector<string>::iterator it = _channels.begin();
+//     for (it; it < _channels.end(); it++)
+//     {
+        
+//     }
+// }
+
+// void Client::setChannels(Channel &channel)
+// {
+//     _channels.insert(channel);
+// }
 
 void Client::setNick(string nick)
 {
@@ -131,5 +161,13 @@ void Client::setUsername(string username)
 
 bool Client::isConnected()
 {
+    // return (true);
     return (_hasUsedNick && _hasUsedUser && _hasPassed);
+}
+
+string  Client::clientInfo()
+{
+    string response;
+    response = ":" + _nick + "!~"  + _username  + "@" + _ip;
+    return response;
 }

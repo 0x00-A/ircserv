@@ -1,16 +1,36 @@
 #include "Channel.hpp"
 
-Channel::Channel(const string& channelName)
+void Channel::setCreationTime(void)
 {
-		_name = channelName;
-		_modes = "+t";
-		_topic = "";
-		_userLimit = -1;		// or string?
-		_passkey = "";
-		_hasInvite = false;
-		_hasPasskey = false;
-		_hasLimit = false;
-		_hasTopic = false;
+    std::time_t res = std::time(NULL);
+
+    char *timePtr = std::ctime(&res);
+    if (!timePtr)
+    {
+        cerr << "error time" << endl;
+        _creationTime = "";
+    }
+    else
+    {
+        _creationTime = timePtr;
+    }
+}
+
+Channel::Channel(const string &channelName, const string &admin)
+{
+    joinUser(admin);
+    setChannelOperator(admin);
+    setCreationTime();
+    _admin = admin;
+    _name = channelName;
+    _modes = "+t";
+    _topic = "";
+    _userLimit = -1;		// or string?
+    _passkey = "";
+    _hasInvite = false;
+    _hasPasskey = false;
+    _hasLimit = false;
+    _hasTopic = false;
 }
 
 Channel::~Channel() {}
@@ -29,65 +49,68 @@ bool Channel::joinUser(const string& user)
 
 bool Channel::isUserInChannel(const string &user) const
 {
-    if (_users.find(user) != _users.end())
-        return (true);
-	return false;
+    return (_users.find(user) != _users.end() || _users.find("@" + user) != _users.end() );
 }
 
 bool Channel::isUserOperator(const string &user) const
 {
-    if (!isUserInChannel(user))
-        return (false);
-    if (_operators.find(user) != _operators.end())
-        return (true);
-    return (false);
+    // if (!isUserInChannel(user))
+    //     return (false);
+    // if (_operators.find(user) != _operators.end())
+    //     return (true);
+    // return (false);
+    return (_users.find("@" + user) != _users.end());
 }
 
 bool Channel::unsetChannelOperator(const string &user)
 {
-    if (!isUserInChannel(user))
+    if (!isUserInChannel(user) || !isUserOperator(user))
         return (false);
-    _operators.erase(user);
+    _users.erase("@" + user);
+    _users.insert(user);
     cout << user << " is no longer an operator in channel " << _name << endl;
     return (true);
 }
 
 bool Channel::partUser(const string& user)
 {
-    if (_users.erase(user))     // returns Number of elements removed (0 or 1)
+    if (_users.erase(user) || _users.erase("@" + user))     // returns Number of elements removed (0 or 1)
     {
         cout << user << " left channel " << _name << endl;
-        if (isUserOperator(user))
-            _operators.erase(user);
         return (true);
     }
     cout << user << " is not in channel " << _name << endl;
     return (false);
 }
 
-
-
+void Channel::swapUser(const string &oldUser, const string &newUser)
+{
+    std::set<string>::iterator itUser = _users.begin();
+    for ( ; itUser != _users.end(); itUser++)
+    {
+        cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+        cout << "olduser: " << oldUser << endl;
+        cout << "newuser: " << *itUser << endl;
+        if (*itUser == oldUser)
+        {
+            _users.erase(oldUser);
+            _users.insert(newUser);
+            break;
+        }
+    }
+}
 
 std::set<string> Channel::getUserList() const
 {
     return (_users);
 }
 
-std::set<string> Channel::getOperatorList() const
-{
-	return (_operators);
-}
-
-
-
-
-
 string Channel::getPasskey(void) const
 {
 	return (_passkey);
 }
 
-int Channel::getUserLimit(void) const
+size_t Channel::getUserLimit(void) const
 {
 	return (_userLimit);
 }
@@ -97,8 +120,10 @@ string Channel::getTopic(void) const
 	return (_topic);
 }
 
-
-
+string Channel::getCreationTime() const
+{
+    return (_creationTime);
+}
 
 bool Channel::empty(void) const
 {
@@ -159,7 +184,7 @@ bool Channel::hasMode(char mode) const
 	return (_modes.find(mode) != string::npos);
 }
 
-string Channel::channelMmodeIs() const
+string Channel::channelModeIs() const
 {
     string s = _modes;
     for (size_t i = 0; i < _modes.size(); i++)
@@ -170,7 +195,7 @@ string Channel::channelMmodeIs() const
         }
         if (_modes[i] == 'l')
         {
-            s += " " + std::to_string(this->getUserLimit());
+            s += " " + intToString(this->getUserLimit());
         }
     }
     return (s);
@@ -187,22 +212,14 @@ void Channel::printUsers()
     cout << endl;
 }
 
-void Channel::printOperators()
-{
-    cout << "Operators in channel " << _name << ": ";
-
-    for (std::set<string>::iterator it =_operators.begin(); it !=_operators.end(); it++)
-    {
-        cout << *it << " ";
-    }
-    cout << endl;
-}
-
 bool Channel::setChannelOperator(const string &user)
 {
     if (!isUserInChannel(user))
         return (false);
-    _operators.insert(user);
+    if (isUserOperator(user))
+        return (false);
+    _users.erase(user);
+    _users.insert("@" + user);
     cout << user << " is now an operator in channel " << _name << endl;
     return (true);
 }
@@ -254,6 +271,16 @@ void Channel::unsetTopic( void )
 {
     _topic = "";
     _hasTopic = false;
+}
+
+string Channel::getAdmin() const
+{
+    return (_admin);
+}
+
+size_t Channel::getSize() const
+{
+    return (_users.size());
 }
 
 string Channel::getName() const

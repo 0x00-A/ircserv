@@ -4,16 +4,17 @@ void Server::pass(Client &client)
 {
     string response;
 
+    std::cout << "receive pass command" << std::endl;
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_ALREADYREGISTRED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_ALREADYREGISTRED) + " " + \
             client.getNick()  + " :You may not reregister";
         reply(client, response);
         return ;
     }
     if (this->_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
             client.getNick()  + " " + this->_params[0] + " :Not enough parameters";
         reply(client, response);
         return;
@@ -24,7 +25,7 @@ void Server::pass(Client &client)
     }
     else
     {
-        response = ":ft_irc.1337.ma " + to_string(RPL_WELCOME) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(RPL_WELCOME) + " " + \
             client.getNick()  + " " + this->_params[1] + " :Password incorrect";
         reply(client, response);
     }
@@ -33,51 +34,81 @@ void Server::pass(Client &client)
 void Server::nick(Client &client)
 {
     string response;
+    std::set<string> channelsJ;
 
+    std::cout << "receive nick command\n";
     if (client.getHasPassed() == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
-            client.getNick()  + " :You have not registered";
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
     }
     if (this->_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NONICKNAMEGIVEN) + " " + \
-            client.getNick()  + " :No nickname given";
+        response = ":ft_irc.1337.ma " + intToString(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given";
         reply(client, response);
         return;
     }
     if (client.checkNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_ERRONEUSNICKNAME) + " " + \
-            client.getNick()  + " :Erroneus nickname";
+        response = ":ft_irc.1337.ma " + intToString(ERR_ERRONEUSNICKNAME) + " " + client.getNick()  + " :Erroneus nickname";
         reply(client, response);
         return;
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NICKNAMEINUSE) + " " + \
-            client.getNick()  + " :Nickname is already in use";
+        response = ":ft_irc.1337.ma " + intToString(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use";
         reply(client, response);
-
+        return;
     }
-    if (client.getHasUsedNick() == true)
+    if (client.getHasUsedNick() == true && !client.isConnected())
     {
-        response = ":" + client.getNick() + "!@ " + this->_params[0] + " :" +  this->_params[1];
+        response = ":" + client.getNick() + "!~"  + client.getUsername()  + "@" + client.getIPAddr() + " NICK :" +  this->_params[1];
         reply(client, response);
-    }
-    client.setNick(this->_params[1]);
-    client.setHasUsedNick(true);
-    if (_clients.size() > 1 && client.getHasUsedUser())
-    {
-        checkSpamClient(client);
     }
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + to_string(RPL_WELCOME) + " " + \
-            client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
-        reply(client, response);
+        response = client.clientInfo() + " NICK :" + this->_params[1];
+        channelsJ = client.getChannels();
+        if (channelsJ.empty())
+        {
+            reply(client, response);
+        }
+        else
+        {
+            std::set<string>::iterator it = channelsJ.begin();
+            for ( ; it != channelsJ.end(); it++)
+            {
+                channelIter itCha = doesChannelExist(*it);
+                if (itCha != _channels.end())
+                {
+                    std::set<string> users;
+                    users = itCha->getUserList();
+                    std::set<string>::iterator itUser = users.begin();
+                    for ( ; itUser != users.end(); itUser++)
+                    {
+                        clientIter itClient = doesUserExit(*itUser);
+
+                        if (itClient != _clients.end())
+                        {
+                            reply(*itClient, response);
+                        }
+                    }
+                }
+                else 
+                {
+                    continue;
+                }
+                itCha->swapUser(client.getNick(), this->_params[1]);
+            } 
+        }
+    }
+    client.setNick(this->_params[1]);
+    client.setHasUsedNick(true);
+    if (client.isConnected()) welcomeClient(client);
+    if (_clients.size() > 1 && client.getHasUsedUser())
+    {
+        checkSpamClient(client);
     }
 }
 
@@ -86,16 +117,23 @@ void Server::user(Client &client)
 {
     string response;
 
+     if (client.isConnected())
+    {
+        response = ":ft_irc.1337.ma " + intToString(ERR_ALREADYREGISTRED) + " " + \
+            client.getNick()  + " :You may not reregister";
+        reply(client, response);
+        return ;
+    }
     if (client.getHasPassed() == false)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
     }
     if (this->_params.size() < 5)
     {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
             client.getNick()  + " " + this->_params[0] + " :Not enough parameters";
         reply(client, response);
         return;
@@ -106,19 +144,12 @@ void Server::user(Client &client)
     {
         checkSpamClient(client);
     }
-    if (client.isConnected())
-    {
-        response = ":ft_irc.1337.ma " + to_string(ERR_NICKNAMEINUSE) + " " + \
-            client.getNick()  + " :Welcome to the 1337 IRC Network " + client.getNick();
-        reply(client, response);
-    }
+    if (client.isConnected())  welcomeClient(client);
 }
 
 void Server::quit(Client &client)
 {
-    // :dan-!d@localhost QUIT :Quit: Bye for now!
-    string response = ":" + client.getNick() + "-!" + client.getUsername() + \
-        "@" + client.getIPAddr() + " QUIT :Quit: Bye for now!\r\n";
+    string response = client.identifier() + " QUIT :Quit: Bye for now!\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
     client.closeSocket();
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
@@ -126,51 +157,43 @@ void Server::quit(Client &client)
 
 void Server::join(Client &client)
 {
-    (void)client;
-}
+    string response;
 
-string Server::trim_comma(const string &str)
-{
-    string result;
-    bool prev_is_comma = false;
-
-    for (string::size_type i = 0; i < str.size(); i++)
+    if (!client.isConnected())
     {
-        char c = str[i];
-        if (c == ',')
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
+            client.getNick()  + " :You have not registered";
+        reply(client, response);
+        return;
+    }
+    initJoin(client);
+    for (size_t i = 0; i < _parsChannels.size(); i++)
+    {
+        if (_parsChannels[i].first[0] != '#')
         {
-            if (!prev_is_comma)
-            {
-                result += c;
-            }
-            prev_is_comma = true;
+            response = ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + \
+            " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
+            reply(client, response);
         }
         else
         {
-            result += c;
-            prev_is_comma = false;
+            joinChannel(client, _parsChannels[i]);
         }
     }
-    if (result[0] == ',')
-        result.erase(0, 1);
-    if (result[result.size() - 1] == ',')
-        result.erase(result.size() - 1, 1);
-    return result;
+
 }
 
 
 void Server::privmsg(Client &client)
 {
-    // ERR_CANNOTSENDTOCHAN >> if don't find client in channel  
-    // ERR_NOTOPLEVEL 
-
-    std::set<std::string> seenNicks;
+    std::set<string> seenNicks;
     bool found = false;
     string response;
+
+
     if (!client.isConnected())
     {
-        //  :stockholm.se.quakenet.org 451 *  :You have not registered
-        response = ":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        response = ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
             client.getNick()  + " :You have not registered";
         reply(client, response);
         return;
@@ -181,32 +204,46 @@ void Server::privmsg(Client &client)
         found = false;
         if (seenNicks.count(_sendMsgClient[i].first) > 0) 
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_TOOMANYTARGETS) + \
+            response = ":ft_irc.1337.ma " + intToString(ERR_TOOMANYTARGETS) + \
              " " +  client.getNick() + " :Duplicate recipients";
             reply(client, response);
             continue ;
         }
         seenNicks.insert(_sendMsgClient[i].first);
-        for (size_t j = 0; j < _clients.size(); j++)
+        if (_sendMsgClient[i].first[0] == '#')
         {
-            if (_sendMsgClient[i].first == _clients[j].getNick())
+            for (size_t k = 0; k < _channels.size(); k++)
             {
-                found = true;
-                response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@" + \
-                 client.getIPAddr() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
-                reply(_clients[j], response);
-                break ;
+                if (_sendMsgClient[i].first == _channels[k].getName())
+                {
+                    found = true;
+                    broadcastMsg(client, _messagClient, _channels[k]);
+                    break ;
+                }
+            }
+        }
+        else
+        {
+            for (size_t j = 0; j < _clients.size(); j++)
+            {
+                if (_sendMsgClient[i].first == _clients[j].getNick())
+                {
+                    found = true;
+                    response = client.identifier() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
+                    reply(_clients[j], response);
+                    break ;
+                }
             }
         }
         if (!found && (_sendMsgClient[i].second == CLIENT))
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
-            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick";
+            response = ":ft_irc.1337.ma " + intToString(ERR_NOSUCHNICK) + \
+            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick/channel";
             reply(client, response);
         }
         if (!found && (_sendMsgClient[i].second == CHANNEL))
         {
-            response = ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + \
+            response = ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such channel";
             reply(client, response);
         }
@@ -299,8 +336,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         {
             if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+")) && !(k < _params.size()))
             {
-                std::cout << ">>>>> " << k << " || " << _params.size() << " || " << sign << c << std::endl;
-                throw ( ":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+                throw ( ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
                 client.getNick() + " " + _params[0]  + " :Not enough parametersss" );
             }
             if (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
@@ -310,7 +346,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         }
         else
         {
-            throw ( ":ft_irc.1337.ma " + to_string(ERR_UNKNOWNMODE) + " " + client.getNick() + \
+            throw ( ":ft_irc.1337.ma " + intToString(ERR_UNKNOWNMODE) + " " + client.getNick() + \
             " " + _params[2].substr(i, 1) + " :is an unknown mode char to me" );
         }
     }
@@ -322,16 +358,18 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     if (doesUserExit(m.second) == _clients.end())
     {
         reply(cli, ":ft_irc.1337.ma " + to_string(ERR_NOSUCHNICK) + " " + \
-            cli.getNick() + " " + m.second + " " + " :No such nick");
+            cli.getNick() + " " + m.second + " :No such nick");
     }
     else if (!chan->isUserInChannel(m.second))
     {
         reply(cli, ":ft_irc.1337.ma " + to_string(ERR_USERNOTINCHANNEL) + " " + \
-            cli.getNick() + " " + _params[1] + " " + " :They aren't on that channel");
+            cli.getNick() + " " + _params[1] + " :They aren't on that channel");
     }
     else
     {
         (m.first == "+o")? chan->setChannelOperator(m.second) : chan->unsetChannelOperator(m.second);
+        // :u1!~x@197.230.30.146 MODE #ch1 -o u4
+        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first + " " + m.second, *chan);
         modesave += m.first;
         paramsave += " " + m.second;
     }
@@ -435,34 +473,36 @@ void    Server::mode(Client& client)
     string                                      modesave;
 
     // test with nick(aaa) channel(c)
-    _channels.push_back(Channel("c"));
-    _channels.begin()->joinUser("aaa");
-    _channels.begin()->setChannelOperator("aaa");
+    _channels.push_back(Channel("c", "aaa"));
+    // _channels.begin()->joinUser("aaa");
+    // _channels.begin()->setChannelOperator("aaa");
 
     if (!client.isConnected())
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_NOTREGISTERED) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + \
         client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_NEEDMOREPARAMS) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + \
         client.getNick() + " " + _params[0]  + " :Not enough parameters");
     }
     if ( (chan = doesChannelExist(_params[1])) == _channels.end())
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_NOSUCHCHANNEL) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + " " + \
         client.getNick() + " " + _params[1]  + " :No such channel");
     }
     if (_params.size() == 2)
     {
-        throw (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->channelMmodeIs());
+        reply(client, (":ft_irc.1337.ma " + to_string(RPL_CHANNELMODEIS) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
+        throw (":ft_irc.1337.ma " + to_string(RPL_CREATIONTIME) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))
     {
-        throw (":ft_irc.1337.ma " + to_string(ERR_CHANOPRIVSNEEDED) + " " + \
+        throw (":ft_irc.1337.ma " + intToString(ERR_CHANOPRIVSNEEDED) + " " + \
         client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
     }
     while (!modes.empty())
@@ -490,5 +530,5 @@ void    Server::mode(Client& client)
     }
     removeExtraPlusMinus(modesave);
     if (!modesave.empty())
-        throw ("nick!~user@ip " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
+        throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
 }

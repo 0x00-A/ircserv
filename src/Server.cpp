@@ -1,11 +1,31 @@
 #include "Server.hpp"
 
+#include <cctype>
+#include <string>
+
+string intToString(int num)
+{
+    std::ostringstream oss;
+    oss << std::setw(3) << std::setfill('0') << num;
+    return oss.str();
+}
+
+string Server::to_upper(const string& str) 
+{
+    string result; 
+	for (size_t i = 1; i < str.size() ; i++)
+        result += (char)toupper(str[i]);
+    return result;
+}
+
+
 Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
+	parseargs();
 	// socket part
-	parsepasswd(_passwd);
-	_socket.listenSocket(_port);
+	_socket.bindSocket(_port);
+	_socket.listenSocket();
 	_socket.setSocketNonBlocking();
 	_servfd = _socket.getfd();
 	// First entry in the _pollfds array is used for the listening socket
@@ -18,8 +38,10 @@ Server::Server(const string& port, const string& passwd)
 	this->commandMap["pass"] = &Server::pass;
     this->commandMap["user"] = &Server::user;
     this->commandMap["nick"] = &Server::nick;
+    this->commandMap["n"] = &Server::nick;
     this->commandMap["quit"] = &Server::quit;
     this->commandMap["join"] = &Server::join;
+    this->commandMap["j"] = &Server::join;
     this->commandMap["privmsg"] = &Server::privmsg;
     this->commandMap["mode"] = &Server::mode;
     this->commandMap["m"] = &Server::mode;
@@ -27,18 +49,6 @@ Server::Server(const string& port, const string& passwd)
 
 Server::~Server()
 {
-}
-
-void Server::broadcastMsg(const Client &sender, const string &msg, const Channel &chan)
-{
-	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
-	{
-		if (chan.isUserInChannel(sender.getNick()))
-		{
-			// send message
-			(void)msg;
-		}
-	}
 }
 
 int Server::handleNewConnection()
@@ -64,6 +74,7 @@ int Server::handleNewConnection()
 		return (1);
 	}
 	// set socket to be Non-blocking
+	// forbiden flags = fcntl(connfd, F_GETFL)
 	if ( (flags = fcntl(connfd, F_GETFL)) == -1
 		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
 	{
@@ -73,7 +84,7 @@ int Server::handleNewConnection()
 	}
 	// Add the new client socket to _clients and _pollfds
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
-	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN)});
+	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN), .revents = 0});
 
 	cout << "client connected - fd: " << connfd << endl;
 	return (0);
@@ -84,14 +95,16 @@ void Server::disconnectClient(int id)
 
 	clientIter			cli_it;
 	pollfdIter			poll_it;
-
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 
 	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
+	exitUserFromChannels(cli_it);
 	cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
+
+	
 }
 
 int Server::handleRead(int id)
@@ -195,12 +208,13 @@ void	Server::run()
 
 
 	cout << "Server running" << endl;
+	setStartTime();
 	while (true)
 	{
 		// printClients();
-		cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
-		std::cout << "port: " << _port << std::endl;
-		if(poll(&_pollfds[0], _pollfds.size(), -1) == -1)
+		// cout << "Polling ... [ connected clients: " << _clients.size() << " ]" << endl;
+		// std::cout << "port: " << _port << std::endl;
+		if(poll(_pollfds.data(), _pollfds.size(), -1) == -1)
 		{
 			perror("poll"); break;
 		}
@@ -212,7 +226,7 @@ void	Server::run()
 				if (_pollfds[i].fd == _servfd)
 				{
 					
-					cout << "Server has incomming connection(s)" << endl;
+					// cout << "Server has incomming connection(s)" << endl;
 					do
 					{
 						// accept incomming connections
@@ -223,7 +237,7 @@ void	Server::run()
 				else
 				{
 					// handle existing connections
-					cout << "fd " << _pollfds[i].fd << " is readable" << endl;
+					// cout << "fd " << _pollfds[i].fd << " is readable" << endl;
 					ret = handleRead(i-1);
 					if (ret == -1)
 					{
@@ -240,9 +254,6 @@ void	Server::run()
 						{
 							reply(_clients[i-1], res);
 						}
-						this->_messagClient.clear();
-						this->_sendMsgClient.clear();
-						this->_params.clear();
 					}
 				}
 			}
@@ -255,7 +266,7 @@ void	Server::run()
 				/*  don’t have anything to write would just waste CPU cycles. 	              */
 				/******************************************************************************/
 			
-				cout << "fd " << _pollfds[i].fd << " is writeable" << endl;
+				// cout << "fd " << _pollfds[i].fd << " is writeable" << endl;
 				ret = handleWrite(i-1);
 				if (ret == -1)
 				{
@@ -281,6 +292,27 @@ void	Server::run()
 	closeAllOpenSockets();
 }
 
+void Server::setStartTime(void)
+{
+	std::time_t res = std::time(NULL);
+
+    char *timePtr = std::ctime(&res);
+    if (!timePtr)
+    {
+        cerr << "error time" << endl;
+        _startTime = "";
+    }
+    else
+    {
+        _startTime = timePtr;
+    }
+}
+
+string Server::getStartTime(void) const
+{
+    return (_startTime);
+}
+
 void Server::cleanUnusedClients()
 {
 	for (size_t i = 0; i < _pollfds.size(); i++)
@@ -288,7 +320,6 @@ void Server::cleanUnusedClients()
 		if (_pollfds[i].fd == -1)
 		{
 			disconnectClient(i - 1);
-			cout << "Done cleaning all sockets" << endl;
 		}
 	}
 }
@@ -311,7 +342,24 @@ int Server::getIndexOfClient(const Client &cli)
 
 Server::clientIter Server::getClientIterator(const Client &cli)
 {
-    return (std::find(_clients.begin(), _clients.end(), cli));
+    // return (std::find(_clients.begin(), _clients.end(), cli));
+	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
+	{
+		if (it->getSockfd() == cli.getSockfd())
+			return (it);
+	}
+	return (_clients.end());
+}
+
+Server::clientIter Server::getClientIterator(const string &nick)
+{
+	clientIter it;
+	for (it = _clients.begin(); it < _clients.end(); it++)
+	{
+		if ((it->getNick() == nick) || ("@" + it->getNick() == nick))
+			return (it);
+	}
+	return (it);
 }
 
 int Server::getIndexOfClient(const clientIter& currIter)

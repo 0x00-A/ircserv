@@ -12,11 +12,13 @@
 # include "Channel.hpp"
 # include "Socket.hpp"
 
+
 # define SA struct sockaddr
 
 # define RD_BUF_SIZE 512
 # define CHANNEL 1
 # define CLIENT 2
+# define NOSUCHCHANNEL 3
 
 class Server
 {
@@ -37,27 +39,33 @@ private:
 	std::vector<struct pollfd>	_pollfds;
 	std::vector<Client>			_clients;
 	Socket						_socket;
+	string 						_startTime;
 
 	// just added
 	std::vector<string> 					_params;
 	std::vector<std::pair<string, int> >	_sendMsgClient;
+    std::vector<std::pair<string, string> >	_parsChannels;
+	std::vector<string>						_keys;
 	string									_messagClient;
 	std::map<string, void (Server::*)(Client&)> commandMap;
 
 	//
 	std::vector<Channel> 		_channels;
-	void broadcastMsg(const Client &sender, const string& msg, const Channel& chan);
 
-	int			handleNewConnection();
-	int			handleRead(int id);
-	int			handleWrite(int id);
-	string		getCommand(int id);
-	void		disconnectClient(int id);
-	void		cleanUnusedClients();
+	void 		broadcastMsg( Client &sender, const string& msg, const Channel& chan );
+
+	int			handleNewConnection( void );
+	int			handleRead( int id );
+	int			handleWrite( int id );
+	string		getCommand( int id );
+	void		disconnectClient( int id );
+	void		cleanUnusedClients( void );
 	void		closeAllOpenSockets( void );
-	int			getIndexOfClient(const clientIter& currIter);
-	int			getIndexOfClient(const Client& cli);
-	clientIter	getClientIterator(const Client& cli);
+	int			getIndexOfClient( const clientIter& currIter );
+	int			getIndexOfClient( const Client& cli );
+	clientIter	getClientIterator( const Client& cli );
+	clientIter	getClientIterator( const string& nick );
+	string		getMembers(Channel& ch);
 
 	/***********************[ MODE ]***********************/
 	bool 		parseModes( std::queue< std::pair<string, string> >& modes, Client& cli );
@@ -71,7 +79,7 @@ private:
 
 
 	/***********************[ SERVER ]***********************/
-	void		parsepasswd( const string& passwd ) const;
+	void		parseargs( void ) const;
 
 public:
 
@@ -80,7 +88,12 @@ public:
 	~Server();
 
 	void		run();
+	void		setStartTime( void );
+	string		getStartTime( void ) const;
 
+
+	
+	void	welcomeClient(Client &client);
 	// functions for debuging
 	void	printClients( void );
 	void	printpollfds( void );
@@ -88,15 +101,18 @@ public:
 	// ============================================================ //
 	 // parser functions
         // bool parseCommandClient(char *buffer, Client& client);
-        void handleCommand(string& cmd, int id);
-		void parseCommand(string& cmd);
-		string 	trim_comma(const string &str);
-		void	initPrivmsg(Client &client);
+        void 		handleCommand(string& cmd, int id);
+		void 		parseCommand(string& cmd);
+		string to_upper(const string& str);
+		// string intToString(int num);
+		string 		trim_comma(const string &str);
+		void		initPrivmsg(Client &client);
+		void 		initJoin(Client &client);
 
 
         // check nick clients
-        bool checkAlreadyNick(string &nick);
-		void checkSpamClient(Client& client);
+        bool	checkAlreadyNick(string &nick);
+		void	checkSpamClient(Client& client);
 		// bool checkNickFormeClient(Client &client);
 
         // command member functions
@@ -111,15 +127,19 @@ public:
 
         // channel member functions
 
-        void createChannel(string channelName);
-        void joinChannel(Client& client, string channelName);
-        void leaveChannel(Client& client, string channelName);
+        // void addChannel(string channelName, Client &client);
+        void joinChannel(Client& client, std::pair<string, string> channel);
+        // void leaveChannel(Client& client, string channelName);
+		string	channelWelcomeMessages(Client &client, Channel& channel);
+		void	joinedAChannel(Client& client, Channel& channel);
         // void listChannels();
 		channelIter	doesChannelExist( const string& chan );
-		clientIter	doesUserExit( const string& nick );
+		clientIter	doesUserExit( const string nick );
+		void		removeUserFromChannel( const string user, const string chan );
+
+		void		exitUserFromChannels(clientIter cli);
 
         // send messg
-
 		void 	reply(Client &client, string const& reply);
 
 };
