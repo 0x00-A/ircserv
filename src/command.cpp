@@ -437,7 +437,7 @@ void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan)
 {
     if (chan->setMode(m.first))
     {
-        (m.first == "+t") ? chan->setHasTopic(true) : chan->setHasTopic(true);
+        (m.first == "+t") ? chan->setHasTopic(true) : chan->setHasTopic(false);
         modesave += m.first;
     }
 }

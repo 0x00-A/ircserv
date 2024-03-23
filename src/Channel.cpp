@@ -18,12 +18,9 @@ void Channel::setCreationTime(void)
 
 Channel::Channel(const string &channelName, const string &admin)
 {
-    joinUser(admin);
-    setChannelOperator(admin);
-    setCreationTime();
     _admin = admin;
     _name = channelName;
-    _modes = "+t";
+    _modes = "+";
     _topic = "";
     _userLimit = -1;		// or string?
     _passkey = "";
@@ -31,6 +28,10 @@ Channel::Channel(const string &channelName, const string &admin)
     _hasPasskey = false;
     _hasLimit = false;
     _hasTopic = false;
+
+    setCreationTime();
+    joinUser(admin);
+    setChannelOperator(admin);
 }
 
 Channel::~Channel() {}

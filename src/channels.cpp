@@ -123,6 +123,9 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 	}
 	this->_channels.push_back(Channel(channel.first, client.getNick()));
 	client.addChannels(channel.first);
+	this->_channels.back().setMode("+t");
+	this->_channels.back().setHasTopic(true);
+	reply(client, client.identifier() + " MODE " + channel.first + " " + "+t");
 	channelWelcomeMessages(client, _channels.back());
 }
 

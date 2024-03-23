@@ -13,13 +13,13 @@ def connect_to_server(host, port, i):
         print(f"Connected to {host} on port {port}")
         
         # Send data to the server
-        message = f"pass 1\nuser x{i} x x x\nnick user{i}\njoin #ch\n"
+        message = f"pass 1\nuser x{i} x x x\nnick user{i}\njoin #ch{i}\n"
         client_socket.sendall(message.encode())
         print("Message sent to server:", message)
         
         # Receive data from the server
-        # response = client_socket.recv(1024)
-        # print("Received:", response.decode())
+        response = client_socket.recv(1024)
+        print("Received:", response.decode())
         
         # Close the connection
         clients.append(client_socket)
@@ -33,8 +33,8 @@ def connect_to_server(host, port, i):
 if __name__ == "__main__":
     host = 'localhost'  # Change this to your server's IP address
     port = 8888  # Change this to the port your server is listening on
-    for i in range(300):
+    for i in range(10):
         connect_to_server(host, port, i)
     a = input()
-    for i in range(300):
+    for i in range(10):
         clients[i].close()

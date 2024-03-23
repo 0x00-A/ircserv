@@ -100,8 +100,6 @@ void Server::disconnectClient(int id)
 	cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
-
-	
 }
 
 int Server::handleRead(int id)
