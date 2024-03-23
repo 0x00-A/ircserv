@@ -26,21 +26,37 @@ string		channelInfo(const string& nick, const string& nameCha)
 }
 void Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
-    string response;
+    string			response;
+	string 			prefix;
+	std::set<string>	users;
 
-    response = client.identifier() + " JOIN " + ch.getName();
-	reply(client, response);
+	reply(client, client.identifier() + " JOIN " + ch.getName());
+	reply(client, ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs());
 
-	response = ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs();
-	reply(client, response);
-
-	response = channelInfo(client.getNick(), ch.getName()) + getMembers(ch);
-    int numChunks = response.length() / 512;
-    if (response.length() % 512 != 0) numChunks++;
-    for (int i = 0; i < numChunks; i++) {
-        string chunk = response.substr(i * 512, 512);
-        reply(client, chunk);
-    }
+	prefix = channelInfo(client.getNick(), ch.getName());
+	users = ch.getUserList();
+	size_t newlen;
+	response = prefix;
+	for (std::set<string>::reverse_iterator it = users.rbegin(); it != users.rend(); it++)
+	{
+		if (response != prefix)
+			newlen = response.size() + 1 + it->size();
+		else
+			newlen = response.size() + it->size();
+		if (newlen > 510)
+		{
+			reply(client, response);
+			response = prefix;
+			it--;
+			continue;
+		}
+		if (response != prefix)
+			response += " " + *it;
+		else
+			response += *it;
+	}
+	if (response != prefix)
+        reply(client, response);
 	
 	response = ":ft_irc.1337.ma " + itos(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
 	reply(client, response);
@@ -48,9 +64,9 @@ void Server::channelWelcomeMessages(Client &client, Channel& ch)
 
 void Server::joinedAChannel(Client& client, Channel& channel)
 {
-	string 				response;
+	string 						response;
 	std::set<string>	users;
-	clientIter			cliIter;
+	clientIter					cliIter;
 
 	users = channel.getUserList();
 	channel.printUsers();

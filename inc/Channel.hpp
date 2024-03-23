@@ -14,9 +14,9 @@ class Channel
 {
 	private:
 
-		string						_name;
-		string						_admin;
-		std::set<string>			_users;
+		string							_name;
+		string							_admin;
+		std::set<string>					_users;
 		// std::set<string>			_operators;
 		
 		string						_modes;	// although there are booleans to check if a certain flag is set i used this also save order of flags in channel when printing
@@ -73,7 +73,7 @@ class Channel
 		size_t				getSize() const;
 		string				getName() const;
 		string				getModes( void ) const;
-		std::set<string>	getUserList( void ) const;
+		std::set<string>		getUserList( void ) const;
 		// std::set<string>	getOperatorList() const;
 		string				getPasskey( void ) const;
 		size_t				getUserLimit( void ) const;

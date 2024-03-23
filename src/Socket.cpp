@@ -57,16 +57,16 @@ void Socket::listenSocket()
 
 void Socket::setSocketNonBlocking()
 {
-	int	flags;
+	// int	flags;
 
-	if ( (flags = fcntl(_sockfd, F_GETFL)) == -1)
-	{
-		perror("fcntl");
-		closeSocket();
-		exit(1);
-	}
-	flags |= O_NONBLOCK;
-	if (fcntl(_sockfd, F_SETFL, flags) == -1)
+	// if ( (flags = fcntl(_sockfd, F_GETFL)) == -1)
+	// {
+	// 	perror("fcntl");
+	// 	closeSocket();
+	// 	exit(1);
+	// }
+	// flags |= O_NONBLOCK;
+	if (fcntl(_sockfd, F_SETFL, O_NONBLOCK) == -1)
 	{
 		perror("fcntl");
 		closeSocket();

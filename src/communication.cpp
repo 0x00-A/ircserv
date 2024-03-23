@@ -42,8 +42,8 @@ void Server::welcomeClient(Client &client)
 
 void Server::changeNick(Client & client)
 {
-    string response;
-    std::set<string> channelsJ;
+    string              response;
+    std::set<string>    channelsJ;
 
     response = client.clientInfo() + " NICK :" + this->_params[1];
     channelsJ = client.getChannels();

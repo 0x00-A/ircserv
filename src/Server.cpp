@@ -55,7 +55,6 @@ int Server::handleNewConnection()
 	char				*ip;
 	int					connfd;
 	socklen_t			len;
-	int					flags;
 
 	len = sizeof(cliaddr);
 	if ( (connfd = accept(_servfd, (SA *) (&cliaddr), &len)) == -1)	// use c++ cast
@@ -72,9 +71,7 @@ int Server::handleNewConnection()
 		return (1);
 	}
 	// set socket to be Non-blocking
-	// forbiden flags = fcntl(connfd, F_GETFL)
-	if ( (flags = fcntl(connfd, F_GETFL)) == -1
-		|| fcntl(connfd, F_SETFL, flags | O_NONBLOCK) == -1)
+	if (fcntl(connfd, F_SETFL, O_NONBLOCK) == -1)
 	{
 		perror("fcntl");
 		close(connfd);
@@ -96,8 +93,8 @@ void Server::disconnectClient(int id)
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 
-	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
 	exitUserFromChannels(cli_it);
+	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
 	cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);

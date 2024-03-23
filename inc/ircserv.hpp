@@ -28,12 +28,15 @@ using std::stringstream;
 
 
 std::string itos(int num);
-// # include <cstdlib>
-// # include <cstdio>
 
-// # include <string>
-// # include <vector>
-// # include <unistd.h>
+// struct unordered {
+//     bool operator()(const string& a, const string& b) const {
+// 		(void)a;
+// 		(void)b;
+//         return true;
+//     }
+// };
 
+// #define std::set<string> std::set<string, unordered>
 
 #endif //IRCSERV_HPP
