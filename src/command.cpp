@@ -118,8 +118,8 @@ void Server::user(Client &client)
 
 void Server::quit(Client &client)
 {
-    string response;
-    std::set<string> channelsJ;
+    string              response;
+    std::set<string>    channelsJ;
 
     response = client.clientInfo() + " QUIT :Client Quit";
     channelsJ = client.getChannels();

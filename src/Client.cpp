@@ -70,19 +70,16 @@ void Client::setHasUsedUser(bool value)
 
 bool Client::getHasPassed()
 {
-    // return (true);
     return this->_hasPassed;
 }
 
 bool Client::getHasUsedNick()
 {
-    // return (true);
     return this->_hasUsedNick;
 }
 
 bool Client::getHasUsedUser()
 {
-    // return (true);
     return this->_hasUsedUser;
 }
 

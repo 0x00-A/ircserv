@@ -5,63 +5,34 @@
 // #include <cpprest/http_client.h>
 // #include <cpprest/json.h>
 
-// using namespace web;
-// using namespace web::http;
-// using namespace web::http::client;
+// int main() {
 
-// // Function to translate text using Microsoft Translator API
-// std::string TranslateText(const std::string& text, const std::string& target_lang, const std::string& api_key) {
-//     utility::string_t url = U("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=") + utility::conversions::to_string_t(target_lang);
-//     http_client client(url);
 
-//     // Prepare request headers
-//     http_request request(methods::POST);
-//     request.headers().add(U("Ocp-Apim-Subscription-Key"), utility::conversions::to_string_t(api_key));
-//     request.headers().add(U("Content-Type"), U("application/json"));
-
-//     // Prepare request body
-//     json::value body;
-//     body[U("text")] = json::value::string(utility::conversions::to_string_t(text));
-//     request.set_body(body);
-
-//     // Send request
-//     http_response response = client.request(request).get();
-
-//     // Read response
-//     json::value json_response = response.extract_json().get();
-//     return utility::conversions::to_utf8string(json_response[0][U("translations")][0][U("text")].as_string());
 // }
 
-std::string _startTime;
-void setStartTime(void)
-{
+#include <set>
+#include <iostream>
 
-	std::time_t res = std::time(NULL);
-
-    char *timePtr = std::ctime(&res);
-    if (!timePtr)
-    {
-        // cerr << "error time" << endl;
-        _startTime = "";
+// Custom comparison function
+struct unordered {
+    bool operator()(const int& a, const int& b) const {
+        return true;
     }
-    else
-    {
-        _startTime = timePtr;
-		_startTime.erase(_startTime.size() - 1, 1);
-    }
-}
+};
 
 int main() {
-    // std::string text_to_translate = "Hello, how are you?";
-    // std::string target_language = "fr"; // French
-    // std::string api_key = "YOUR_API_KEY"; // Replace with your actual API key
+    std::set<int, unordered> mySet;
 
-    // std::string translated_text = TranslateText(text_to_translate, target_language, api_key);
-    // std::cout << "Translated text: " << translated_text << std::endl;
+    // Inserting elements
+    mySet.insert(20);
+    mySet.insert(10);
+    mySet.insert(30);
 
-    setStartTime();
-    std::cout << _startTime.size() << std::endl;
-    std::cout << ">> " << _startTime[_startTime.size() - 1] << "|" << std::endl;
+    // Displaying elements
+    for (int num : mySet) {
+        std::cout << num << ' ';
+    }
+
     return 0;
 }
 
