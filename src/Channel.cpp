@@ -292,3 +292,8 @@ string Channel::getModes(void) const
 {
 	return (_modes);
 }
+
+
+void Channel::kickUser(const std::string& userToKick) {
+        _users.erase(userToKick);
+}

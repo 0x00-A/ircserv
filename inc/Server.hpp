@@ -77,6 +77,7 @@ private:
 	void		handleTopicFlag( strPair&, string&, channelIter& );
 	void		removeExtraPlusMinus( string& );
 
+	/***********************[ KICK ]***********************/
 
 	/***********************[ SERVER ]***********************/
 	void		parseargs( void ) const;
@@ -122,6 +123,8 @@ public:
 		void	quit(Client& client);
 		void	join(Client& client);
 		void	privmsg(Client& client);
+		void    kick(Client& client);
+
 
 		void	mode(Client& client);
 

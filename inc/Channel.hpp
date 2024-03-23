@@ -97,6 +97,9 @@ class Channel
 
 		void				printUsers( void );
 
+		//////////////////////////////////
+		void kickUser(const std::string& userToKick);
+
 };
 
 #endif  // CHANNEL_HPP
