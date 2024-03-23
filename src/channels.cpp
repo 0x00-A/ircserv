@@ -69,7 +69,6 @@ void Server::joinedAChannel(Client& client, Channel& channel)
 	clientIter					cliIter;
 
 	users = channel.getUserList();
-	channel.printUsers();
     response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + channel.getName();
 	for (std::set<string>::iterator it = users.begin(); it != users.end(); it++)
 	{
