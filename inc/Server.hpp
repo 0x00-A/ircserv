@@ -96,7 +96,7 @@ class Server
 		// parser functions
 		void handleCommand(string &cmd, int id);
 		void parseCommand(string &cmd);
-		string to_upper(const string &str);
+		void to_upper(string& str);
 		string trim_comma(const string &str);
 		void initPrivmsg(Client &client);
 		void initJoin(Client &client);

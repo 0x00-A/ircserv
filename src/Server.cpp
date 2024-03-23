@@ -10,12 +10,12 @@ string itos(int num)
     return oss.str();
 }
 
-string Server::to_upper(const string& str) 
+void Server::to_upper(string& str) 
 {
-    string result; 
-	for (size_t i = 1; i < str.size() ; i++)
-        result += (char)toupper(str[i]);
-    return result;
+	for (size_t i = 0; i < str.size() ; i++)
+	{
+        str[i] = (char)toupper(str[i]);
+	}
 }
 
 
@@ -35,16 +35,14 @@ Server::Server(const string& port, const string& passwd)
 	_pollfds.push_back(servPoll);
 
 	//
-	this->commandMap["pass"] = &Server::pass;
-    this->commandMap["user"] = &Server::user;
-    this->commandMap["nick"] = &Server::nick;
-    this->commandMap["n"] = &Server::nick;
-    this->commandMap["quit"] = &Server::quit;
-    this->commandMap["join"] = &Server::join;
-    this->commandMap["j"] = &Server::join;
-    this->commandMap["privmsg"] = &Server::privmsg;
-    this->commandMap["mode"] = &Server::mode;
-    this->commandMap["m"] = &Server::mode;
+	this->commandMap["PASS"] = &Server::pass;
+    this->commandMap["USER"] = &Server::user;
+    this->commandMap["NICK"] = &Server::nick;
+    this->commandMap["QUIT"] = &Server::quit;
+    this->commandMap["JOIN"] = &Server::join;
+    this->commandMap["PRIVMSG"] = &Server::privmsg;
+    this->commandMap["PR"] = &Server::privmsg;
+    this->commandMap["MODE"] = &Server::mode;
 }
 
 Server::~Server()

@@ -2,7 +2,8 @@
 
 void Server::reply(Client &client, string const& msg)
 {
-    client.sdBuf().push(msg + "\r\n");
+    string resp = msg + "\r\n";
+    client.sdBuf().push(resp);
     _pollfds[getIndexOfClient(client) + 1].events |= POLLOUT;
 }
 
@@ -33,7 +34,7 @@ void Server::welcomeClient(Client &client)
 	response  = ":ft_irc.1337.ma " + itos(RPL_WELCOME) + " :Welcome to the " + "ft_irc.1337.ma" + " Network, " + \
 					client.getNick() + "!" + client.getUsername() + "@" + client.getIPAddr();
 	reply(client, response);
-	response = ":ft_irc.1337.ma " + itos(RPL_YOURHOST) + " :Your host is " + "ft_irc.1337.ma" + ", running version " + "version01";
+	response = ":ft_irc.1337.ma " + itos(RPL_YOURHOST) + " :Your host is " + "ft_irc.1337.ma" + ", running version " + "version: 01";
 	reply(client, response);
 	response = ":ft_irc.1337.ma " + itos(RPL_CREATED) + " :This server was created " + getStartTime();
 	reply(client, response);
