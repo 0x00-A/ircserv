@@ -85,7 +85,6 @@ void Server::user(Client &client)
 {
     string response;
 
-    if (this->_params[1].size() > 9) this->_params[1].erase(9);
     if (client.isConnected())
     {
         response = ":ft_irc.1337.ma " + itos(ERR_ALREADYREGISTRED) + " " + \
@@ -107,6 +106,7 @@ void Server::user(Client &client)
         reply(client, response);
         return;
     }
+    if (this->_params[1].size() > 9) this->_params[1].erase(9);
     client.setHasUsedUser(true);
     client.setUsername(this->_params[1]);
     if (_clients.size() > 1 && client.getHasUsedNick())

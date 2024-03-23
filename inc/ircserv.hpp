@@ -16,6 +16,7 @@
 # include <string>
 # include <string.h>
 # include <cstdlib>
+#include <cctype>
 # include <cerrno>
 
 using std::string;
