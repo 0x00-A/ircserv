@@ -58,7 +58,7 @@ void Server::handleCommand(string& cmd, int id)
 
     parseCommand(cmd);
     if (this->_params.empty()) return;
-
+    to_upper(this->_params[0]);
     cmdmapIter it = this->commandMap.find(this->_params[0]);
     if (it != this->commandMap.end())
     {

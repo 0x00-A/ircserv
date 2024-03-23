@@ -5,7 +5,6 @@ void Server::pass(Client &client)
 {
     string response;
 
-    std::cout << "receive pass command" << std::endl;
     if (client.isConnected())
     {
         response = ":ft_irc.1337.ma " + itos(ERR_ALREADYREGISTRED) + " " + \
@@ -37,7 +36,7 @@ void Server::nick(Client &client)
     string response;
     bool    welcome = false;
 
-    std::cout << "receive nick command\n";
+    if (this->_params[1].size() > 15) this->_params[1].erase(15);
     if (client.getHasPassed() == false)
     {
         response = ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered";
@@ -86,7 +85,7 @@ void Server::user(Client &client)
 {
     string response;
 
-     if (client.isConnected())
+    if (client.isConnected())
     {
         response = ":ft_irc.1337.ma " + itos(ERR_ALREADYREGISTRED) + " " + \
             client.getNick()  + " :You may not reregister";
@@ -107,6 +106,7 @@ void Server::user(Client &client)
         reply(client, response);
         return;
     }
+    if (this->_params[1].size() > 9) this->_params[1].erase(9);
     client.setHasUsedUser(true);
     client.setUsername(this->_params[1]);
     if (_clients.size() > 1 && client.getHasUsedNick())
