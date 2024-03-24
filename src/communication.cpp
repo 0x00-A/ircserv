@@ -45,7 +45,7 @@ void Server::changeNick(Client & client)
     string              response;
     std::set<string>    channelsJ;
 
-    response = client.clientInfo() + " NICK :" + this->_params[1];
+    response = client.identifier() + " NICK :" + this->_params[1];
     channelsJ = client.getChannels();
 
     if (channelsJ.empty())

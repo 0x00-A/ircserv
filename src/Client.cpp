@@ -161,10 +161,3 @@ bool Client::isConnected()
     // return (true);
     return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }
-
-string  Client::clientInfo()
-{
-    string response;
-    response = ":" + _nick + "!~"  + _username  + "@" + _ip;
-    return response;
-}

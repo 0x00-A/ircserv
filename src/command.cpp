@@ -63,7 +63,7 @@ void Server::nick(Client &client)
     }
     if (client.getHasUsedNick() == true && !client.isConnected())
     {
-        response = client.clientInfo() + " NICK :" +  this->_params[1];
+        response = client.identifier() + " NICK :" +  this->_params[1];
         reply(client, response);
     }
     if (client.isConnected())
@@ -121,7 +121,7 @@ void Server::quit(Client &client)
     string              response;
     std::set<string>    channelsJ;
 
-    response = client.clientInfo() + " QUIT :Client Quit";
+    response = client.identifier() + " QUIT :Client Quit";
     channelsJ = client.getChannels();
 
     if (channelsJ.empty())
@@ -476,11 +476,6 @@ void    Server::mode(Client& client)
     channelIter                                 chan;
     string                                      paramsave;
     string                                      modesave;
-
-    // test with nick(aaa) channel(c)
-    // _channels.push_back(Channel("c", "aaa"));
-    // _channels.begin()->joinUser("aaa");
-    // _channels.begin()->setChannelOperator("aaa");
 
     if (!client.isConnected())
     {

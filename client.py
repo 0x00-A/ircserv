@@ -1,9 +1,8 @@
-#!/usr/local/bin/python3
-from socket import *
-from sys import *
-import selectors
+import socket
 
-def    conn(host, port, i):
+clients = []
+
+def connect_to_server(host, port, i):
     try:
         # Create a socket object
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,38 +32,9 @@ def    conn(host, port, i):
 
 if __name__ == "__main__":
     host = 'localhost'  # Change this to your server's IP address
-    port = 8888  # Change this to the port your server is listening on
+    port = 6667  # Change this to the port your server is listening on
     for i in range(10):
         connect_to_server(host, port, i)
     a = input()
     for i in range(10):
         clients[i].close()
-        fd = socket(AF_INET, SOCK_STREAM)
-        fd.connect((host, port))
-        fd.setblocking(False)
-        fd.send("pass 2001\r\n".encode())
-        fd.send(("nick kk"+str(i)+"\r\n").encode())
-        fd.send("user a as s d a \r\n".encode())
-        fd.send("join #food\r\n".encode())
-        # fd.send(("\n"*1000).encode())
-        # fd.send(bytes.fromhex("0a03"))
-        return fd
-    except Exception as err:
-        print("errr :" , err)
-
-if __name__ == "__main__":
-    if len(argv) != 4:
-        exit(1)
-    l = selectors.DefaultSelector()
-    for item in range(int(argv[3])):
-        s = conn(argv[1], int(argv[2]), item)
-        if s:
-            l.register(s, selectors.EVENT_READ | selectors.EVENT_WRITE)
-    kkkk = True
-    while kkkk:
-        for k, m in l.select(1):
-            con = k.fileobj
-            if m & selectors.EVENT_READ:
-                data = con.recv(2048)
-                print(data.decode(), end='')
-                close(k.fd)

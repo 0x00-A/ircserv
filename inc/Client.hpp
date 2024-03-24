@@ -112,7 +112,6 @@ class Client
 
 		// bool 			isRegistered(void);
 		bool checkNick(string &nick);
-		string clientInfo(void);
 
 		std::set<string> getChannels(void);
 		const string &getNick(void) const;
