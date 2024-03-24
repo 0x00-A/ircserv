@@ -20,14 +20,14 @@ Channel::Channel(const string &channelName, const string &admin)
 {
     _admin = admin;
     _name = channelName;
-    _modes = "+";
+    _modes = "+t";
     _topic = "";
     _userLimit = -1;		// or string?
     _passkey = "";
     _hasInvite = false;
     _hasPasskey = false;
     _hasLimit = false;
-    _hasTopic = false;
+    _hasTopic = true;
 
     setCreationTime();
     joinUser(admin);
@@ -227,21 +227,25 @@ bool Channel::setChannelOperator(const string &user)
 
 bool Channel::setMode(const string &mode)
 {
-    // if mode == "-o" > if param is in channel > add to operator list
-
-    // this code is not tested !!!!
     if (mode[0] == '+')
     {
         if (_modes.find(mode[1]) == string::npos)
         {
+            if (_modes.empty())
+                _modes += "+";
             _modes += mode[1];
             return (true);
         }
     }
-    else if (_modes.find(mode[1]) != string::npos)
+    else if (mode[0] == '-')
     {
-        _modes.erase(_modes.find(mode[1]), 1);
-        return (true);
+        if (_modes.find(mode[1]) != string::npos)
+        {
+            _modes.erase(_modes.find(mode[1]), 1);
+            if (_modes == "+")
+                _modes = "";
+            return (true);
+        }
     }
     return (false);
 }

@@ -33,7 +33,7 @@ void Server::pass(Client &client)
 
 void Server::nick(Client &client)
 {
-    string response;
+    string  response;
     bool    welcome = false;
 
     if (this->_params[1].size() > 15) this->_params[1].erase(15);
@@ -478,7 +478,7 @@ void    Server::mode(Client& client)
     string                                      modesave;
 
     // test with nick(aaa) channel(c)
-    _channels.push_back(Channel("c", "aaa"));
+    // _channels.push_back(Channel("c", "aaa"));
     // _channels.begin()->joinUser("aaa");
     // _channels.begin()->setChannelOperator("aaa");
 

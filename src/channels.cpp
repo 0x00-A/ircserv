@@ -31,7 +31,9 @@ void Server::channelWelcomeMessages(Client &client, Channel& ch)
 	std::set<string>	users;
 
 	reply(client, client.identifier() + " JOIN " + ch.getName());
-	reply(client, ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs());
+	// reply(client, ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs());
+	if (ch.isUserOperator(client.getNick()))
+		reply(client, client.identifier() + " MODE " + ch.getName() + " " + "+t");
 
 	prefix = channelInfo(client.getNick(), ch.getName());
 	users = ch.getUserList();
@@ -69,7 +71,7 @@ void Server::joinedAChannel(Client& client, Channel& channel)
 	clientIter					cliIter;
 
 	users = channel.getUserList();
-    response = ":" + client.getNick() + "!~" + client.getUsername() + "@" + client.getIPAddr() + " JOIN " + channel.getName();
+    response = client.identifier() + " JOIN " + channel.getName();
 	for (std::set<string>::iterator it = users.begin(); it != users.end(); it++)
 	{
 		cliIter = getClientIterator(*it);
@@ -122,9 +124,6 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 	}
 	this->_channels.push_back(Channel(channel.first, client.getNick()));
 	client.addChannels(channel.first);
-	this->_channels.back().setMode("+t");
-	this->_channels.back().setHasTopic(true);
-	reply(client, client.identifier() + " MODE " + channel.first + " " + "+t");
 	channelWelcomeMessages(client, _channels.back());
 }
 
