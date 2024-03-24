@@ -59,6 +59,7 @@ void Server::handleCommand(string& cmd, int id)
     parseCommand(cmd);
     if (this->_params.empty()) return;
     to_upper(this->_params[0]);
+    if (this->_params[0] == "PONG") return ;
     cmdmapIter it = this->commandMap.find(this->_params[0]);
     if (it != this->commandMap.end())
     {
@@ -66,6 +67,7 @@ void Server::handleCommand(string& cmd, int id)
     }
     else if (_clients[id].isConnected())
     {
+
         throw ( ":ft_irc.1337.ma " + itos(ERR_UNKNOWNCOMMAND) + " " + \
         _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }

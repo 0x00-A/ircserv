@@ -33,7 +33,7 @@ void Server::pass(Client &client)
 
 void Server::nick(Client &client)
 {
-    string response;
+    string  response;
     bool    welcome = false;
 
     if (this->_params[1].size() > 15) this->_params[1].erase(15);
