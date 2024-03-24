@@ -350,7 +350,7 @@ Server::clientIter Server::getClientIterator(const string &nick)
 	clientIter it;
 	for (it = _clients.begin(); it < _clients.end(); it++)
 	{
-		if ((it->getNick() == nick) || ("@" + it->getNick() == nick))
+		if ((it->getNick() == nick) || ("@" + it->getNick()) == nick)
 			return (it);
 	}
 	return (it);

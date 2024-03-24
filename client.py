@@ -14,7 +14,7 @@ def connect_to_server(host, port, i):
         print(f"Connected to {host} on port {port}")
         
         # Send data to the server
-        message = f"pass 2001\nuser x{i} x x x\nnick user{i}\njoin #ch\n"
+        message = f"pass 2001\nuser x{i} x x x\nnick galta{i}\njoin #food\n"
         client_socket.sendall(message.encode())
         print("Message sent to server:", message)
         
@@ -32,8 +32,8 @@ def connect_to_server(host, port, i):
         print("An error occurred:", e)
 
 if __name__ == "__main__":
-    host = 'localhost'  # Change this to your server's IP address
-    port = 6667  # Change this to the port your server is listening on
+    host = 'e1r2p15'  # Change this to your server's IP address
+    port = 8080  # Change this to the port your server is listening on
     for i in range(30):
         connect_to_server(host, port, i)
     while True:

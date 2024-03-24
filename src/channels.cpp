@@ -77,7 +77,7 @@ void Server::joinedAChannel(Client& client, Channel& channel)
 		cliIter = getClientIterator(*it);
 		if (cliIter != _clients.end())
 		{
-			if (cliIter->getNick() == *it) continue;
+			if (client.getNick() == *it) continue;
 			reply(*cliIter, response);
 		}
 	}
