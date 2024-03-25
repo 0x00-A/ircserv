@@ -110,7 +110,7 @@ int Server::handleRead(int id)
 		bytesread = read(_clients[id].getSockfd(), readbuf, sizeof(readbuf) - 1);
 		if (bytesread < 0)
 		{
-			if (errno != EWOULDBLOCK && errno != EAGAIN)
+			if (errno != EWOULDBLOCK)
 			{
 				perror("read");
 				return (-1);
@@ -251,7 +251,7 @@ void	Server::run()
 				}
 			}
 			if (_pollfds[i].revents & POLLOUT)	// Client can recieve data
-			{				
+			{
 				/******************************************************************************/
 				/*  Set POLLOUT only if you have data to send to the other end.               */
 				/*  This is because most of the time, sockets are writable, and POLLOUT will  */

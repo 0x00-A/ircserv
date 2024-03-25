@@ -179,6 +179,8 @@ void Server::parseargs() const
 {
     if (_passwd.empty())
         throw (std::invalid_argument("Invalid password"));
+    if (_port.empty() || _port == "nan")
+        throw (std::invalid_argument("Invalid port number"));
     char * endptr;
     double d = std::strtod(_port.c_str(), &endptr);
     if (*endptr)
