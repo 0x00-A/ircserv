@@ -48,6 +48,7 @@ Server::Server(const string& port, const string& passwd)
 	//--------------------------------------//
     this->commandMap["kick"] = &Server::kick;
     this->commandMap["invite"] = &Server::invite;
+    this->commandMap["topic"] = &Server::topic;
 }
 
 Server::~Server()

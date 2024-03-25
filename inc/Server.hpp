@@ -126,6 +126,7 @@ public:
 
 		void    kick(Client& client);
 		void 	invite(Client& client);
+		void 	topic(Client& client);
 
 
 		void	mode(Client& client);
