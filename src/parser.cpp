@@ -102,22 +102,28 @@ string Server::trim_comma(const string &str)
     return result;
 }
 
-void Server::initPrivmsg(Client &client)
+bool Server::initPrivmsg(Client &client)
 {
     string response;
+
+    if (!client.isConnected())
+    {
+        replyNotConnected(client);
+        return false;
+    }
     if (_params.size() < 2)
     {
         response = ":ft_irc.1337.ma " + itos(ERR_NORECIPIENT) + " " + \
             client.getNick()  + " :No recipient given (" + _params[0] + ")";
         reply(client, response);
-        return;
+        return false;
     }
     if (_params.size() < 3)
     {
         response = ":ft_irc.1337.ma " + itos(ERR_NOTEXTTOSEND) + " " + \
             client.getNick()  + " ::No text to send";
         reply(client, response);
-        return;
+        return false;
     }
     string clients = trim_comma(_params[1]);
     stringstream ss(clients);
@@ -131,17 +137,18 @@ void Server::initPrivmsg(Client &client)
 
     }
     _messagClient = _params[_params.size() - 1];
+    return true;
 }
 void Server::initJoin(Client &client)
 {
-    string line;
-    string chan;
-    string key = "";
-    bool    keys = false;
-    stringstream ssk;
+    string              line;
+    string              chan;
+    string              key = "";
+    string              response;
+    stringstream        ssk;
+    std::set<string>    seenChannels;
+    bool                keys = false;
 
-    std::set<string> seenChannels;
-    string response;
     if (_params.size() < 2)
     {
         response = ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
@@ -151,7 +158,6 @@ void Server::initJoin(Client &client)
     }
     line = trim_comma(_params[1]);
     stringstream ss(line);
-
     if (_params.size() > 2)
     {
         keys = true;

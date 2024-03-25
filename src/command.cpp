@@ -28,6 +28,7 @@ void Server::pass(Client &client)
         response = ":ft_irc.1337.ma " + itos(RPL_WELCOME) + " " + \
             client.getNick()  + " " + this->_params[1] + " :Password incorrect";
         reply(client, response);
+        client.setHasPassed(false);
     }
 }
 
@@ -36,7 +37,6 @@ void Server::nick(Client &client)
     string  response;
     bool    welcome = false;
 
-    if (this->_params[1].size() > 15) this->_params[1].erase(15);
     if (client.getHasPassed() == false)
     {
         response = ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered";
@@ -48,6 +48,10 @@ void Server::nick(Client &client)
         response = ":ft_irc.1337.ma " + itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given";
         reply(client, response);
         return;
+    }
+    if (this->_params[1].size() >= 16)
+    {
+        this->_params[1].erase(15);
     }
     if (client.checkNick(this->_params[1]) == false)
     {
@@ -149,8 +153,6 @@ void Server::quit(Client &client)
             }
         } 
     }
-
-    // send befor closing ...
     response += "\r\n";
     send(client.getSockfd(), response.c_str(), response.length(), 0);
     response = "ERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)";
@@ -165,9 +167,7 @@ void Server::join(Client &client)
 
     if (!client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + \
-            client.getNick()  + " :You have not registered";
-        reply(client, response);
+        replyNotConnected(client);
         return;
     }
     initJoin(client);
@@ -175,14 +175,12 @@ void Server::join(Client &client)
     {
         if (_parsChannels[i].first[0] != '#')
         {
-            response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + \
-            " " +  client.getNick() + " " + _parsChannels[i].first + " :No such channel";
+            response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " +\
+                client.getNick() + " " + _parsChannels[i].first + " :No such channel";
             reply(client, response);
         }
         else
-        {
             joinChannel(client, _parsChannels[i]);
-        }
     }
 
 }
@@ -190,19 +188,12 @@ void Server::join(Client &client)
 
 void Server::privmsg(Client &client)
 {
-    std::set<string> seenNicks;
-    bool found = false;
-    string response;
+    std::set<string>    seenNicks;
+    bool                found;
+    string              response;
 
-
-    if (!client.isConnected())
-    {
-        response = ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + \
-            client.getNick()  + " :You have not registered";
-        reply(client, response);
-        return;
-    }
-    initPrivmsg(client);
+    found = false;
+    if (!initPrivmsg(client)) return;
     for (size_t i = 0; i < _sendMsgClient.size(); i++)
     {
         found = false;
@@ -215,38 +206,17 @@ void Server::privmsg(Client &client)
         }
         seenNicks.insert(_sendMsgClient[i].first);
         if (_sendMsgClient[i].first[0] == '#')
-        {
-            for (size_t k = 0; k < _channels.size(); k++)
-            {
-                if (_sendMsgClient[i].first == _channels[k].getName())
-                {
-                    found = true;
-                    response = ":"  + client.getNick() + "!~" + client.getUsername()  + "@" + client.getIPAddr() + " PRIVMSG " + _channels[k].getName() + " :";
-                    broadcastMsg(client, (response  + _messagClient), _channels[k]);
-                    break ;
-                }
-            }
-        }
+           found = channelSendMsg(client, _sendMsgClient[i].first);
         else
-        {
-            for (size_t j = 0; j < _clients.size(); j++)
-            {
-                if (_sendMsgClient[i].first == _clients[j].getNick())
-                {
-                    found = true;
-                    response = client.identifier() + " PRIVMSG " + _clients[j].getNick() + " :" +  _messagClient;
-                    reply(_clients[j], response);
-                    break ;
-                }
-            }
-        }
+            found = nickSendMsg(client, _sendMsgClient[i].first);
+        
         if (!found && (_sendMsgClient[i].second == CLIENT))
         {
             response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + \
             " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick/channel";
             reply(client, response);
         }
-        if (!found && (_sendMsgClient[i].second == CHANNEL))
+        else if (!found && (_sendMsgClient[i].second == CHANNEL))
         {
             response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + \
             " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such channel";
@@ -254,6 +224,7 @@ void Server::privmsg(Client &client)
         }
     }   
 }
+
 
 /********************************************************************************/
 /* The MODE command is provided so that channel operators may change the        */
