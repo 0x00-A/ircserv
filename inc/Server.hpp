@@ -123,7 +123,9 @@ public:
 		void	quit(Client& client);
 		void	join(Client& client);
 		void	privmsg(Client& client);
+
 		void    kick(Client& client);
+		void 	invite(Client& client);
 
 
 		void	mode(Client& client);

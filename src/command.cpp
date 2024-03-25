@@ -551,15 +551,6 @@ void Server::kick(Client& client)
     std::string key = _params[2];
 	std::string reason = (_params.size() > 3) ? _params[3] : "No reason provided";
 
-    // Finding the channel object
-    // Channel* channel = NULL;
-    // for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
-	// 	std::cout << "it->getName(): " << it->getName() << '\n';
-    //     if (it->getName() == channelName) {
-    //         channel = &(*it);
-    //         break;
-    //     }
-    // }
 	channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
         reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel\r\n");
@@ -587,5 +578,47 @@ void Server::kick(Client& client)
 	broadcastMsg(client, kickMessage, *chanit);
 
     std::cout << "User " << client.getNick() << " kicked " << key << " from " << channelName << "\n";
+}
+
+
+void Server::invite(Client& client)
+{
+    if (!client.isConnected()) {
+        reply(client, "451 :You have not registered\r\n");
+        return;
+    }
+    if (_params.size() < 3) {
+        reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters\r\n");
+        return;
+    }
+    std::string userToInvite = _params[1];
+    std::string channelName = _params[2];
+
+	channelIter chanit = doesChannelExist(channelName);
+    if (chanit == _channels.end()) {
+        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + client.getNick() + " " + channelName + " :No such channel\r\n");
+        return;
+    }
+	if (!chanit->isUserInChannel(client.getNick())) {
+        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
+        return;
+    }
+    if (!chanit->isUserOperator(client.getNick())) {
+        reply(client, ":ft_irc.1337.ma " + intToString(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " " + channelName + " :You're not channel operator\r\n");
+        return;
+    }
+
+    if (doesUserExit(userToInvite) == _clients.end()){
+        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHNICK) + " " + client.getNick() + " " + userToInvite + " :No such nick\r\n");
+        return;
+    }
+
+    if (chanit->isUserInChannel(userToInvite)) {
+        reply(client, ":ft_irc.1337.ma " + intToString(ERR_USERONCHANNEL) + " "+ client.getNick() + " " + userToInvite + " " + channelName + " :is already on channel\r\n");
+        return;
+    }
+	chanit->joinUser(userToInvite);
+	std::string kickMessage = client.identifier()  + " INVITE " + userToInvite + " :" + channelName + "\r\n";
+	broadcastMsg(client, kickMessage, *chanit);
 }
 
