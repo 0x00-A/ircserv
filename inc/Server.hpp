@@ -98,13 +98,16 @@ class Server
 		void parseCommand(string &cmd);
 		void to_upper(string& str);
 		string trim_comma(const string &str);
-		void initPrivmsg(Client &client);
+		bool initPrivmsg(Client &client);
 		void initJoin(Client &client);
 
 		// check nick clients
 		bool checkAlreadyNick(string &nick);
 		void checkSpamClient(Client &client);
 		void changeNick(Client &client);
+		// fun reply
+		void    replyNotConnected(Client &client);
+
 
 		// command member functions
 		void pass(Client &client);
@@ -121,7 +124,9 @@ class Server
 		void joinChannel(Client &client, std::pair<string, string> channel);
 		void channelWelcomeMessages(Client &client, Channel &channel);
 		void joinedAChannel(Client &client, Channel &channel);
-		// void listChannels();
+		bool channelSendMsg(Client& client, string& ch); 
+		bool nickSendMsg(Client& client, string& nick);
+		
 		channelIter doesChannelExist(const string &chan);
 		clientIter doesUserExit(const string nick);
 		void removeUserFromChannel(const string user, const string chan);

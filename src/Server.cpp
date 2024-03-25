@@ -143,7 +143,7 @@ int	Server::handleWrite(int id)
 	while (!buffer.empty())
 	{
 		string	data = buffer.front();
-
+		std::cout << "data: " << data << std::endl;
 		sent_data = write(_clients[id].getSockfd(), data.c_str(), data.length());
 		if (sent_data < 0)
 		{
@@ -169,7 +169,7 @@ int	Server::handleWrite(int id)
 		// if all data was sent
 		buffer.pop();
 	}
-	cout << "Done sending data to client - fd: " << _clients[id].getSockfd() << endl;
+	cout << "Done sending data to client - fd: " << _clients[id].getSockfd()  << " sizesending:: " << sent_data << endl;
 	_pollfds[id+1].events = POLLIN;
 	return (0);
 }
@@ -350,7 +350,7 @@ Server::clientIter Server::getClientIterator(const string &nick)
 	clientIter it;
 	for (it = _clients.begin(); it < _clients.end(); it++)
 	{
-		if ((it->getNick() == nick) || ("@" + it->getNick() == nick))
+		if ((it->getNick() == nick) || ("@" + it->getNick()) == nick)
 			return (it);
 	}
 	return (it);

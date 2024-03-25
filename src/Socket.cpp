@@ -35,6 +35,10 @@ void Socket::bindSocket(string port)
 	{
 		perror("setsockopt");
 	}
+	// if (setsockopt(_sockfd, SOL_SOCKET, SO_NOSIGPIPE, &enable, sizeof(int)))
+	// {
+	// 	perror("setsockopt");
+	// }
 
 	// bind The server's port to the socket
 	if (bind(_sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
