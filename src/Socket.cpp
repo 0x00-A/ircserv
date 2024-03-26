@@ -41,6 +41,7 @@ void Socket::bindSocket(string port)
 	// }
 
 	// bind The server's port to the socket
+	// std::cout << inet_ntoa(servaddr.sin_addr) << std::endl;
 	if (bind(_sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
 	{
 		perror("bind");
