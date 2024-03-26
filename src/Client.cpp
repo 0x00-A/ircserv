@@ -78,6 +78,9 @@ void Client::inviteToChannel(string &channelName)
 
 bool Client::isInvitedToChannel(string &channelName) const
 {
+    std::vector<string>::const_iterator it = std::find(_invitedChannels.begin(), _invitedChannels.end(), channelName);
+    if (it != _invitedChannels.end())
+        return true;
     return false;
 }
 
