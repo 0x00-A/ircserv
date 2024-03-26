@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Channel.hpp"
 
 
 void Server::pass(Client &client)
@@ -213,10 +214,10 @@ void Server::privmsg(Client &client)
 //	When using the 'o' options, a restriction on a total of three per mode command has been imposed
 
 /* Examples
-    MODE #Finnish +i               ; Makes #Finnish channel 'invite-only'.
-    MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on channel #Finnish.
-    MODE #42 +k oulu                ; Set the channel key to "oulu".
-    MODE #eu-opers +l 10            ; Set the limit for the number of users on channel to 10.
+	MODE #Finnish +i               ; Makes #Finnish channel 'invite-only'.
+	MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on channel #Finnish.
+	MODE #42 +k oulu                ; Set the channel key to "oulu".
+	MODE #eu-opers +l 10            ; Set the limit for the number of users on channel to 10.
 */
 /********************************************
 
@@ -321,55 +322,55 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
 
 void Server::handleLimitFlag(strPair &m, string &modesave, string &paramsave, channelIter &chan)
 {
-    if (m.first == "+l")
-    {
-        if (std::atoi(m.second.c_str()) > 0)
-        {
-            chan->setMode(m.first);
-            chan->setHasUserLimit(true);
-            chan->setUserLimit(m.second);
-            modesave += m.first;
-            paramsave += " " + m.second;
-        }
-    }
-    else if (m.first == "-l")
-    {
-        if (chan->setMode(m.first))
-        {
-            chan->setHasUserLimit(false);
-            modesave += m.first;
-        }
-    }
+	if (m.first == "+l")
+	{
+		if (std::atoi(m.second.c_str()) > 0)
+		{
+			chan->setMode(m.first);
+			chan->setHasUserLimit(true);
+			chan->setUserLimit(m.second);
+			modesave += m.first;
+			paramsave += " " + m.second;
+		}
+	}
+	else if (m.first == "-l")
+	{
+		if (chan->setMode(m.first))
+		{
+			chan->setHasUserLimit(false);
+			modesave += m.first;
+		}
+	}
 }
 
 void Server::handlePasskeyFlag(strPair &m, string &modesave, string &paramsave, channelIter &chan)
 {
-    if (m.first == "+k")
-    {
-        chan->setMode(m.first);
-        chan->setPasskey(m.second);
-        modesave += m.first;
-        paramsave += " " + m.second;
-    }
-    else if (m.first == "-k")
-    {
-        if (chan->hasPasskey())
-        {
-            chan->setMode(m.first);
-            chan->setHasPasskey(false);
-            modesave += m.first;
-            paramsave += " *";
-        }
-    }
+	if (m.first == "+k")
+	{
+		chan->setMode(m.first);
+		chan->setPasskey(m.second);
+		modesave += m.first;
+		paramsave += " " + m.second;
+	}
+	else if (m.first == "-k")
+	{
+		if (chan->hasPasskey())
+		{
+			chan->setMode(m.first);
+			chan->setHasPasskey(false);
+			modesave += m.first;
+			paramsave += " *";
+		}
+	}
 }
 
 void Server::handleInviteFlag(strPair &m, string &modesave, channelIter &chan)
 {
-    if (chan->setMode(m.first))
-    {
-        (m.first == "+i")? chan->setHasInvite(true) : chan->setHasInvite(false);
-        modesave += m.first;
-    }
+	if (chan->setMode(m.first))
+	{
+		(m.first == "+i")? chan->setHasInvite(true) : chan->setHasInvite(false);
+		modesave += m.first;
+	}
 }
 
 void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan)
@@ -383,30 +384,30 @@ void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan)
 
 void Server::removeExtraPlusMinus(string &s)
 {
-    bool sawPlus = false;
-    bool sawMinus = false;
+	bool sawPlus = false;
+	bool sawMinus = false;
 
-    for (size_t i = 0; i < s.size(); i++)
-    {
-        if (s[i] == '+' && !sawPlus)
-        {
-            sawPlus = true;
-            sawMinus = false;
-        }
-        else if (s[i] == '+' && sawPlus)
-        {
-            s.erase(i--, 1);
-        }
-        if (s[i] == '-' && !sawMinus)
-        {
-            sawMinus = true;
-            sawPlus = false;
-        }
-        else if (s[i] == '-' && sawMinus)
-        {
-            s.erase(i--, 1);
-        }
-    }
+	for (size_t i = 0; i < s.size(); i++)
+	{
+		if (s[i] == '+' && !sawPlus)
+		{
+			sawPlus = true;
+			sawMinus = false;
+		}
+		else if (s[i] == '+' && sawPlus)
+		{
+			s.erase(i--, 1);
+		}
+		if (s[i] == '-' && !sawMinus)
+		{
+			sawMinus = true;
+			sawPlus = false;
+		}
+		else if (s[i] == '-' && sawMinus)
+		{
+			s.erase(i--, 1);
+		}
+	}
 }
 
 void    Server::mode(Client& client)
@@ -443,31 +444,171 @@ void    Server::mode(Client& client)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + \
         client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
-    }
-    while (!modes.empty())
-    {
-        std::pair<string, string> m = modes.front();
-        switch (m.first[1])
-        {
-            case ('o'):
-            handleOperatorFlag(m, modesave, paramsave, chan, client);
-            break;
-            case ('l'):
-            handleLimitFlag(m, modesave, paramsave, chan);
-            break;
-            case ('k'):
-            handlePasskeyFlag(m, modesave, paramsave, chan);
-            break;
-            case ('i'):
-            handleInviteFlag(m, modesave, chan);
-            break;
-            case ('t'):
-            handleTopicFlag(m, modesave, chan);
-            break;
-        }
-        modes.pop();
-    }
-    removeExtraPlusMinus(modesave);
-    if (!modesave.empty())
-        throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
+	}
+	while (!modes.empty())
+	{
+		std::pair<string, string> m = modes.front();
+		switch (m.first[1])
+		{
+			case ('o'):
+			handleOperatorFlag(m, modesave, paramsave, chan, client);
+			break;
+			case ('l'):
+			handleLimitFlag(m, modesave, paramsave, chan);
+			break;
+			case ('k'):
+			handlePasskeyFlag(m, modesave, paramsave, chan);
+			break;
+			case ('i'):
+			handleInviteFlag(m, modesave, chan);
+			break;
+			case ('t'):
+			handleTopicFlag(m, modesave, chan);
+			break;
+		}
+		modes.pop();
+	}
+	removeExtraPlusMinus(modesave);
+	if (!modesave.empty())
+		throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+void Server::kick(Client& client)
+{
+    if (!client.isConnected()) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered\r\n");
+        return;
+    }
+    if (_params.size() < 3) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " KICK :Not enough parameters\r\n");
+        return;
+    }
+
+    std::string channelName = _params[1];
+    std::string key = _params[2];
+	std::string reason = (_params.size() > 3) ? _params[3] : "No reason provided";
+
+	channelIter chanit = doesChannelExist(channelName);
+    if (chanit == _channels.end()) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel\r\n");
+        return;
+    }
+    if (!chanit->isUserInChannel(client.getNick())) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
+        return;
+    }
+    if (!chanit->isUserOperator(client.getNick())) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator\r\n");
+        return;
+    }
+
+	if (doesUserExit(key) == _clients.end()) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + channelName + " :No such nick/channel\r\n");
+        return;
+	}
+    if (!chanit->isUserInChannel(key)) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel\r\n");
+        return;
+    }
+	removeUserFromChannel(key, channelName);
+    std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + reason;
+	broadcastMsg(client, kickMessage, *chanit);
+
+    std::cout << "User " << client.getNick() << " kicked " << key << " from " << channelName << "\n";
+}
+
+
+void Server::invite(Client& client)
+{
+    if (!client.isConnected()) {
+        reply(client, "451 :You have not registered\r\n");
+        return;
+    }
+    if (_params.size() < 3) {
+        reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters\r\n");
+        return;
+    }
+    std::string userToInvite = _params[1];
+    std::string channelName = _params[2];
+
+	channelIter chanit = doesChannelExist(channelName);
+    if (chanit == _channels.end()) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + client.getNick() + " " + channelName + " :No such channel\r\n");
+        return;
+    }
+	if (!chanit->isUserInChannel(client.getNick())) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
+        return;
+    }
+    if (!chanit->isUserOperator(client.getNick())) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " " + channelName + " :You're not channel operator\r\n");
+        return;
+    }
+
+    if (doesUserExit(userToInvite) == _clients.end()){
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + userToInvite + " :No such nick\r\n");
+        return;
+    }
+
+    if (chanit->isUserInChannel(userToInvite)) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_USERONCHANNEL) + " "+ client.getNick() + " " + userToInvite + " " + channelName + " :is already on channel\r\n");
+        return;
+    }
+	chanit->joinUser(userToInvite);
+	std::string kickMessage = client.identifier()  + " INVITE " + userToInvite + " :" + channelName + "\r\n";
+	broadcastMsg(client, kickMessage, *chanit);
+}
+
+void Server::topic(Client& client)
+{
+    if (!client.isConnected()) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered\r\n");
+        return;
+    }
+
+    if (_params.size() < 2) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " TOPIC :Not enough parameters\r\n");
+        return;
+    }
+
+    std::string channelName = _params[1];
+    channelIter chanit = doesChannelExist(channelName);
+    if (chanit == _channels.end()) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel\r\n");
+        return;
+    }
+
+    if (!chanit->isUserInChannel(client.getNick())) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
+        return;
+    }
+
+    // If a topic is provided, set the new topic
+    if (_params.size() > 2) {
+        // Check if the client is a channel operator if the channel mode is +t
+        if (chanit->hasMode('t') || !chanit->isUserOperator(client.getNick())) {
+            reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator\r\n");
+            return;
+        }
+
+        std::string newTopic = _params[2];
+
+        chanit->setTopic(newTopic);
+        chanit->setHasTopic(true);
+        std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
+        broadcastMsg(client, msg, *chanit);
+    }
+	else {
+        // If no topic is provided, return the current topic
+        std::string currentTopic = chanit->getTopic();
+        if (currentTopic.empty()) {
+            reply(client, ":ft_irc.1337.ma " + itos(RPL_NOTOPIC) + " " + client.getNick() + " " + channelName + " :No topic is set\r\n");
+        }
+		else {
+            reply(client, ":ft_irc.1337.ma " + itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + currentTopic + "\r\n");
+        }
+    }
+}
+

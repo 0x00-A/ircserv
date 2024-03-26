@@ -35,14 +35,20 @@ Server::Server(const string& port, const string& passwd)
 	_pollfds.push_back(servPoll);
 
 	//
-	this->commandMap["PASS"] = &Server::pass;
-    this->commandMap["USER"] = &Server::user;
-    this->commandMap["NICK"] = &Server::nick;
-    this->commandMap["QUIT"] = &Server::quit;
-    this->commandMap["JOIN"] = &Server::join;
-    this->commandMap["PRIVMSG"] = &Server::privmsg;
-    this->commandMap["PR"] = &Server::privmsg;
-    this->commandMap["MODE"] = &Server::mode;
+	this->commandMap["pass"] = &Server::pass;
+    this->commandMap["user"] = &Server::user;
+    this->commandMap["nick"] = &Server::nick;
+    this->commandMap["n"] = &Server::nick;
+    this->commandMap["quit"] = &Server::quit;
+    this->commandMap["join"] = &Server::join;
+    this->commandMap["j"] = &Server::join;
+    this->commandMap["privmsg"] = &Server::privmsg;
+    this->commandMap["mode"] = &Server::mode;
+    this->commandMap["m"] = &Server::mode;
+	//--------------------------------------//
+    this->commandMap["kick"] = &Server::kick;
+    this->commandMap["invite"] = &Server::invite;
+    this->commandMap["topic"] = &Server::topic;
 }
 
 Server::~Server()

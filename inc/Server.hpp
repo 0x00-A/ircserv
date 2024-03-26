@@ -117,6 +117,10 @@ class Server
 		void join(Client &client);
 		void privmsg(Client &client);
 		void mode(Client &client);
+
+		void    kick(Client& client);
+		void 	invite(Client& client);
+		void 	topic(Client& client);
 		
 
 		// channel member functions
@@ -124,8 +128,8 @@ class Server
 		void joinChannel(Client &client, std::pair<string, string> channel);
 		void channelWelcomeMessages(Client &client, Channel &channel);
 		void joinedAChannel(Client &client, Channel &channel);
-		bool channelSendMsg(Client& client, string& ch); 
-		bool nickSendMsg(Client& client, string& nick);
+		// bool channelSendMsg(Client& client, string& ch); 
+		// bool nickSendMsg(Client& client, string& nick);
 		
 		channelIter doesChannelExist(const string &chan);
 		clientIter doesUserExit(const string nick);
