@@ -98,7 +98,7 @@ class Server
 		void parseCommand(string &cmd);
 		void to_upper(string& str);
 		string trim_comma(const string &str);
-		bool initPrivmsg(Client &client);
+		void initPrivmsg(Client &client);
 		void initJoin(Client &client);
 
 		// check nick clients
@@ -106,7 +106,7 @@ class Server
 		void checkSpamClient(Client &client);
 		void changeNick(Client &client);
 		// fun reply
-		void    replyNotConnected(Client &client);
+		// void    replyNotConnected(Client &client);
 
 
 		// command member functions
@@ -132,6 +132,7 @@ class Server
 		void removeUserFromChannel(const string user, const string chan);
 
 		void exitUserFromChannels(clientIter cli);
+		void	showChannelNames(Client& client, Channel& chan);
 
 		// send messg
 		void reply(Client &client, string const &reply);

@@ -1,6 +1,5 @@
 #include "Server.hpp"
 
-
 string		Server::getMembers(Channel& ch)
 {
     string response;
@@ -26,42 +25,14 @@ string		channelInfo(const string& nick, const string& nameCha)
 }
 void Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
-    string			response;
-	string 			prefix;
-	std::set<string>	users;
+
 
 	reply(client, client.identifier() + " JOIN " + ch.getName());
 	// reply(client, ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs());
 	if (ch.isUserOperator(client.getNick()))
 		reply(client, client.identifier() + " MODE " + ch.getName() + " " + "+t");
 
-	prefix = channelInfo(client.getNick(), ch.getName());
-	users = ch.getUserList();
-	size_t newlen;
-	response = prefix;
-	for (std::set<string>::reverse_iterator it = users.rbegin(); it != users.rend(); it++)
-	{
-		if (response != prefix)
-			newlen = response.size() + 1 + it->size();
-		else
-			newlen = response.size() + it->size();
-		if (newlen > 510)
-		{
-			reply(client, response);
-			response = prefix;
-			it--;
-			continue;
-		}
-		if (response != prefix)
-			response += " " + *it;
-		else
-			response += *it;
-	}
-	if (response != prefix)
-        reply(client, response);
-	
-	response = ":ft_irc.1337.ma " + itos(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
-	reply(client, response);
+	showChannelNames(client, ch);
 }
 
 void Server::joinedAChannel(Client& client, Channel& channel)
@@ -168,4 +139,39 @@ void Server::exitUserFromChannels(clientIter cli)
 	{
 		removeUserFromChannel(cli->getNick(), *it);
 	}
+}
+
+void Server::showChannelNames(Client &client, Channel &ch)
+{
+    string		    	response;
+	string 			    prefix;
+	std::set<string>	users;
+
+	prefix = channelInfo(client.getNick(), ch.getName());
+	users = ch.getUserList();
+	size_t newlen;
+	response = prefix;
+	for (std::set<string>::reverse_iterator it = users.rbegin(); it != users.rend(); it++)
+	{
+		if (response != prefix)
+			newlen = response.size() + 1 + it->size();
+		else
+			newlen = response.size() + it->size();
+		if (newlen > 510)
+		{
+			reply(client, response);
+			response = prefix;
+			it--;
+			continue;
+		}
+		if (response != prefix)
+			response += " " + *it;
+		else
+			response += *it;
+	}
+	if (response != prefix)
+        reply(client, response);
+	
+	response = ":ft_irc.1337.ma " + itos(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
+	reply(client, response);
 }

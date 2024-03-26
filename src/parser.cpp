@@ -102,28 +102,19 @@ string Server::trim_comma(const string &str)
     return result;
 }
 
-bool Server::initPrivmsg(Client &client)
+void Server::initPrivmsg(Client &client)
 {
-    string response;
-
     if (!client.isConnected())
     {
-        replyNotConnected(client);
-        return false;
+        throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NORECIPIENT) + " " + \
-            client.getNick()  + " :No recipient given (" + _params[0] + ")";
-        reply(client, response);
-        return false;
+        throw (":ft_irc.1337.ma " + itos(ERR_NORECIPIENT) + " " + client.getNick()  + " :No recipient given (" + _params[0] + ")");
     }
     if (_params.size() < 3)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NOTEXTTOSEND) + " " + \
-            client.getNick()  + " ::No text to send";
-        reply(client, response);
-        return false;
+        throw (":ft_irc.1337.ma " + itos(ERR_NOTEXTTOSEND) + " " + client.getNick()  + " ::No text to send");
     }
     string clients = trim_comma(_params[1]);
     stringstream ss(clients);
@@ -134,27 +125,21 @@ bool Server::initPrivmsg(Client &client)
             _sendMsgClient.push_back(std::make_pair(token, CHANNEL));
         else
             _sendMsgClient.push_back(std::make_pair(token, CLIENT));
-
     }
     _messagClient = _params[_params.size() - 1];
-    return true;
 }
+
 void Server::initJoin(Client &client)
 {
-    string              line;
-    string              chan;
-    string              key = "";
-    string              response;
+    string              line, chan, key = "", response;
     stringstream        ssk;
     std::set<string>    seenChannels;
     bool                keys = false;
 
     if (_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
-            client.getNick() + " JOIN" + " :Not enough parameters";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + \
+                " JOIN" + " :Not enough parameters");
     }
     line = trim_comma(_params[1]);
     stringstream ss(line);
@@ -171,8 +156,8 @@ void Server::initJoin(Client &client)
             std::getline(ssk, key, ',');
         if (seenChannels.count(chan) > 0) 
         {
-            response = ":ft_irc.1337.ma " + itos(ERR_TOOMANYTARGETS) + \
-             " " +  client.getNick() + " :Duplicate recipients";
+            response = ":ft_irc.1337.ma " + itos(ERR_TOOMANYTARGETS) + " " +  client.getNick() + \
+                    " :Duplicate recipients";
             reply(client, response);
             continue ;
         }

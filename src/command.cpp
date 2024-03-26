@@ -3,21 +3,14 @@
 
 void Server::pass(Client &client)
 {
-    string response;
-
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_ALREADYREGISTRED) + " " + \
-            client.getNick()  + " :You may not reregister";
-        reply(client, response);
-        return ;
+        throw (":ft_irc.1337.ma " + itos(ERR_ALREADYREGISTRED) + " " + client.getNick()  + " :You may not reregister");
     }
     if (this->_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
-            client.getNick()  + " " + this->_params[0] + " :Not enough parameters";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick()  + " " + this->_params[0] + " \
+                :Not enough parameters");
     }
     if (this->_params[1] == this->_passwd)
     {
@@ -25,29 +18,23 @@ void Server::pass(Client &client)
     }
     else
     {
-        response = ":ft_irc.1337.ma " + itos(RPL_WELCOME) + " " + \
-            client.getNick()  + " " + this->_params[1] + " :Password incorrect";
-        reply(client, response);
         client.setHasPassed(false);
+        throw (":ft_irc.1337.ma " + itos(RPL_WELCOME) + " " + client.getNick()  + " " + this->_params[1] + \
+                " :Password incorrect");
     }
 }
 
 void Server::nick(Client &client)
 {
-    string  response;
     bool    welcome = false;
 
     if (client.getHasPassed() == false)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
     }
     if (this->_params.size() < 2)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given");
     }
     if (this->_params[1].size() >= 16)
     {
@@ -55,20 +42,15 @@ void Server::nick(Client &client)
     }
     if (client.checkNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_ERRONEUSNICKNAME) + " " + client.getNick()  + " :Erroneus nickname";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_ERRONEUSNICKNAME) + " " + client.getNick()  + " :Erroneus nickname");
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (client.getHasUsedNick() == true && !client.isConnected())
     {
-        response = client.identifier() + " NICK :" +  this->_params[1];
-        reply(client, response);
+        reply(client, client.identifier() + " NICK :" +  this->_params[1]);
     }
     if (client.isConnected())
     {
@@ -87,28 +69,18 @@ void Server::nick(Client &client)
 
 void Server::user(Client &client)
 {
-    string response;
-
     if (client.isConnected())
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_ALREADYREGISTRED) + " " + \
-            client.getNick()  + " :You may not reregister";
-        reply(client, response);
-        return ;
+        throw (":ft_irc.1337.ma " + itos(ERR_ALREADYREGISTRED) + " " + client.getNick()  + " :You may not reregister");
     }
     if (client.getHasPassed() == false)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + \
-            client.getNick()  + " :You have not registered";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
     }
     if (this->_params.size() < 5)
     {
-        response = ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
-            client.getNick()  + " " + this->_params[0] + " :Not enough parameters";
-        reply(client, response);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick()  + " " + this->_params[0] + \
+                " :Not enough parameters");
     }
     if (this->_params[1].size() > 9) this->_params[1].erase(9);
     client.setHasUsedUser(true);
@@ -128,59 +100,44 @@ void Server::quit(Client &client)
     response = client.identifier() + " QUIT :Client Quit";
     channelsJ = client.getChannels();
 
-    if (channelsJ.empty())
-        reply(client, response);
-    else
+    std::set<string>::iterator it = channelsJ.begin();
+    for ( ; it != channelsJ.end(); it++)
     {
-        std::set<string>::iterator it = channelsJ.begin();
-        for ( ; it != channelsJ.end(); it++)
+        channelIter itCha = doesChannelExist(*it);
+        if (itCha != _channels.end())
         {
-            channelIter itCha = doesChannelExist(*it);
-            if (itCha != _channels.end())
-            {
-                std::set<string> users;
-                users = itCha->getUserList();
-                std::set<string>::iterator itUser = users.begin();
-                for ( ; itUser != users.end(); itUser++)
-                {
-                    clientIter itClient = doesUserExit(*itUser);
-
-                    if (itClient != _clients.end())
-                    {
-                        reply(*itClient, response);
-                    }
-                }
-            }
-        } 
+            this->broadcastMsg(client, response, *itCha);
+        }
     }
     response += "\r\n";
-    send(client.getSockfd(), response.c_str(), response.length(), 0);
-    response = "ERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)";
-    send(client.getSockfd(), response.c_str(), response.length(), 0);
-    client.closeSocket();
+    write(client.getSockfd(), response.c_str(), response.length());
+    response = "ERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)\r\n";
+    write(client.getSockfd(), response.c_str(), response.length());
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
 }
 
 void Server::join(Client &client)
 {
-    string response;
+    string  response;
 
     if (!client.isConnected())
     {
-        replyNotConnected(client);
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + \
+                " :You have not registered");
     }
     initJoin(client);
     for (size_t i = 0; i < _parsChannels.size(); i++)
     {
         if (_parsChannels[i].first[0] != '#')
         {
-            response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " +\
-                client.getNick() + " " + _parsChannels[i].first + " :No such channel";
+            response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + _parsChannels[i].first + \
+                    " :No such channel";
             reply(client, response);
         }
         else
+        {
             joinChannel(client, _parsChannels[i]);
+        }
     }
 
 }
@@ -189,38 +146,49 @@ void Server::join(Client &client)
 void Server::privmsg(Client &client)
 {
     std::set<string>    seenNicks;
-    bool                found;
     string              response;
+    channelIter         chanIt;
+    clientIter          cliIt;
 
-    found = false;
-    if (!initPrivmsg(client)) return;
+    initPrivmsg(client);
     for (size_t i = 0; i < _sendMsgClient.size(); i++)
     {
-        found = false;
         if (seenNicks.count(_sendMsgClient[i].first) > 0) 
         {
-            response = ":ft_irc.1337.ma " + itos(ERR_TOOMANYTARGETS) + \
-             " " +  client.getNick() + " :Duplicate recipients";
+            response = ":ft_irc.1337.ma " + itos(ERR_TOOMANYTARGETS) + " " +  client.getNick() + \
+                        " :Duplicate recipients";
             reply(client, response);
             continue ;
         }
         seenNicks.insert(_sendMsgClient[i].first);
         if (_sendMsgClient[i].first[0] == '#')
-           found = channelSendMsg(client, _sendMsgClient[i].first);
-        else
-            found = nickSendMsg(client, _sendMsgClient[i].first);
-        
-        if (!found && (_sendMsgClient[i].second == CLIENT))
         {
-            response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + \
-            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick/channel";
-            reply(client, response);
+            if ( (chanIt = doesChannelExist(_sendMsgClient[i].first)) != _channels.end())
+            {
+                response = ":"  + client.getNick() + "!~" + client.getUsername()  + \
+                    "@" + client.getIPAddr() + " PRIVMSG " + chanIt->getName() + " :" + _messagClient;
+                broadcastMsg(client, response, *chanIt);
+            }
+            else
+            {
+                response = (":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + \
+                " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such channel");
+                reply(client, response);
+            }
         }
-        else if (!found && (_sendMsgClient[i].second == CHANNEL))
+        else
         {
-            response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + \
-            " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such channel";
-            reply(client, response);
+            if ( (cliIt = doesUserExit(_sendMsgClient[i].first)) != _clients.end())
+            {
+                response = client.identifier() + " PRIVMSG " + cliIt->getNick() + " :" +  _messagClient;
+                reply(*cliIt, response);
+            }
+            else
+            {
+                response = ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + \
+                " " +  client.getNick() + " " + _sendMsgClient[i].first + " :No such nick/channel";
+                reply(client, response);
+            }
         }
     }   
 }
