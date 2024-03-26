@@ -37,6 +37,7 @@ class Server
 		std::vector<Client> _clients;
 		Socket _socket;
 		string _startTime;
+		std::string	_hostname;
 
 		// just added
 		std::vector<string> _params;
@@ -86,6 +87,7 @@ class Server
 		// for get time in start
 		void setStartTime(void);
 		string getStartTime(void) const;
+		string	getHostname( void ) const;
 
 		void welcomeClient(Client &client);
 		// functions for debuging

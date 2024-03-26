@@ -10,8 +10,8 @@ void Server::pass(Client &client)
     }
     if (this->_params.size() < 2)
     {
-        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick()  + " " + this->_params[0] + " \
-                :Not enough parameters");
+        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick()  + " " + this->_params[0] + \
+                " :Not enough parameters");
     }
     if (this->_params[1] == this->_passwd)
     {
@@ -478,11 +478,11 @@ void    Server::mode(Client& client)
 void Server::kick(Client& client)
 {
     if (!client.isConnected()) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered");
         return;
     }
     if (_params.size() < 3) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " KICK :Not enough parameters\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " KICK :Not enough parameters");
         return;
     }
 
@@ -492,29 +492,31 @@ void Server::kick(Client& client)
 
 	channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel");
         return;
     }
     if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator");
         return;
     }
 
 	if (doesUserExit(key) == _clients.end()) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHNICK) + " " + client.getNick() + " " + channelName + " :No such nick/channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + channelName + " :No such nick/channel");
         return;
 	}
     if (!chanit->isUserInChannel(key)) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel");
         return;
     }
-	removeUserFromChannel(key, channelName);
+    // :lalala!~x@197.230.30.146 KICK #ch11 lalala :lalala
     std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + reason;
+    reply(client, kickMessage);
 	broadcastMsg(client, kickMessage, *chanit);
+	removeUserFromChannel(key, channelName);
 
     std::cout << "User " << client.getNick() << " kicked " << key << " from " << channelName << "\n";
 }
@@ -523,11 +525,11 @@ void Server::kick(Client& client)
 void Server::invite(Client& client)
 {
     if (!client.isConnected()) {
-        reply(client, "451 :You have not registered\r\n");
+        reply(client, "451 :You have not registered");
         return;
     }
     if (_params.size() < 3) {
-        reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters\r\n");
+        reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters");
         return;
     }
     std::string userToInvite = _params[1];
@@ -535,53 +537,53 @@ void Server::invite(Client& client)
 
 	channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + client.getNick() + " " + channelName + " :No such channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + client.getNick() + " " + channelName + " :No such channel");
         return;
     }
 	if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " " + channelName + " :You're not channel operator\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " " + channelName + " :You're not channel operator");
         return;
     }
 
     if (doesUserExit(userToInvite) == _clients.end()){
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHNICK) + " " + client.getNick() + " " + userToInvite + " :No such nick\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + userToInvite + " :No such nick");
         return;
     }
 
     if (chanit->isUserInChannel(userToInvite)) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_USERONCHANNEL) + " "+ client.getNick() + " " + userToInvite + " " + channelName + " :is already on channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_USERONCHANNEL) + " "+ client.getNick() + " " + userToInvite + " " + channelName + " :is already on channel");
         return;
     }
 	chanit->joinUser(userToInvite);
-	std::string kickMessage = client.identifier()  + " INVITE " + userToInvite + " :" + channelName + "\r\n";
+	std::string kickMessage = client.identifier()  + " INVITE " + userToInvite + " :" + channelName + "";
 	broadcastMsg(client, kickMessage, *chanit);
 }
 
 void Server::topic(Client& client)
 {
     if (!client.isConnected()) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered");
         return;
     }
 
     if (_params.size() < 2) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " TOPIC :Not enough parameters\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " TOPIC :Not enough parameters");
         return;
     }
 
     std::string channelName = _params[1];
     channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel");
         return;
     }
 
     if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, ":ft_irc.1337.ma " + intToString(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
 
@@ -589,7 +591,7 @@ void Server::topic(Client& client)
     if (_params.size() > 2) {
         // Check if the client is a channel operator if the channel mode is +t
         if (chanit->hasMode('t') || !chanit->isUserOperator(client.getNick())) {
-            reply(client, ":ft_irc.1337.ma " + intToString(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator\r\n");
+            reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator");
             return;
         }
 
@@ -604,10 +606,10 @@ void Server::topic(Client& client)
         // If no topic is provided, return the current topic
         std::string currentTopic = chanit->getTopic();
         if (currentTopic.empty()) {
-            reply(client, ":ft_irc.1337.ma " + intToString(RPL_NOTOPIC) + " " + client.getNick() + " " + channelName + " :No topic is set\r\n");
+            reply(client, ":ft_irc.1337.ma " + itos(RPL_NOTOPIC) + " " + client.getNick() + " " + channelName + " :No topic is set");
         }
 		else {
-            reply(client, ":ft_irc.1337.ma " + intToString(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + currentTopic + "\r\n");
+            reply(client, ":ft_irc.1337.ma " + itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + currentTopic);
         }
     }
 }
