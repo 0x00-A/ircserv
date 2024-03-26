@@ -547,7 +547,7 @@ void Server::invite(Client& client)
         return;
     }
 
-    if (doesUserExit(userToInvite) == _clients.end()){
+    if (doesUserExit(userToInvite) == _clients.end()) {
         reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + userToInvite + " :No such nick\r\n");
         return;
     }

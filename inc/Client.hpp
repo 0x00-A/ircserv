@@ -37,6 +37,7 @@
 #define ERR_NOTONCHANNEL 442
 #define ERR_USERONCHANNEL 443
 
+
 #define RPL_CHANNELMODEIS 324
 #define RPL_WELCOME 001
 #define RPL_YOURHOST 002
@@ -71,6 +72,7 @@ class Client
 
 		int _clifd;
 
+		std::vector<string> _invitedChannels; // here add chan name and invite status ture or false 
 		std::set<string> _channels; // channels user currently in
 
 		Client();
@@ -107,9 +109,11 @@ class Client
 		void setHasPassed(bool value);
 		void setHasUsedNick(bool value);
 		void setHasUsedUser(bool value);
+		void inviteToChannel(string& channelName);
 		
 		bool isConnected();
 		
+		bool isInvitedToChannel( string& channelName ) const;
 		bool getHasPassed();
 		bool getHasUsedNick();
 		bool getHasUsedUser();

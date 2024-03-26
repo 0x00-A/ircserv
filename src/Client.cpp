@@ -68,6 +68,19 @@ void Client::setHasUsedUser(bool value)
     this->_hasUsedUser = value;
 }
 
+void Client::inviteToChannel(string &channelName)
+{
+    if (!isInvitedToChannel(channelName))
+    {
+        _invitedChannels.push_back(channelName);
+    }
+}
+
+bool Client::isInvitedToChannel(string &channelName) const
+{
+    return false;
+}
+
 bool Client::getHasPassed()
 {
     return this->_hasPassed;

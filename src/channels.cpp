@@ -57,6 +57,7 @@ void Server::joinedAChannel(Client& client, Channel& channel)
 void Server::joinChannel(Client &client, std::pair<string, string> channel)
 {
 	string response;
+	std::map<string, bool> invitees;
 
 	for (size_t i = 0; i < this->_channels.size(); i++)
 	{
@@ -65,7 +66,17 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			if (_channels[i].isUserInChannel(client.getNick())) return;
 			if (_channels[i].hasInvite())
 			{
-				/// here for check client invite after salat dohr (lawah salat l3id)
+				invitees = client.getInvitees();
+				std::map<string, bool>::iterator itInvt =  invitees.find(channel.first);
+				if (itInvt != invitees.end())
+				{
+					if (itInvt->second == false)
+					{
+						response =  (":ft_irc.1337.ma "  + itos(ERR_INVITEONLYCHAN) + " " + client.getNick()  + " " + _channels[i].getName() + " :Cannot join channel, you must be invited (+i)");
+						reply(client, response);
+						return ;
+					}
+				}
 			}
 			if (_channels[i].hasPasskey()  && !_channels[i].hasInvite())
 			{
