@@ -477,6 +477,8 @@ void    Server::mode(Client& client)
 
 void Server::kick(Client& client)
 {
+    // :q1!~f@197.230.30.146 KICK #edc q4 :q4
+    // :q1!~f@197.230.30.146 KICK #edc q3 :speck english
     if (!client.isConnected()) {
         reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered");
         return;
@@ -512,7 +514,6 @@ void Server::kick(Client& client)
         reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel");
         return;
     }
-    // :lalala!~x@197.230.30.146 KICK #ch11 lalala :lalala
     std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + reason;
     reply(client, kickMessage);
 	broadcastMsg(client, kickMessage, *chanit);
@@ -524,6 +525,7 @@ void Server::kick(Client& client)
 
 void Server::invite(Client& client)
 {
+    clientIter invitedUserIter;
     if (!client.isConnected()) {
         reply(client, "451 :You have not registered");
         return;
@@ -532,35 +534,40 @@ void Server::invite(Client& client)
         reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters");
         return;
     }
-    std::string userToInvite = _params[1];
-    std::string channelName = _params[2];
+    std::string invitedUser = _params[1];
+    std::string chanName = _params[2];
 
-	channelIter chanit = doesChannelExist(channelName);
+	channelIter chanit = doesChannelExist(chanName);
     if (chanit == _channels.end()) {
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + client.getNick() + " " + channelName + " :No such channel");
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + client.getNick() + " " + chanName + \
+                " :No such channel");
     }
 	if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel");
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + chanName + \
+                " :You're not on that channel");
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " " + channelName + " :You're not channel operator");
-        return;
+        throw (":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " " + chanName + \
+                " :You're not channel operator");
     }
+    if ( (invitedUserIter = doesUserExit(invitedUser)) == _clients.end()){
+        throw (":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + invitedUser + \
+                " :No such nick");
+    }
+    if (chanit->isUserInChannel(invitedUser)) {
+        throw (":ft_irc.1337.ma " + itos(ERR_USERONCHANNEL) + " "+ client.getNick() + " " + invitedUser + " " + \
+                chanName + " :is already on channel");
+    }
+    // message sent to the inviter
+    reply(client, ":ft_irc.1337.ma " + itos(RPL_INVITING) + " " + client.getNick() + " " + invitedUser + " " + chanName);
+    // message sent to the invitedUserIter
+    reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " " + chanName);
+    invitedUserIter->inviteToChannel(chanName);
 
-    if (doesUserExit(userToInvite) == _clients.end()){
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + userToInvite + " :No such nick");
-        return;
-    }
-
-    if (chanit->isUserInChannel(userToInvite)) {
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_USERONCHANNEL) + " "+ client.getNick() + " " + userToInvite + " " + channelName + " :is already on channel");
-        return;
-    }
-	chanit->joinUser(userToInvite);
-	std::string kickMessage = client.identifier()  + " INVITE " + userToInvite + " :" + channelName + "";
-	broadcastMsg(client, kickMessage, *chanit);
+    // :nick!~user@197.230.30.146 INVITE nick_sender #channame
+    // :name sever 341 nick nick_sender #channame
+	// std::string kickMessage = client.identifier()  + " INVITE " + invitedUser + " :" + chanName;
+	// broadcastMsg(client, kickMessage, *chanit);
 }
 
 void Server::topic(Client& client)
