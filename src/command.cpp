@@ -195,6 +195,27 @@ void Server::privmsg(Client &client)
 }
 
 
+void Server::names(Client &client)
+{
+    channelIter         chanIt;
+    string              response;
+
+    if (_params.size() >= 2)
+    {
+        if ( (chanIt = doesChannelExist(_params[1])) != _channels.end())
+        {
+            showChannelNames(client, *chanIt);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < _channels.size() ; i++)
+        {
+            showChannelNames(client, _channels[i]);
+        }
+    }
+}
+
 /********************************************************************************/
 /* The MODE command is provided so that channel operators may change the        */
 /* characteristics of `their' channel.                                          */
@@ -472,6 +493,7 @@ void    Server::mode(Client& client)
 	if (!modesave.empty())
 		throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 

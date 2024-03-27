@@ -27,6 +27,7 @@ Server::Server(const string& port, const string& passwd)
     this->commandMap["QUIT"] = &Server::quit;
     this->commandMap["JOIN"] = &Server::join;
     this->commandMap["PRIVMSG"] = &Server::privmsg;
+    this->commandMap["NAMES"] = &Server::names;
     this->commandMap["MODE"] = &Server::mode;
     this->commandMap["KICK"] = &Server::kick;
     this->commandMap["INVITE"] = &Server::invite;

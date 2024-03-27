@@ -117,6 +117,7 @@ class Server
 		void join(Client &client);
 		void privmsg(Client &client);
 		void mode(Client &client);
+		void names(Client &client);
 
 		void    kick(Client& client);
 		void 	invite(Client& client);
