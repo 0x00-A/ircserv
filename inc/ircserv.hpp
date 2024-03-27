@@ -28,5 +28,6 @@ using std::stringstream;
 
 
 std::string itos(int num);
+struct tm *getCurrentTime();
 
 #endif //IRCSERV_HPP

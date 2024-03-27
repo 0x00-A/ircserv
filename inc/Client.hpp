@@ -37,6 +37,7 @@
 #define ERR_NOTONCHANNEL 442
 #define ERR_USERONCHANNEL 443
 
+
 #define RPL_CHANNELMODEIS 324
 #define RPL_WELCOME 001
 #define RPL_YOURHOST 002
@@ -58,6 +59,9 @@ class Client
 		string _real;
 		string _hostname;
 
+		// for time 
+		struct tm *_startTime;
+
 		// bool 	_isOperator;
 		// bool 	_isRegistered;
 
@@ -71,6 +75,7 @@ class Client
 
 		int _clifd;
 
+		std::vector<string> _invitedChannels; // here add chan name and invite status ture or false 
 		std::set<string> _channels; // channels user currently in
 
 		Client();
@@ -104,15 +109,19 @@ class Client
 		void setNick(string nick);
 		void setUsername(string username);
 
+		void setStartTimeToClinet();
 		void setHasPassed(bool value);
 		void setHasUsedNick(bool value);
 		void setHasUsedUser(bool value);
+		void inviteToChannel(string& channelName);
 		
 		bool isConnected();
 		
-		bool getHasPassed();
-		bool getHasUsedNick();
-		bool getHasUsedUser();
+		bool 		isInvitedToChannel( string& channelName ) const;
+		struct tm 	*getStartTimeToClinet();
+		bool 		getHasPassed();
+		bool 		getHasUsedNick();
+		bool 		getHasUsedUser();
 		
 		string identifier( void );
 

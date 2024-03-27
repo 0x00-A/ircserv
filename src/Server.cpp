@@ -3,21 +3,6 @@
 #include <cctype>
 #include <string>
 
-string itos(int num)
-{
-    std::ostringstream oss;
-    oss << std::setw(3) << std::setfill('0') << num;
-    return oss.str();
-}
-
-void Server::to_upper(string& str) 
-{
-	for (size_t i = 0; i < str.size() ; i++)
-	{
-        str[i] = static_cast<char>(std::toupper(str[i]));
-	}
-}
-
 
 Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
@@ -38,11 +23,11 @@ Server::Server(const string& port, const string& passwd)
 	this->commandMap["PASS"] = &Server::pass;
     this->commandMap["USER"] = &Server::user;
     this->commandMap["NICK"] = &Server::nick;
+    this->commandMap["n"] = &Server::nick;
     this->commandMap["QUIT"] = &Server::quit;
     this->commandMap["JOIN"] = &Server::join;
     this->commandMap["PRIVMSG"] = &Server::privmsg;
     this->commandMap["MODE"] = &Server::mode;
-	//--------------------------------------//
     this->commandMap["KICK"] = &Server::kick;
     this->commandMap["INVITE"] = &Server::invite;
     this->commandMap["TOPIC"] = &Server::topic;
@@ -50,6 +35,30 @@ Server::Server(const string& port, const string& passwd)
 
 Server::~Server()
 {
+}
+
+string itos(int num)
+{
+    std::ostringstream oss;
+    oss << std::setw(3) << std::setfill('0') << num;
+    return oss.str();
+}
+
+void Server::to_upper(string& str) 
+{
+	for (size_t i = 0; i < str.size() ; i++)
+	{
+        str[i] = static_cast<char>(std::toupper(str[i]));
+	}
+}
+
+struct tm *getCurrentTime() 
+{
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    return timeinfo;
 }
 
 int Server::handleNewConnection()
