@@ -3,21 +3,6 @@
 #include <cctype>
 #include <string>
 
-string itos(int num)
-{
-    std::ostringstream oss;
-    oss << std::setw(3) << std::setfill('0') << num;
-    return oss.str();
-}
-
-void Server::to_upper(string& str) 
-{
-	for (size_t i = 0; i < str.size() ; i++)
-	{
-        str[i] = static_cast<char>(std::toupper(str[i]));
-	}
-}
-
 
 Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
@@ -50,6 +35,30 @@ Server::Server(const string& port, const string& passwd)
 
 Server::~Server()
 {
+}
+
+string itos(int num)
+{
+    std::ostringstream oss;
+    oss << std::setw(3) << std::setfill('0') << num;
+    return oss.str();
+}
+
+void Server::to_upper(string& str) 
+{
+	for (size_t i = 0; i < str.size() ; i++)
+	{
+        str[i] = static_cast<char>(std::toupper(str[i]));
+	}
+}
+
+struct tm *getCurrentTime() 
+{
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    return timeinfo;
 }
 
 int Server::handleNewConnection()

@@ -53,6 +53,11 @@ std::queue<string>& Client::sdBuf(void)
 	return (_sendBuf);
 }
 
+void Client::setStartTimeToClinet()
+{
+    _startTime = getCurrentTime();
+}
+
 void Client::setHasPassed(bool value)
 {
     this->_hasPassed = value;
@@ -86,6 +91,10 @@ bool Client::isInvitedToChannel(string &channelName) const
     return false;
 }
 
+struct tm *Client::getStartTimeToClinet()
+{
+    return (_startTime);
+}
 
 bool Client::getHasPassed()
 {

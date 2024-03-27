@@ -59,6 +59,9 @@ class Client
 		string _real;
 		string _hostname;
 
+		// for time 
+		struct tm *_startTime;
+
 		// bool 	_isOperator;
 		// bool 	_isRegistered;
 
@@ -106,6 +109,7 @@ class Client
 		void setNick(string nick);
 		void setUsername(string username);
 
+		void setStartTimeToClinet();
 		void setHasPassed(bool value);
 		void setHasUsedNick(bool value);
 		void setHasUsedUser(bool value);
@@ -113,10 +117,11 @@ class Client
 		
 		bool isConnected();
 		
-		bool isInvitedToChannel( string& channelName ) const;
-		bool getHasPassed();
-		bool getHasUsedNick();
-		bool getHasUsedUser();
+		bool 		isInvitedToChannel( string& channelName ) const;
+		struct tm 	*getStartTimeToClinet();
+		bool 		getHasPassed();
+		bool 		getHasUsedNick();
+		bool 		getHasUsedUser();
 		
 		string identifier( void );
 
