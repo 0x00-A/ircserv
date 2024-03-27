@@ -11,9 +11,9 @@ int main(int ac, char** av)
 		banbot.connectToServer();
 		banbot.run();
 	}
-	catch ( ... )
+	catch ( string & msg )
 	{
-		std::cout << "what" << std::endl;
+		std::cout << msg << std::endl;
 	}
 
 	return 0;

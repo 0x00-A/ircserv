@@ -96,6 +96,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			client.addChannels(channel.first);
 			channelWelcomeMessages(client, _channels[i]);
 			joinedAChannel(client, _channels[i]);
+			client.uninviteFromChannel(channel.first);
 			return ;
 		}
 	}
