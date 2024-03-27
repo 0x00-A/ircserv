@@ -1,6 +1,23 @@
 #include "Server.hpp"
 #include "Channel.hpp"
 
+
+void Server::_Operator(std::string nick, std::string chName, Client &cli ,bool _Op)
+{
+    channelIter chanit = doesChannelExist(chName);
+    if (doesUserExit(nick) == _clients.end()){
+        reply(cli, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + cli.getNick() + " " + nick + " :No such nick\r\n");
+        return;
+    }
+    else if (!chanit->isUserInChannel(nick)) {
+        reply(cli, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + cli.getNick() + " " + chName + " :they are not on that channel\r\n");
+        return;
+    }
+    else {
+        (_Op == true) ? chanit->setChannelOperator(nick) : chanit->unsetChannelOperator(nick);
+    }
+} 
+
 void Server::mode(Client& client){
 
     if (!client.isConnected()) {
@@ -26,14 +43,6 @@ void Server::mode(Client& client){
     }
     std::string mode = _params[2];
     std::string nick = _params[3];
-    // if (doesUserExit(nick) == _clients.end()){
-    //     reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + nick + " :No such nick\r\n");
-    //     return;
-    // }
-    // if (!chanit->isUserInChannel(nick)) {
-    //     reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel\r\n");
-    //     return;
-    // }
 
     switch (mode[0]) {
         case '+':
@@ -51,7 +60,7 @@ void Server::mode(Client& client){
                     chanit->setHasTopic(true);
                     break;
                 case 'o':
-                    chanit->setChannelOperator(nick);
+                    _Operator(nick, channelName, client, true);
                     broadcastMsg(client, client.identifier() + " MODE " + _params[1] + " " + _params[2] + " " + nick, *chanit);
                     break;
                 default:
@@ -74,7 +83,7 @@ void Server::mode(Client& client){
                     chanit->setHasTopic(false);
                     break;
                 case 'o':
-                    chanit->unsetChannelOperator(nick);
+                    _Operator(nick, channelName, client, false);
                     broadcastMsg(client, client.identifier() + " MODE " + _params[1] + " " + _params[2] + " " + nick, *chanit);
                     break;
                 default:

@@ -90,6 +90,8 @@ class Channel
 		void				setHasUserLimit( bool stat );
 		void				setHasInvite( bool stat );
 		void				setHasTopic( bool stat );
+
+
 		
 
 

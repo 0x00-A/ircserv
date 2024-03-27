@@ -297,3 +297,5 @@ string Channel::getModes(void) const
 {
 	return (_modes);
 }
+
+
