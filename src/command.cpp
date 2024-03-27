@@ -514,7 +514,7 @@ void Server::kick(Client& client)
         reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel");
         return;
     }
-    std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + reason;
+    std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
     reply(client, kickMessage);
 	broadcastMsg(client, kickMessage, *chanit);
 	removeUserFromChannel(key, channelName);
@@ -597,8 +597,8 @@ void Server::topic(Client& client)
     // If a topic is provided, set the new topic
     if (_params.size() > 2) {
         // Check if the client is a channel operator if the channel mode is +t
-        if (chanit->hasMode('t') || !chanit->isUserOperator(client.getNick())) {
-            reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator");
+        if (chanit->hasMode('t') && !chanit->isUserOperator(client.getNick())) {
+            reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operatoooor");
             return;
         }
 

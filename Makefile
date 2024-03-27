@@ -5,7 +5,7 @@ SRCDIR = src
 OBJDIR = obj
 INCLUDES = ./inc
 
-SRC = main.cpp Socket.cpp mode.cpp Server.cpp Client.cpp command.cpp parser.cpp channels.cpp Channel.cpp \
+SRC = main.cpp Socket.cpp Server.cpp mode.cpp Client.cpp command.cpp parser.cpp channels.cpp Channel.cpp \
 		communication.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))

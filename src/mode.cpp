@@ -26,14 +26,14 @@ void Server::mode(Client& client){
     }
     std::string mode = _params[2];
     std::string nick = _params[3];
-    if (doesUserExit(nick) == _clients.end()){
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + nick + " :No such nick\r\n");
-        return;
-    }
-    if (!chanit->isUserInChannel(nick)) {
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel\r\n");
-        return;
-    }
+    // if (doesUserExit(nick) == _clients.end()){
+    //     reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + nick + " :No such nick\r\n");
+    //     return;
+    // }
+    // if (!chanit->isUserInChannel(nick)) {
+    //     reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel\r\n");
+    //     return;
+    // }
 
     switch (mode[0]) {
         case '+':
@@ -42,7 +42,6 @@ void Server::mode(Client& client){
                     chanit->setHasInvite(true);
                     break;
                 case 'l':
-                    // int limit = std::atoi(_params[3].c_str());
                     chanit->setUserLimit(_params[3]);
                     break;
                 case 'k':
@@ -53,7 +52,7 @@ void Server::mode(Client& client){
                     break;
                 case 'o':
                     chanit->setChannelOperator(nick);
-                    broadcastMsg(client, clien)
+                    broadcastMsg(client, client.identifier() + " MODE " + _params[1] + " " + _params[2] + " " + nick, *chanit);
                     break;
                 default:
                     reply(client, ":ft_irc.1337.ma " + itos(ERR_UNKNOWNMODE) + " " + client.getNick() + " " + mode + " :Unknown mode\r\n");
@@ -75,7 +74,8 @@ void Server::mode(Client& client){
                     chanit->setHasTopic(false);
                     break;
                 case 'o':
-                    chanit->setChannelOperator(nick);
+                    chanit->unsetChannelOperator(nick);
+                    broadcastMsg(client, client.identifier() + " MODE " + _params[1] + " " + _params[2] + " " + nick, *chanit);
                     break;
                 default:
                     reply(client, ":ft_irc.1337.ma " + itos(ERR_UNKNOWNMODE) + " " + client.getNick() + " " + mode + " :Unknown mode\r\n");
