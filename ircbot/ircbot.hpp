@@ -18,6 +18,18 @@ using std::string;
 
 class ircbot
 {
+public:
+	class	User
+	{
+		public:
+		  	string _nick;
+		  	string _timer;
+
+			User()
+			{
+				// init timer;
+			}
+	};
 private:
 
 	// int		_ircSock;
@@ -25,8 +37,8 @@ private:
 	string	_passwd;
 	string	_ircPort;
 	std::string	_recvbuf;
-	string	_botNick;
-
+	string	_nick;
+	string	_channel;
 
 	void	registerBot( void );
 	void	handleRead( void );
@@ -35,11 +47,14 @@ private:
 	void	handleCommand( std::vector<string>& );
 
 
+	std::vector<User> loggedUsers;
+	void	logtime(std::vector<string>& tokens);
+
 public:
 
 	~ircbot();
 
-	ircbot( string, string, string );
+	ircbot( string, string, string, string );
 
 	void	connectToServer( void );
 
@@ -47,7 +62,8 @@ public:
 
 };
 
-ircbot::ircbot(string passwd, string port, string nick) : _passwd(passwd), _ircPort(port), _recvbuf(""), _botNick(nick)
+ircbot::ircbot(string passwd, string port, string nick, string chan)
+	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick), _channel(chan)
 {
 	if ( (_botSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -71,15 +87,23 @@ void	ircbot::connectToServer()
 		close(_botSock);
 		exit(1);
 	}
+	std::cout << "Connected to server successfully" << std::endl;
 }
 
 void	ircbot::registerBot()
 {
 	std::vector<string> tokens;
 	string				cmd;
+	// char				buf[BUF_SIZE];
 
-	string msg = "pass 3" + _passwd + "\nnick " + _botNick + "\nuser x x x x\n";
-	write(_botSock, msg.data(), msg.length());
+	std::stringstream ss;
+    ss << "PASS " << _passwd << "\r\n";
+    ss << "NICK " << _nick << "\r\n";
+    ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
+    ss << "JOIN " << _channel << "\r\n";
+
+	write(_botSock, ss.str().data(), ss.str().length());
+	// read(_botSock, buf, sizeof(buf));
 }
 
 void	ircbot::handleRead()
@@ -98,7 +122,7 @@ void	ircbot::handleRead()
 	}
 	buffer[read_size] = '\0';
 	_recvbuf += buffer;
-	std::cout << "buf: " << _recvbuf << std::endl;
+	// std::cout << "buf: " << _recvbuf << std::endl;
 }
 
 string	ircbot::getCommand()
@@ -109,7 +133,7 @@ string	ircbot::getCommand()
 	if ( (pos = _recvbuf.find("\n")) != std::string::npos)
 	{
 		cmd = _recvbuf.substr(0, pos);
-		std::cout << "cmd: " << cmd << std::endl;
+		// std::cout << "cmd: " << cmd << std::endl;
 
 		// // parse command
 		// 	if (cmd.size() > 1 && cmd[cmd.size() - 1] == '\r')
@@ -164,6 +188,7 @@ void ircbot::parseCommand(string &cmd, std::vector<string> &tokens)
 void	ircbot::handleCommand(std::vector<string>& tokens)
 {
 	string				response;
+	string				usersList;
 
 	// if (tokens[1] == "433")
 	// {
@@ -177,22 +202,42 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 	// 	// std::cout << "Nickname is already in use" << std::endl;
 	// 	// return;
 	// }
-	if (tokens[1] == "INVITE")
-	{
-		std::cout << tokens[2] << " have been invited to channel " << tokens[3] << std::endl;
-		response = "JOIN " + tokens[3] + "\r\n";
-		write(_botSock, response.data(), response.length());
-	}
-	else if (tokens[1] == "PRIVMSG")
-	{
-		// 
-		std::cout << ">>>>>>>>> handle privmsg <<<<<<<<<" << std::endl;
-	}
-	else
+	// if (tokens[1] == "INVITE")
+	// {
+	// 	std::cout << tokens[2] << " have been invited to channel " << tokens[3] << std::endl;
+	// 	response = "JOIN " + tokens[3] + "\r\n";
+	// 	write(_botSock, response.data(), response.length());
+	// }
+	if (tokens[1] == "461" || tokens[1] == "464" || tokens[1] == "451" || tokens[1] == "432" || tokens[1] == "433"
+		|| tokens[1] == "403" || tokens[1] == "473" || tokens[1] == "475" || tokens[1] == "471")
 	{
 		throw (tokens.back());
 	}
+	else if (tokens[1] == "353")
+	{
+		//
+		usersList = tokens[5]; // 
+		// add to logedusers vector User user("nick");
+	}
+	else if (tokens[1] == "PRIVMSG")
+	{
+		//
+		std::cout << ">>>>>>>>> handle privmsg <<<<<<<<<" << std::endl;
+	}
+	else if (tokens[1] == "JOIN" || tokens[1] == "KICK")
+	{
+		logtime(tokens);
+	}
 	// if (cmd.find())
+}
+
+void ircbot::logtime(std::vector<string>& tokens)
+{
+	(void)tokens;
+	// if ([1] == "JOIN")
+	// {}
+	// else if ([1] == "KICK")
+	// {}
 }
 
 void	ircbot::run()
@@ -202,7 +247,6 @@ void	ircbot::run()
 	string				response, cmd;
 
 	registerBot();
-	std::cout << "+++++++++++++++++++++++++++++++++++" << std::endl;
 	while (true)
 	{
 		handleRead();
