@@ -11,6 +11,7 @@
 # include <poll.h>
 # include <vector>
 # include <sstream>
+# include <iomanip>
 
 # define BUF_SIZE 1024
 
@@ -25,19 +26,18 @@ class ircbot
 				string _nick;
 				struct tm *_timer;
 				User(const string& nick);
-				
-				struct tm *getCurrentTime();
 		};
 	private:
 
 		// int		_ircSock;
-		int		_botSock;
-		string	_passwd;
-		string	_ircPort;
-		std::string	_recvbuf;
-		string	_nick;
-		string	_channel;
-		std::vector<string> _operators;
+		int						_botSock;
+		string					_passwd;
+		string					_ircPort;
+		std::string				_recvbuf;
+		string					_nick;
+		string					_channel;
+		std::vector<string> 	_operators;
+		std::vector<User>		loggedUsers;
 
 		void	registerBot( void );
 		void	handleRead( void );
@@ -46,25 +46,48 @@ class ircbot
 		void	handleCommand( std::vector<string>& );
 
 
-		std::vector<User> loggedUsers;
 		void	logtime(std::vector<string>& tokens);
 
 	public:
 
+		typedef std::vector<User>::iterator userIter;
 		~ircbot();
 
 		ircbot( string, string, string, string );
 
-		void		connectToServer( void );
+		static struct tm 	*getCurrentTime();
+		std::string			itos(int num);
+		int					getTime(const string& user);
+		void				removeUser(const string& user);
+		userIter			doesUserExit(const string& user);
+
+		void				connectToServer( void );
 
 		void	run( void );
 
 };
 
 
+ircbot::userIter ircbot::doesUserExit(const string& user)
+{
+	for (userIter it = loggedUsers.begin(); it < loggedUsers.end(); it++)
+	{
+		if (it->_nick == user)
+			return (it);
+	}
+	return (loggedUsers.end());
+}
+
+string ircbot::itos(int num)
+{
+    std::ostringstream oss;
+    oss << std::setw(3) << std::setfill('0') << num;
+    return oss.str();
+}
+
 ircbot::User::User(const string& nick) : _nick(nick)
 {
-	_timer = getCurrentTime();
+	_timer = ircbot::getCurrentTime();
 }
 ircbot::ircbot(string passwd, string port, string nick, string chan)
 	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick), _channel(chan)
@@ -76,13 +99,24 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 	}
 }
 
-struct tm *ircbot::User::getCurrentTime() 
+struct tm *ircbot::getCurrentTime() 
 {
     time_t rawtime;
     struct tm *timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
     return timeinfo;
+}
+
+int	ircbot::getTime(const string& user)
+{
+	userIter it =  doesUserExit(user);
+
+	if (it != loggedUsers.end())
+	{
+    	return (getCurrentTime()->tm_min - it->_timer->tm_min);
+	}
+    return 0;
 }
 
 void	ircbot::connectToServer()
@@ -243,6 +277,15 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 	}
 	else if (tokens[1] == "PRIVMSG")
 	{
+		// :n2!~u2@127.0.0.1 PRIVMSG n1 :logtime
+		string userNick = tokens[0].substr(1, tokens[0].find_first_of('!') - 1);
+		if (tokens[2] == _nick && tokens[3] == "logtime")
+		{
+			// 
+			response = "PRIVMSG " + userNick + \
+				" :Logtime for " + userNick + " is: " + itos(getTime(userNick)) + " min\r\n";
+			write(_botSock, response.data(), response.length());
+		}
 		//
 		std::cout << ">>>>>>>>> handle privmsg <<<<<<<<<" << std::endl;
 	}
@@ -255,11 +298,33 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 
 void ircbot::logtime(std::vector<string>& tokens)
 {
-	(void)tokens;
-	// if ([1] == "JOIN")
-	// {}
-	// else if ([1] == "KICK")
-	// {}
+	string user;
+
+	user = tokens[0].substr(1, tokens[1].find("!~"));
+	if (tokens[1] == "JOIN")
+	{
+		User cli(user);
+		loggedUsers.push_back(cli);
+	}
+	else if (tokens[1] == "KICK")
+	{
+		userIter it =  doesUserExit(user);
+		if (it != loggedUsers.end())
+		{
+			removeUser(user);
+		}
+	}
+}
+
+void ircbot::removeUser(const string &user)
+{
+	for (userIter it = loggedUsers.begin(); it < loggedUsers.end(); it++)
+	{
+		if (it->_nick == user)
+		{
+			loggedUsers.erase(it);
+		}
+	}
 }
 
 void	ircbot::run()
