@@ -81,6 +81,14 @@ void Client::inviteToChannel(string &channelName)
     }
 }
 
+void Client::uninviteFromChannel(string &channelName)
+{
+    if (isInvitedToChannel(channelName))
+    {
+        _invitedChannels.erase(std::find(_invitedChannels.begin(), _invitedChannels.end(), channelName));
+    }
+}
+
 bool Client::isInvitedToChannel(string &channelName) const
 {
     std::vector<string>::const_iterator it = std::find(_invitedChannels.begin(), _invitedChannels.end(), channelName);

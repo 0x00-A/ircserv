@@ -94,7 +94,7 @@ int Server::handleNewConnection()
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
 	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN), .revents = 0});
 
-	cout << "client connected - fd: " << connfd << endl;
+	cout << "client connected - fd: " << connfd << " client host: " << ip << endl;
 	return (0);
 }
 
@@ -156,7 +156,6 @@ int	Server::handleWrite(int id)
 	while (!buffer.empty())
 	{
 		string	data = buffer.front();
-		std::cout << "data: " << data << std::endl;
 		sent_data = write(_clients[id].getSockfd(), data.c_str(), data.length());
 		if (sent_data < 0)
 		{
@@ -182,7 +181,7 @@ int	Server::handleWrite(int id)
 		// if all data was sent
 		buffer.pop();
 	}
-	cout << "Done sending data to client - fd: " << _clients[id].getSockfd()  << " sizesending:: " << sent_data << endl;
+	cout << "Done sending data to client - fd: " << _clients[id].getSockfd()  << " send_size: " << sent_data << endl;
 	_pollfds[id+1].events = POLLIN;
 	return (0);
 }
@@ -318,6 +317,11 @@ void Server::setStartTime(void)
 string Server::getStartTime(void) const
 {
     return (_startTime);
+}
+
+string Server::getHostname(void) const
+{
+	return (_hostname);
 }
 
 void Server::cleanUnusedClients()

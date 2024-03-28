@@ -36,6 +36,7 @@
 #define ERR_USERNOTINCHANNEL 441
 #define ERR_NOTONCHANNEL 442
 #define ERR_USERONCHANNEL 443
+#define ERR_PASSWDMISMATCH 464
 
 
 #define RPL_CHANNELMODEIS 324
@@ -45,6 +46,8 @@
 #define RPL_MYINFO 004
 #define RPL_NOTOPIC 331
 #define RPL_TOPIC 332
+
+#define RPL_INVITING 341
 
 
 
@@ -114,6 +117,7 @@ class Client
 		void setHasUsedNick(bool value);
 		void setHasUsedUser(bool value);
 		void inviteToChannel(string& channelName);
+		void uninviteFromChannel(string &channelName);
 		
 		bool isConnected();
 		
@@ -132,7 +136,6 @@ class Client
 		const string &getNick(void) const;
 		const string &getUsername(void) const;
 
-		void	exitFromChannels();
 };
 
 #endif // CLIENT_HPP
