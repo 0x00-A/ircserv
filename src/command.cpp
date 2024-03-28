@@ -594,30 +594,28 @@ void Server::topic(Client& client)
         return;
     }
 
-    // If a topic is provided, set the new topic
-    if (_params.size() > 2) {
-        // Check if the client is a channel operator if the channel mode is +t
-        if (chanit->hasMode('t') && !chanit->isUserOperator(client.getNick())) {
-            reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operatoooor");
+    if(_params.size() > 2) {
+
+        if (chanit->hasTopic() && !chanit->isUserOperator(client.getNick())) {
+            reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator");
             return;
         }
-
+        
         std::string newTopic = _params[2];
-
         chanit->setTopic(newTopic);
         chanit->setHasTopic(true);
+
+        reply(client, ":ft_irc.1337.ma " + itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + newTopic);
         std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
         broadcastMsg(client, msg, *chanit);
     }
 	else {
-        // If no topic is provided, return the current topic
         std::string currentTopic = chanit->getTopic();
-        if (currentTopic.empty()) {
+        if (currentTopic.empty())
             reply(client, ":ft_irc.1337.ma " + itos(RPL_NOTOPIC) + " " + client.getNick() + " " + channelName + " :No topic is set");
-        }
-		else {
+		else 
             reply(client, ":ft_irc.1337.ma " + itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + currentTopic);
-        }
+        return;
     }
 }
 

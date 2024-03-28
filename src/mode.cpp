@@ -17,16 +17,14 @@ void Server::_Operator(std::string nick, std::string chName, Client &cli ,bool _
         (_Op == true) ? chanit->setChannelOperator(nick) : chanit->unsetChannelOperator(nick);
     }
 } 
-
-void Server::mode(Client& client){
-
+void Server::mode(Client& client) {
     if (!client.isConnected()) {
         reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered\r\n");
         return;
     }
 
-    if (_params.size() < 2) {
-        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " TOPIC :Not enough parameters\r\n");
+    if (_params.size() < 3) {
+        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " MODE :Not enough parameters\r\n");
         return;
     }
 
@@ -41,58 +39,66 @@ void Server::mode(Client& client){
         reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
         return;
     }
-    std::string mode = _params[2];
-    std::string nick = _params[3];
 
-    switch (mode[0]) {
-        case '+':
-            switch (mode[1]) {
-                case 'i':
-                    chanit->setHasInvite(true);
-                    break;
-                case 'l':
-                    chanit->setUserLimit(_params[3]);
-                    break;
-                case 'k':
-                    chanit->setPasskey(nick);
-                    break;
-                case 't':
-                    chanit->setHasTopic(true);
-                    break;
-                case 'o':
-                    _Operator(nick, channelName, client, true);
-                    broadcastMsg(client, client.identifier() + " MODE " + _params[1] + " " + _params[2] + " " + nick, *chanit);
-                    break;
-                default:
-                    reply(client, ":ft_irc.1337.ma " + itos(ERR_UNKNOWNMODE) + " " + client.getNick() + " " + mode + " :Unknown mode\r\n");
-                    return;
-            }
-            break;
-        case '-':
-            switch (mode[1]) {
-                case 'i':
-                    chanit->setHasInvite(false);
-                    break;
-                case 'l':
+    std::string modeChanges = _params[2];
+    bool settingMode = true;
+    std::vector<std::string>::size_type paramIndex = 3;
+
+    for (std::string::size_type i = 0; i < modeChanges.length(); ++i) {
+        char mode = modeChanges[i];
+        if (mode == '+') {
+            settingMode = true;
+            continue;
+        } else if (mode == '-') {
+            settingMode = false;
+            continue;
+        }
+
+        switch (mode) {
+            case 'i':
+                chanit->setHasInvite(settingMode);
+                break;
+            case 'l':
+                if (settingMode) {
+                    if (_params.size() > paramIndex) {
+                        chanit->setUserLimit(_params[paramIndex++]);
+                    } else {
+                        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " :Not enough parameters for mode +l\r\n");
+                        return;
+                    }
+                } else {
                     chanit->setHasUserLimit(false);
-                    break;
-                case 'k':
+                }
+                break;
+            case 'k':
+                if (settingMode) {
+                    if (_params.size() > paramIndex) {
+                        chanit->setPasskey(_params[paramIndex++]);
+                    } else {
+                        reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " :Not enough parameters for mode +k\r\n");
+                        return;
+                    }
+                } else {
                     chanit->setHasPasskey(false);
-                    break;
-                case 't':
-                    chanit->setHasTopic(false);
-                    break;
-                case 'o':
-                    _Operator(nick, channelName, client, false);
-                    broadcastMsg(client, client.identifier() + " MODE " + _params[1] + " " + _params[2] + " " + nick, *chanit);
-                    break;
-                default:
-                    reply(client, ":ft_irc.1337.ma " + itos(ERR_UNKNOWNMODE) + " " + client.getNick() + " " + mode + " :Unknown mode\r\n");
+                }
+                break;
+            case 't':
+                chanit->setHasTopic(settingMode);
+                break;
+            case 'o':
+                if (_params.size() > paramIndex) {
+                    std::string nick = _params[paramIndex++];
+                    _Operator(nick, channelName, client, settingMode);
+                    std::string modeChangeMsg = client.identifier() + " MODE " + channelName + " " + (settingMode ? "+" : "-") + "o " + nick;
+                    broadcastMsg(client, modeChangeMsg, *chanit);
+                } else {
+                    reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " :Not enough parameters for mode +o/-o\r\n");
                     return;
-            }
-            break;
-        default:
-            reply(client, ":ft_irc.1337.ma " + itos(ERR_UNKNOWNMODE) + " " + client.getNick() + " " + mode + " :Unknown mode\r\n");
-            return;
+                }
+                break;
+            default:
+                reply(client, ":ft_irc.1337.ma " + itos(ERR_UNKNOWNMODE) + " " + client.getNick() + " " + mode + " :Unknown mode\r\n");
+                return;
+        }
     }
 }
