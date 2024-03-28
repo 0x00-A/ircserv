@@ -18,50 +18,54 @@ using std::string;
 
 class ircbot
 {
-public:
-	class	User
-	{
-		public:
-		  	string _nick;
-		  	string _timer;
+	public:
+		class	User
+		{
+			public:
+				string _nick;
+				struct tm *_timer;
+				User(const string& nick);
+				
+				struct tm *getCurrentTime();
+		};
+	private:
 
-			User()
-			{
-				// init timer;
-			}
-	};
-private:
+		// int		_ircSock;
+		int		_botSock;
+		string	_passwd;
+		string	_ircPort;
+		std::string	_recvbuf;
+		string	_nick;
+		string	_channel;
+		std::vector<string> _operators;
 
-	// int		_ircSock;
-	int		_botSock;
-	string	_passwd;
-	string	_ircPort;
-	std::string	_recvbuf;
-	string	_nick;
-	string	_channel;
-
-	void	registerBot( void );
-	void	handleRead( void );
-	string	getCommand( void );
-	void	parseCommand( string&, std::vector<string>& );
-	void	handleCommand( std::vector<string>& );
+		void	registerBot( void );
+		void	handleRead( void );
+		string	getCommand( void );
+		void	parseCommand( string&, std::vector<string>& );
+		void	handleCommand( std::vector<string>& );
 
 
-	std::vector<User> loggedUsers;
-	void	logtime(std::vector<string>& tokens);
+		std::vector<User> loggedUsers;
+		void	logtime(std::vector<string>& tokens);
 
-public:
+	public:
 
-	~ircbot();
+		~ircbot();
 
-	ircbot( string, string, string, string );
+		ircbot( string, string, string, string );
 
-	void	connectToServer( void );
+		void		connectToServer( void );
 
-	void	run( void );
+		void	run( void );
 
 };
 
+
+ircbot::User::User(const string& nick) : _nick(nick)
+{
+	_timer = getCurrentTime();
+}
 ircbot::ircbot(string passwd, string port, string nick, string chan)
 	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick), _channel(chan)
 {
@@ -70,6 +74,15 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 		std::perror("socket");
 		exit(1);
 	}
+}
+
+struct tm *ircbot::User::getCurrentTime() 
+{
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    return timeinfo;
 }
 
 void	ircbot::connectToServer()
@@ -189,6 +202,7 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 {
 	string				response;
 	string				usersList;
+	string				user;
 
 	// if (tokens[1] == "433")
 	// {
@@ -218,6 +232,14 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 		//
 		usersList = tokens[5]; // 
 		// add to logedusers vector User user("nick");
+		std::stringstream ss(tokens.back());
+		while (ss >> user)
+		{
+			User cli(user);
+			loggedUsers.push_back(cli);
+			if (user[0] == '@')
+				_operators.push_back(user.substr(1));
+		}
 	}
 	else if (tokens[1] == "PRIVMSG")
 	{
