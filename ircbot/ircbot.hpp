@@ -11,6 +11,7 @@
 # include <poll.h>
 # include <vector>
 # include <sstream>
+# include <fstream>
 
 # define BUF_SIZE 1024
 
@@ -18,50 +19,57 @@ using std::string;
 
 class ircbot
 {
-public:
-	class	User
-	{
-		public:
-		  	string _nick;
-		  	string _timer;
+	public:
+		class	User
+		{
+			public:
+				string _nick;
+				struct tm *_timer;
+				User(const string& nick);
+				
+				struct tm *getCurrentTime();
+		};
+	private:
 
-			User()
-			{
-				// init timer;
-			}
-	};
-private:
+		// int		_ircSock;
+		int		_botSock;
+		string	_passwd;
+		string	_ircPort;
+		std::string	_recvbuf;
+		string	_nick;
+		string	_channel;
+		std::vector<string> _operators;
+		std::vector<string> _wordlist;
 
-	// int		_ircSock;
-	int		_botSock;
-	string	_passwd;
-	string	_ircPort;
-	std::string	_recvbuf;
-	string	_nick;
-	string	_channel;
+		void	registerBot( void );
+		void	handleRead( void );
+		string	getCommand( void );
+		void	parseCommand( string&, std::vector<string>& );
+		void	handleCommand( std::vector<string>& );
+		string	getUserNick( string& token );
+		void	checkOffensiveWords( std::vector<string>& tokens );
+		bool	hasBadWords( string& str );
 
-	void	registerBot( void );
-	void	handleRead( void );
-	string	getCommand( void );
-	void	parseCommand( string&, std::vector<string>& );
-	void	handleCommand( std::vector<string>& );
+		std::vector<User> loggedUsers;
+		void	logtime(std::vector<string>& tokens);
 
+	public:
 
-	std::vector<User> loggedUsers;
-	void	logtime(std::vector<string>& tokens);
+		~ircbot();
 
-public:
+		ircbot( string, string, string, string );
 
-	~ircbot();
+		void		connectToServer( void );
 
-	ircbot( string, string, string, string );
-
-	void	connectToServer( void );
-
-	void	run( void );
+		void	run( void );
 
 };
 
+
+ircbot::User::User(const string& nick) : _nick(nick)
+{
+	_timer = getCurrentTime();
+}
 ircbot::ircbot(string passwd, string port, string nick, string chan)
 	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick), _channel(chan)
 {
@@ -70,6 +78,27 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 		std::perror("socket");
 		exit(1);
 	}
+
+	// store data
+	std::ifstream infile("offensive_words.txt");
+	if (infile.is_open())
+	{
+		string s;
+		while(std::getline(infile, s))
+		{
+			_wordlist.push_back(s);
+		}
+	}
+	_wordlist.push_back("fuck");
+}
+
+struct tm *ircbot::User::getCurrentTime() 
+{
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    return timeinfo;
 }
 
 void	ircbot::connectToServer()
@@ -133,7 +162,7 @@ string	ircbot::getCommand()
 	if ( (pos = _recvbuf.find("\n")) != std::string::npos)
 	{
 		cmd = _recvbuf.substr(0, pos);
-		// std::cout << "cmd: " << cmd << std::endl;
+		std::cout << "cmd: " << cmd << std::endl;
 
 		// // parse command
 		// 	if (cmd.size() > 1 && cmd[cmd.size() - 1] == '\r')
@@ -189,6 +218,7 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 {
 	string				response;
 	string				usersList;
+	string				user;
 
 	// if (tokens[1] == "433")
 	// {
@@ -218,17 +248,65 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 		//
 		usersList = tokens[5]; // 
 		// add to logedusers vector User user("nick");
+		std::stringstream ss(tokens.back());
+		while (ss >> user)
+		{
+			User cli(user);
+			loggedUsers.push_back(cli);
+			if (user[0] == '@')
+				_operators.push_back(user.substr(1));
+		}
 	}
 	else if (tokens[1] == "PRIVMSG")
 	{
 		//
 		std::cout << ">>>>>>>>> handle privmsg <<<<<<<<<" << std::endl;
+		checkOffensiveWords(tokens);
+		
 	}
 	else if (tokens[1] == "JOIN" || tokens[1] == "KICK")
 	{
 		logtime(tokens);
 	}
 	// if (cmd.find())
+}
+
+string ircbot::getUserNick(string &token)
+{
+	size_t pos = token.find_first_of('!');
+	return (token.substr(1, pos - 1));
+}
+
+void ircbot::checkOffensiveWords(std::vector<string> &tokens)
+{
+	if (tokens[2] == _nick) return;
+
+	string userNick = getUserNick(tokens[0]);
+
+	if (hasBadWords(tokens.back()))
+	{
+		for (std::vector<string>::iterator it = _operators.begin(); it < _operators.end(); it++)
+		{
+			/* code */
+			string reply = "PRIVMSG " + *it + " :user " + userNick + " used a bad word\n";
+			if (*it != userNick)
+				write(_botSock, reply.data(), reply.length());
+		}
+	}
+}
+
+bool ircbot::hasBadWords(string &str)
+{
+	std::stringstream ss(str);
+	string	token;
+
+	while (ss >> token)
+	{
+		std::transform(token.begin(), token.end(), token.begin(), ::tolower);
+		if (std::find(_wordlist.begin(), _wordlist.end(), token) != _wordlist.end())
+			return (true);
+	}
+	return (false);
 }
 
 void ircbot::logtime(std::vector<string>& tokens)
