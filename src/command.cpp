@@ -20,7 +20,7 @@ void Server::pass(Client &client)
     else
     {
         client.setHasPassed(false);
-        throw (":ft_irc.1337.ma " + itos(RPL_WELCOME) + " " + client.getNick()  + " " + this->_params[1] + \
+        throw (":ft_irc.1337.ma " + itos(ERR_PASSWDMISMATCH) + " " + client.getNick()  + " " + this->_params[1] + \
                 " :Password incorrect");
     }
 }
