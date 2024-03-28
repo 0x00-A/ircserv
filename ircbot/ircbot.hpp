@@ -73,7 +73,6 @@ class ircbot
 
 };
 
-
 ircbot::User::User(const string& nick) : _nick(nick)
 {
 	_timer = getCurrentTime();
