@@ -5,7 +5,7 @@ SRCDIR = .
 OBJDIR = obj
 INCLUDES = ./inc
 
-SRC = main.cpp
+SRC = main.cpp ircbot.cpp
 
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))
