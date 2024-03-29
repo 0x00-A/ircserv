@@ -1,20 +1,23 @@
 #include <iostream>
 #include <ctime>
 
-// Function to get the current hour
-struct tm *getCurrentTime() 
-{
-    time_t rawtime;
-    struct tm *timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    return timeinfo;
+#include <ctime>
+
+long getTimeInMinutes() {
+    // Get current time
+    std::time_t currentTime;
+    std::time(&currentTime);
+
+    // Convert to minutes
+    return currentTime / 60;
 }
 
-int main() 
-{
-    struct tm *timeinfo = getCurrentTime();
-    std::cout << "Current hour: " << timeinfo->tm_min << std::endl;
+
+#include <iostream>
+
+int main() {
+    long currentTimeInMinutes = getTimeInMinutes();
+    std::cout << "Current time in minutes since epoch: " << currentTimeInMinutes << std::endl;
     return 0;
 }
 

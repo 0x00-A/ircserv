@@ -26,7 +26,7 @@ class ircbot
 		{
 			public:
 				string _nick;
-				int _timer;
+				long _timer;
 				User(const string& nick);
 		};
 
@@ -43,7 +43,7 @@ class ircbot
 		string					_channel;
 		std::vector<string> 	_operators;
 		std::vector<string> 	_wordlist;
-		std::vector<User> 		loggedUsers;
+		std::vector<User> 		_loggedUsers;
 
 		void					registerBot( void );
 		void					handleRead( void );
@@ -57,7 +57,7 @@ class ircbot
 		void					logtime(std::vector<string>& tokens);
 
 		std::string				itos(int num);
-		int						getTime(const string& user);
+		long					getTime(const string& user);
 		void					removeUser(const string& user);
 		userIter				doesUserExit(const string& user);
 	
@@ -69,7 +69,7 @@ class ircbot
 		void					run( void );
 		void					connectToServer( void );
 
-		static struct tm 		*getCurrentTime();
+		static long 			getTimeInMinutes();
 
 };
 
