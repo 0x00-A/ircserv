@@ -33,6 +33,7 @@ void Server::nick(Client &client)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
     }
+    // ERROR container overflow _params[1] is not a valid addr test cmd: nick
     if (checkAlreadyNick(this->_params[1]) == false)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
@@ -96,25 +97,16 @@ void Server::user(Client &client)
 void Server::quit(Client &client)
 {
     string              response;
-    std::set<string>    channelsJ;
 
     response = client.identifier() + " QUIT :Client Quit";
-    channelsJ = client.getChannels();
-
-    std::set<string>::iterator it = channelsJ.begin();
-    for ( ; it != channelsJ.end(); it++)
-    {
-        channelIter itCha = doesChannelExist(*it);
-        if (itCha != _channels.end())
-        {
-            this->broadcastMsg(client, response, *itCha);
-        }
-    }
-    response += "\r\n";
-    write(client.getSockfd(), response.c_str(), response.length());
-    response = "ERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)\r\n";
-    write(client.getSockfd(), response.c_str(), response.length());
-    _pollfds[getIndexOfClient(client) + 1].fd = -1;
+    broadcastToJoinedChannels(client, response);
+    response += "\r\nERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)\r\n";
+    // write(client.getSockfd(), response.c_str(), response.length());
+    reply(client, response);
+    // response = "ERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)\r\n";
+    // write(client.getSockfd(), response.c_str(), response.length());
+    // _pollfds[getIndexOfClient(client) + 1].fd = -1;
+    _disconnectedClients.push_back(client.fd);
 }
 
 void Server::join(Client &client)
@@ -431,68 +423,68 @@ void Server::removeExtraPlusMinus(string &s)
 	}
 }
 
-// void    Server::mode(Client& client)
-// {
-//     std::queue<std::pair<string, string> >      modes;
-//     channelIter                                 chan;
-//     string                                      paramsave;
-//     string                                      modesave;
+void    Server::mode(Client& client)
+{
+    std::queue<std::pair<string, string> >      modes;
+    channelIter                                 chan;
+    string                                      paramsave;
+    string                                      modesave;
 
-//     if (!client.isConnected())
-//     {
-//         throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + \
-//         client.getNick()  + " :You have not registered");
-//     }
-//     if (_params.size() < 2)
-//     {
-//         throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
-//         client.getNick() + " " + _params[0]  + " :Not enough parameters");
-//     }
-//     if ( (chan = doesChannelExist(_params[1])) == _channels.end())
-//     {
-//         throw (":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + \
-//         client.getNick() + " " + _params[1]  + " :No such channel");
-//     }
-//     if (_params.size() == 2)
-//     {
-//         reply(client, (":ft_irc.1337.ma " + itos(RPL_CHANNELMODEIS) + " " + \
-//         client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
-//         throw (":ft_irc.1337.ma " + itos(RPL_CREATIONTIME) + " " + \
-//         client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
-//     }
-//     parseModes(modes, client);
-//     if (!chan->isUserOperator(client.getNick()))
-//     {
-//         throw (":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + \
-//         client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
-// 	}
-// 	while (!modes.empty())
-// 	{
-// 		std::pair<string, string> m = modes.front();
-// 		switch (m.first[1])
-// 		{
-// 			case ('o'):
-// 			handleOperatorFlag(m, modesave, paramsave, chan, client);
-// 			break;
-// 			case ('l'):
-// 			handleLimitFlag(m, modesave, paramsave, chan);
-// 			break;
-// 			case ('k'):
-// 			handlePasskeyFlag(m, modesave, paramsave, chan);
-// 			break;
-// 			case ('i'):
-// 			handleInviteFlag(m, modesave, chan);
-// 			break;
-// 			case ('t'):
-// 			handleTopicFlag(m, modesave, chan);
-// 			break;
-// 		}
-// 		modes.pop();
-// 	}
-// 	removeExtraPlusMinus(modesave);
-// 	if (!modesave.empty())
-// 		throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
-// }
+    if (!client.isConnected())
+    {
+        throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + \
+        client.getNick()  + " :You have not registered");
+    }
+    if (_params.size() < 2)
+    {
+        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
+        client.getNick() + " " + _params[0]  + " :Not enough parameters");
+    }
+    if ( (chan = doesChannelExist(_params[1])) == _channels.end())
+    {
+        throw (":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + \
+        client.getNick() + " " + _params[1]  + " :No such channel");
+    }
+    if (_params.size() == 2)
+    {
+        reply(client, (":ft_irc.1337.ma " + itos(RPL_CHANNELMODEIS) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
+        throw (":ft_irc.1337.ma " + itos(RPL_CREATIONTIME) + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
+    }
+    parseModes(modes, client);
+    if (!chan->isUserOperator(client.getNick()))
+    {
+        throw (":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + \
+        client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
+	}
+	while (!modes.empty())
+	{
+		std::pair<string, string> m = modes.front();
+		switch (m.first[1])
+		{
+			case ('o'):
+			handleOperatorFlag(m, modesave, paramsave, chan, client);
+			break;
+			case ('l'):
+			handleLimitFlag(m, modesave, paramsave, chan);
+			break;
+			case ('k'):
+			handlePasskeyFlag(m, modesave, paramsave, chan);
+			break;
+			case ('i'):
+			handleInviteFlag(m, modesave, chan);
+			break;
+			case ('t'):
+			handleTopicFlag(m, modesave, chan);
+			break;
+		}
+		modes.pop();
+	}
+	removeExtraPlusMinus(modesave);
+	if (!modesave.empty())
+		throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
+}
 
 
 //////////////////////////////////////////////////////////////////////////

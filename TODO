@@ -44,16 +44,14 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 
 
-
-
-join #chan
-:zoz!~x@127.0.0.1 JOIN #chan
-:ft_irc.1337.ma MODE #chan +tli 004 <<<<<<<<
-:ft_irc.1337.ma 353 zoz @ #chan :zoz @XOXO
-:ft_irc.1337.ma 366 zoz #chan :End of /NAMES list.
+<<<< for rachid >>>>
+[ ] :lalala!~s@197.230.30.146 QUIT :Quit: comment (handle quit comment sent in broadcast to channels)
 
 
 
 
-
-sigpipe in sockets 
+###############################
+[ ] close fds CTRL-c
+[ ] handle SIGPIPE
+[x] fix time mode
+[ ] :lalala!~x@197.230.30.146 QUIT :EOF from client (when a user disconnect broadcast to channels)

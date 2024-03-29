@@ -1,21 +1,5 @@
 #include "Channel.hpp"
 
-void Channel::setCreationTime(void)
-{
-    std::time_t res = std::time(NULL);
-
-    char *timePtr = std::ctime(&res);
-    if (!timePtr)
-    {
-        cerr << "error time" << endl;
-        _creationTime = "";
-    }
-    else
-    {
-        _creationTime = timePtr;
-    }
-}
-
 Channel::Channel(const string &channelName, const string &admin)
 {
     _admin = admin;
@@ -187,19 +171,22 @@ bool Channel::hasMode(char mode) const
 
 string Channel::channelModeIs() const
 {
-    string s = _modes;
+    stringstream s;
+    s << _modes;
     for (size_t i = 0; i < _modes.size(); i++)
     {
         if (_modes[i] == 'k')
         {
-            s += " " + this->getPasskey();
+            s << (" " + this->getPasskey());
         }
         if (_modes[i] == 'l')
         {
-            s += " " + itos(this->getUserLimit());
+            s << " " ;
+            s << this->getUserLimit();
         }
     }
-    return (s);
+    std::cout << ">>>>>> " <<  s.str() << std::endl;
+    return (s.str());
 }
 
 void Channel::printUsers()
@@ -298,4 +285,12 @@ string Channel::getModes(void) const
 	return (_modes);
 }
 
+void Channel::setCreationTime(void)
+{
+    std::time_t     res;
+    stringstream    ss;
 
+    res = std::time(NULL);
+    ss << res;
+    _creationTime = ss.str();
+}

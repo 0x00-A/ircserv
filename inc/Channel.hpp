@@ -15,7 +15,7 @@ class Channel
 
 		string							_name;
 		string							_admin;
-		std::set<string>					_users;
+		std::set<string>				_users;
 		// std::set<string>			_operators;
 		
 		string						_modes;	// although there are booleans to check if a certain flag is set i used this also save order of flags in channel when printing

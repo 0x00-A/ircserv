@@ -13,6 +13,7 @@
 # include <sstream>
 # include <fstream>
 # include <iomanip>
+# include "numReplies.hpp"
 
 # define BUF_SIZE 1024
 
@@ -31,7 +32,7 @@ class ircbot
 		};
 
 		typedef std::vector<User>::iterator userIter;
-		typedef std::vector<string>::iterator opIter;
+		typedef std::vector<string>::iterator strVecIter;
 
 	private:
 
@@ -44,6 +45,7 @@ class ircbot
 		std::vector<string> 	_operators;
 		std::vector<string> 	_wordlist;
 		std::vector<User> 		_loggedUsers;
+		std::vector<string>		_badUsers;
 
 		void					registerBot( void );
 		void					handleRead( void );
@@ -54,12 +56,23 @@ class ircbot
 		void					checkOffensiveWords( std::vector<string>& tokens );
 		bool					hasBadWords( string& str );
 		void					updateOperators( std::vector<string>& tokens );
-		void					logtime(std::vector<string>& tokens);
+		void					updateUsers(std::vector<string>& tokens);
+		void					logUsers( string& users );
+
+		void					blacklistReply( string& nick );
+		void					logtimeReply( string& nick );
 
 		std::string				itos(int num);
 		long					getTime(const string& user);
 		void					removeUser(const string& user);
+		void					updateUserNick( const string& old_nick, const string& new_nick );
 		userIter				doesUserExit(const string& user);
+		bool					isOperator( string& user );
+		bool					isMember( string& user );
+		string					getBadUsers( void );
+		void					addBadUser( string& user );
+		void					sendReply(const string& reply);
+		bool					isErrorCode( const string& code );
 	
 	public:
 
@@ -71,6 +84,7 @@ class ircbot
 
 		static long 			getTimeInMinutes();
 
+		void	debugInfo( void );
 };
 
 #endif //IRCBOT_HPP

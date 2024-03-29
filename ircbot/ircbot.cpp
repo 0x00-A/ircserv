@@ -7,20 +7,120 @@ ircbot::User::User(const string& nick) : _nick(nick)
 
 ircbot::userIter ircbot::doesUserExit(const string& user)
 {
-	std::cout << "::::::::::::::::::::::::::::::::::" << std::endl;
+	// std::cout << "::::::::::::::::::::::::::::::::::" << std::endl;
+	// for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
+	// {
+	// 	std::cout << ":::: > " << it->_nick << " <" << std::endl;
+	// }
+	// std::cout << "::::::::::::::::::::::::::::::::::" << std::endl;
 	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
 	{
-		std::cout << ":::: > " << it->_nick << " <" << std::endl;
-	}
-	std::cout << "::::::::::::::::::::::::::::::::::" << std::endl;
-	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
-	{
-		if (it->_nick == user || it->_nick == ("@" + user))
+		if (it->_nick == user)// || it->_nick == ("@" + user))
 		{
 			return (it);
 		}
 	}
 	return (_loggedUsers.end());
+}
+
+bool ircbot::isOperator(string &user)
+{
+	// strVecIter it = std::find(_operators.begin(), _operators.end(), user);
+	return (std::find(_operators.begin(), _operators.end(), user) != _operators.end());
+}
+
+bool ircbot::isMember(string &user)
+{
+	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
+	{
+		if (it->_nick == user)
+		{
+			return (true);
+		}
+	}
+	return (false);
+}
+
+string ircbot::getBadUsers(void)
+{
+	string r;
+	
+	for (size_t i = 0; i < _badUsers.size(); i++)
+	{
+		// if (_badUsers[i].empty()) continue;
+		if (i != 0)
+			r += " ";
+		if (isOperator(_badUsers[i]))
+			r += "@";
+		r += _badUsers[i];
+	}
+	return (r);
+}
+
+void ircbot::addBadUser(string &user)
+{
+	static int i;
+	std::vector<string>::iterator it = std::find(_badUsers.begin(), _badUsers.end(), user);
+	if (it == _badUsers.end())
+	{
+		if (_badUsers.size() < 10)
+			_badUsers.push_back(user);
+		else
+			_badUsers[i % 10] = user;
+		i++;
+		std::cout << "added " << user << " to blacklist" << std::endl;
+	}
+}
+
+void ircbot::sendReply(const string &reply)
+{
+	if (write(_botSock, reply.data(), reply.length()) <= 0)
+	{
+		std::perror("write");
+		throw (string("The bot was unable to send a reply to the server"));
+	}
+}
+
+bool ircbot::isErrorCode(const string &code)
+{
+	return ( code == ERR_NEEDMOREPARAMS || code == ERR_PASSWDMISMATCH || code == ERR_NOTREGISTERED
+			|| code == ERR_ERRONEUSNICKNAME || code == ERR_NICKNAMEINUSE || code == ERR_NOSUCHCHANNEL
+			|| code == ERR_INVITEONLYCHAN || code == ERR_BADCHANNELKEY || code == ERR_CHANNELISFULL);
+}
+
+void ircbot::blacklistReply(string &nick)
+{
+	string response;
+
+	if (!isMember(nick))
+	{
+		response = "PRIVMSG " + nick + " :" + _channel + " You're not on the channel\n";
+	}
+	if (!isOperator(nick))
+	{
+		response = "PRIVMSG " + nick + " :" + _channel + " You're not channel operator\n";
+	}
+	else
+	{
+		response = "PRIVMSG " + nick + " :" + _channel + " :" + getBadUsers() + "\n";
+	}
+	sendReply(response);
+}
+
+void ircbot::logtimeReply(string &nick)
+{
+	string response;
+
+	// TODO: handle users not in the channel !!
+	if (!isMember(nick))
+	{
+		response = "PRIVMSG " + nick + " :You're not on the channel\n";
+	}
+	else
+	{
+		response = "PRIVMSG " + nick + " :Logtime for " + nick + " is: " + itos(getTime(nick)) + " min\n";
+	}
+	sendReply(response);
 }
 
 string ircbot::itos(int num)
@@ -33,12 +133,18 @@ string ircbot::itos(int num)
 ircbot::ircbot(string passwd, string port, string nick, string chan)
 	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick), _channel(chan)
 {
+	const int	enable = 1;
+
 	if ( (_botSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		std::perror("socket");
 		exit(1);
 	}
-
+	if (setsockopt(_botSock, SOL_SOCKET, SO_NOSIGPIPE, &enable, sizeof(int)))
+	{
+		perror("setsockopt");
+	}
+	
 	// store data
 	std::ifstream infile("offensive_words.txt");
 	if (infile.is_open())
@@ -49,7 +155,6 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 			_wordlist.push_back(s);
 		}
 	}
-	// _wordlist.push_back("fuck");
 }
 
 long ircbot::getTimeInMinutes()
@@ -58,6 +163,37 @@ long ircbot::getTimeInMinutes()
     std::time(&currentTime);
 
     return currentTime / 60;
+}
+
+void ircbot::debugInfo(void)
+{
+	if (!_loggedUsers.empty())
+	{
+		std::cout << ">>>>>>>>>>>>> [ ALL USERS ] <<<<<<<<<<<<<<" << std::endl;
+		for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
+		{
+			std::cout << it->_nick << "(" << it->_timer << ")" << " | " << std::endl;
+		}
+		std::cout << "\n\n";
+	}
+	if (!_operators.empty())
+	{
+		std::cout << ">>>>>>>>>>>>> [ OPERATORS ] <<<<<<<<<<<<<<" << std::endl;
+		for (strVecIter it = _operators.begin(); it < _operators.end(); it++)
+		{
+			std::cout << *it << " " << std::endl;
+		}
+		std::cout << "\n\n";
+	}
+	if (!_badUsers.empty())
+	{
+		std::cout << ">>>>>>>>>>>>> [ BLACKLIST ] <<<<<<<<<<<<<<" << std::endl;
+		for (strVecIter it = _badUsers.begin(); it < _badUsers.end(); it++)
+		{
+			std::cout << *it << " " << std::endl;
+		}
+	}
+	std::cout << std::endl;
 }
 
 long	ircbot::getTime(const string& user)
@@ -84,8 +220,7 @@ void	ircbot::connectToServer()
 	if (connect(_botSock, (struct sockaddr*) &servaddr, sizeof(servaddr)) != 0)
 	{
 		std::perror("connect");
-		close(_botSock);
-		exit(1);
+		throw (string("The bot was unable to connect to server"));
 	}
 	std::cout << "Connected to server successfully" << std::endl;
 }
@@ -96,12 +231,12 @@ void	ircbot::registerBot()
 	string				cmd;
 
 	std::stringstream ss;
-    ss << "PASS " << _passwd << "\r\n";
+    // ss << "PASS " << _passwd << "\r\n";
     ss << "NICK " << _nick << "\r\n";
-    ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
+    // ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
     ss << "JOIN " << _channel << "\r\n";
 
-	write(_botSock, ss.str().data(), ss.str().length());
+	sendReply(ss.str());
 }
 
 void	ircbot::handleRead()
@@ -113,10 +248,8 @@ void	ircbot::handleRead()
 	read_size = read(_botSock, buffer, sizeof(buffer) - 1);
 	if (read_size <= 0)
 	{
-		// std::perror("read");
-		// // close fds
-		// exit(1);
-		throw ("read failed!");
+		std::perror("read");
+		throw (string("read failed!"));
 	}
 	buffer[read_size] = '\0';
 	_recvbuf += buffer;
@@ -131,7 +264,7 @@ string	ircbot::getCommand()
 	if ( (pos = _recvbuf.find("\n")) != std::string::npos)
 	{
 		cmd = _recvbuf.substr(0, pos);
-		std::cout << "cmd: " << cmd << std::endl;
+		// std::cout << "cmd: " << cmd << std::endl;
 
 		_recvbuf = _recvbuf.substr(pos + 1);
 	}
@@ -144,6 +277,18 @@ void ircbot::parseCommand(string &cmd, std::vector<string> &tokens)
     std::stringstream ss;
     string token, tmp = "";
 
+	// if (tokens[3][tokens[3].size() - 1] == '\n')
+	// 	tokens[3].erase(tokens[3].size() - 1, 1);
+	// if (tokens[3][tokens[3].size() - 1] == '\r')
+	// 	tokens[3].erase(tokens[3].size() - 1, 1);
+	if (cmd[cmd.size() - 1] == '\n')
+	{
+		cmd.erase(cmd.size() - 1, 1);
+	}
+	if (cmd[cmd.size() - 1] == '\r')
+	{
+		cmd.erase(cmd.size() - 1, 1);
+	}
     if ( (pos = cmd.find(" :")) != string::npos)
     {
         tmp = cmd.substr(pos + 2);
@@ -160,69 +305,43 @@ void ircbot::parseCommand(string &cmd, std::vector<string> &tokens)
 
 void	ircbot::handleCommand(std::vector<string>& tokens)
 {
-	string				response;
-	string				usersList;
-	string				user;
+	string				response, usersList, userNick, command;
 
-	std::cout << std::endl;
-	if (tokens[1] == "461" || tokens[1] == "464" || tokens[1] == "451" || tokens[1] == "432" || tokens[1] == "433"
-		|| tokens[1] == "403" || tokens[1] == "473" || tokens[1] == "475" || tokens[1] == "471")
+	command = tokens[1];
+	if (isErrorCode(command))
 	{
 		throw (tokens.back());
 	}
-	else if (tokens[1] == "353")
+	else if (command == RPL_NAMREPLY)
 	{
-		//
-		usersList = tokens[5]; // 
-		// add to logedusers vector User user("nick");
-		std::stringstream ss(tokens.back());
-		while (ss >> user)
+		logUsers(tokens.back());
+	}
+	else if (command == "PRIVMSG")
+	{
+		userNick = getUserNick(tokens[0]);
+		if (tokens[2] == _nick && tokens.back() == "logtime")
 		{
-			std::cout << "*** user **" << user << std::endl;
-			if (user == _nick) continue ;
-
-			User cli(user);
-
-			_loggedUsers.push_back(cli);
-			if (user[0] == '@')
-			{
-				_operators.push_back(user.substr(1));
-			}
+			logtimeReply(userNick);
+		}
+		if (tokens[2] == _nick && tokens.back() == "blacklist")
+		{	
+			blacklistReply(userNick);
+		}
+		if (tokens[2] != _nick)		// not just a privmsg to bot
+		{
+			checkOffensiveWords(tokens);
 		}
 	}
-	else if (tokens[1] == "PRIVMSG")
+	else if (command == "JOIN" || command == "KICK" || command == "QUIT" || command == "NICK")
 	{
-			for (size_t i = 0; i < _loggedUsers.size(); i++)
-			{
-				std::cout << user << " ";
-			}
-			std::cout << std::endl;
-		// :n2!~u2@127.0.0.1 PRIVMSG n1 :logtime
-		string userNick = tokens[0].substr(1, tokens[0].find_first_of('!') - 1);
-
-
-		if (tokens[3][tokens[3].size() - 1] == '\n')
-        	tokens[3].erase(tokens[3].size() - 1, 1);
-		if (tokens[3][tokens[3].size() - 1] == '\r')
-        	tokens[3].erase(tokens[3].size() - 1, 1);
-
-		if (tokens[2] == _nick && tokens[3] == "logtime")
-		{
-			response = "PRIVMSG " + userNick + " :Logtime for " + userNick + " is: " + itos(getTime(userNick)) + " min\n";
-			write(_botSock, response.data(), response.length());
-		}
-		//
-		std::cout << ">>>>>>>>> handle privmsg <<<<<<<<<" << std::endl;
-		checkOffensiveWords(tokens);
-		
+		// TODO: handle quit and NICK
+		updateUsers(tokens);
+		debugInfo();
 	}
-	else if (tokens[1] == "JOIN" || tokens[1] == "KICK")
-	{
-		logtime(tokens);
-	}
-	else if (tokens[1] == "MODE" && (tokens[3] == "+o" || tokens[3] == "-o"))
+	else if (command == "MODE" && (tokens[3] == "+o" || tokens[3] == "-o"))
 	{
 		updateOperators(tokens);
+		debugInfo();
 	}
 }
 
@@ -234,21 +353,13 @@ string ircbot::getUserNick(string &token)
 
 void ircbot::checkOffensiveWords(std::vector<string> &tokens)
 {
-	if (tokens[2] == _nick) return;
+	string userNick;
 
-	string userNick = getUserNick(tokens[0]);
-
+	userNick = getUserNick(tokens[0]);
 	if (hasBadWords(tokens.back()))
 	{
-		// for (std::vector<string>::iterator it = _operators.begin(); it < _operators.end(); it++)
-		// {
-		// 	/* code */
-		// 	string reply = "PRIVMSG " + *it + " :" + userNick + " used a bad word in channel " + tokens[2] + "\r\n";
-		// 	if (*it != userNick)
-		// 		write(_botSock, reply.data(), reply.length());
-		// }
-		string reply = "PRIVMSG " + tokens[2] + ":Warning: Please refrain from using inappropriate language, " + userNick + ".\n";
-		write(_botSock, reply.data(), reply.length());
+		sendReply("PRIVMSG " + _channel + " :Please refrain from using inappropriate language, " + userNick + ".\n");
+		addBadUser(userNick);
 	}
 }
 
@@ -268,7 +379,7 @@ bool ircbot::hasBadWords(string &str)
 
 void ircbot::updateOperators(std::vector<string> &tokens)
 {
-	opIter it;
+	strVecIter it;
 
 	if (tokens[3] == "+o")
 	{
@@ -283,26 +394,64 @@ void ircbot::updateOperators(std::vector<string> &tokens)
 	}
 }
 
-void ircbot::logtime(std::vector<string>& tokens)
+void ircbot::updateUsers(std::vector<string>& tokens)
 {
 	string user;
 
-	user = tokens[0].substr(1, (tokens[0].find("!~") - 1));
+	user = getUserNick(tokens[0]);
 
 	if (tokens[1] == "JOIN")
 	{
-		std::cout << "||||||" << user << "||||" << std::endl;
 		if (user == _nick) return ;
 		User cli(user);
 		_loggedUsers.push_back(cli);
 	}
-	else if (tokens[1] == "KICK")
+	else if (tokens[1] == "KICK" || tokens[1] == "QUIT")
 	{
+		// TODO: remove from _operatos
+		// TODO: remove from _badUsers list
 		userIter it =  doesUserExit(user);
 		if (it != _loggedUsers.end())
 		{
 			removeUser(user);
 		}
+	}
+	else if ((tokens[1] == "NICK"))
+	{
+		// TODO: change in _operatos
+		// TODO: change in _badUsers
+		// TODO: change in _loggedUsers
+		userIter it =  doesUserExit(user);
+		if (it != _loggedUsers.end())
+		{
+			updateUserNick(user, tokens.back());
+		}
+	}
+}
+
+void ircbot::logUsers(string &users)
+{
+	string				user;
+
+	std::stringstream ss(users);
+	while (ss >> user)
+	{
+		if (user == _nick || "@" + user == _nick) continue ;
+
+		// TODO: handle "@" in nicknames of operatos and TEST !! 
+
+		if (user[0] == '@')
+		{
+			_operators.push_back(user.substr(1));
+			User cli(user.substr(1));
+			_loggedUsers.push_back(cli);
+		}
+		else
+		{
+			User cli(user);
+			_loggedUsers.push_back(cli);
+		}
+		std::cout << "BOT INFO: user `" << user << "` logged" << std::endl;
 	}
 }
 
@@ -313,8 +462,58 @@ void ircbot::removeUser(const string &user)
 		if (it->_nick == user)
 		{
 			_loggedUsers.erase(it);
+			return;
 		}
 	}
+	for (strVecIter it = _operators.begin(); it < _operators.end(); it++)
+	{
+		if (*it == user)
+		{
+			_operators.erase(it);
+			return;
+		}
+	}
+	for (strVecIter it = _badUsers.begin(); it < _badUsers.end(); it++)
+	{
+		if (*it == user)
+		{
+			_badUsers.erase(it);
+			return;
+		}
+	}
+	std::cout << "BOT INFO: removed user `" << user << "`" << std::endl;
+}
+
+void ircbot::updateUserNick(const string &old_nick, const string &new_nick)
+{
+	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
+	{
+		if (it->_nick == old_nick)
+		{
+			*it = new_nick;
+			std::cout << "user `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
+			return;
+		}
+	}
+	for (strVecIter it = _operators.begin(); it < _operators.end(); it++)
+	{
+		if (*it == old_nick)
+		{
+			*it = new_nick;
+			std::cout << "operator `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
+			return;
+		}
+	}
+	for (strVecIter it = _badUsers.begin(); it < _badUsers.end(); it++)
+	{
+		if (*it == old_nick)
+		{
+			*it = new_nick;
+			std::cout << "blacklist nick  `" << old_nick << "` changed to `" << new_nick << "`" << std::endl;
+			return;
+		}
+	}
+	std::cout << "BOT INFO: user `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
 }
 
 void	ircbot::run()

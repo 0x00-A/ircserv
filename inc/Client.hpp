@@ -31,7 +31,6 @@
 #define RPL_CHANNELMODEIS 324
 #define RPL_CREATIONTIME 329
 #define ERR_NOSUCHCHANNEL 403
-#define ERR_UNKNOWNMODE 472
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_USERNOTINCHANNEL 441
 #define ERR_NOTONCHANNEL 442
@@ -54,87 +53,84 @@
 class Client
 {
 	private:
-		string _ip;
-		int _port;
 
-		string _nick;
-		string _username;
-		string _real;
-		string _hostname;
+		string 					_ip;
+		int 					_port;
+		string 					_nick;
+		string 					_username;
+		string 					_real;
+		string 					_hostname;
 
 		// for time 
-		struct tm *_startTime;
+		// struct tm*				_startTime;
 
 		// bool 	_isOperator;
 		// bool 	_isRegistered;
 
 		// track the commands
-		bool _hasPassed;
-		bool _hasUsedNick;
-		bool _hasUsedUser;
-
-		string _recvBuf;
-		std::queue<string> _sendBuf;
-
-		int _clifd;
-
-		std::vector<string> _invitedChannels; // here add chan name and invite status ture or false 
-		std::set<string> _channels; // channels user currently in
+		bool 					_hasPassed;
+		bool 					_hasUsedNick;
+		bool 					_hasUsedUser;
+		string 					_recvBuf;
+		std::queue<string> 		_sendBuf;
+		int 					_clifd;
+		std::vector<string> 	_invitedChannels; // here add chan name and invite status ture or false 
+		std::set<string> 		_channels; // channels user currently in
 
 		Client();
 
 	public:
 
 		Client(const string &ip, int port, int sockfd);
-
 		~Client();
 
 		// Add getters and sitters
 
 		// get socket fd
-		int getSockfd(void) const;
+		int 				getSockfd(void) const;
 
-		void closeSocket(void) const;
+		void 				closeSocket(void) const;
 
-		int getPort(void) const;
+		int 				getPort(void) const;
 
-		string getIPAddr(void) const;
+		string 				getIPAddr(void) const;
 
 		// get read buffer
-		string &rdBuf(void);
+		string 				&rdBuf(void);
 
 		// get send buffer
-		std::queue<string> &sdBuf(void);
+		std::queue<string>	&sdBuf(void);
 
 		///////////////////////////////////////////
 
-		void addChannels(string &channel);
-		void setNick(string nick);
-		void setUsername(string username);
 
-		void setStartTimeToClinet();
-		void setHasPassed(bool value);
-		void setHasUsedNick(bool value);
-		void setHasUsedUser(bool value);
-		void inviteToChannel(string& channelName);
-		void uninviteFromChannel(string &channelName);
+		void 				addChannels(string &channel);
+		void 				setNick(string nick);
+		void 				setUsername(string username);
+
+		// void 				setStartTimeToClinet();
+		void 				setHasPassed(bool value);
+		void 				setHasUsedNick(bool value);
+		void 				setHasUsedUser(bool value);
+		void 				inviteToChannel(string& channelName);
+		void 				uninviteFromChannel(string &channelName);
 		
-		bool isConnected();
+		bool 				isConnected();
 		
-		bool 		isInvitedToChannel( string& channelName ) const;
-		struct tm 	*getStartTimeToClinet();
-		bool 		getHasPassed();
-		bool 		getHasUsedNick();
-		bool 		getHasUsedUser();
+		bool 				isInvitedToChannel( string& channelName ) const;
+		// struct tm 			*getStartTimeToClinet();
+		bool 				getHasPassed();
+		bool 				getHasUsedNick();
+		bool 				getHasUsedUser();
 		
-		string identifier( void );
+		string 				identifier( void );
 
 		// bool 			isRegistered(void);
-		bool checkNick(string &nick);
+		bool 				checkNick(string &nick);
 
-		std::set<string> getChannels(void);
-		const string &getNick(void) const;
-		const string &getUsername(void) const;
+		std::set<string> 	getChannels(void);
+		const string		&getNick(void) const;
+		const string		&getUsername(void) const;
 
 };
 

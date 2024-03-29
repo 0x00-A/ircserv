@@ -23,7 +23,6 @@ Server::Server(const string& port, const string& passwd)
 	this->commandMap["PASS"] = &Server::pass;
     this->commandMap["USER"] = &Server::user;
     this->commandMap["NICK"] = &Server::nick;
-    this->commandMap["n"] = &Server::nick;
     this->commandMap["QUIT"] = &Server::quit;
     this->commandMap["JOIN"] = &Server::join;
     this->commandMap["PRIVMSG"] = &Server::privmsg;
@@ -32,6 +31,21 @@ Server::Server(const string& port, const string& passwd)
     this->commandMap["KICK"] = &Server::kick;
     this->commandMap["INVITE"] = &Server::invite;
     this->commandMap["TOPIC"] = &Server::topic;
+
+
+	// temp
+	this->commandMap["P"] = &Server::pass;
+    this->commandMap["U"] = &Server::user;
+    this->commandMap["N"] = &Server::nick;
+    this->commandMap["Q"] = &Server::quit;
+    this->commandMap["J"] = &Server::join;
+    this->commandMap["PM"] = &Server::privmsg;
+    this->commandMap["M"] = &Server::mode;
+    this->commandMap["K"] = &Server::kick;
+    this->commandMap["I"] = &Server::invite;
+    this->commandMap["T"] = &Server::topic;
+
+	// signal(SIGPIPE, SIG_IGN);
 }
 
 Server::~Server()
@@ -95,6 +109,10 @@ int Server::handleNewConnection()
 	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN), .revents = 0});
 
 	cout << "client connected - fd: " << connfd << " client host: " << ip << endl;
+
+	// for testing	/********* DELETE **********/
+	_clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + std::to_string(connfd) + "\n";
+	// _pollfds.back().events |= POLLOUT;
 	return (0);
 }
 
@@ -106,6 +124,10 @@ void Server::disconnectClient(int id)
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 
+	// string              response;
+
+    // response = cli_it->identifier() + " QUIT :Client Quit";
+    // broadcastToJoinedChannels(*cli_it, response);
 	exitUserFromChannels(cli_it);
 	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
 	cli_it->closeSocket();
@@ -164,6 +186,10 @@ int	Server::handleWrite(int id)
 			/*  you attempt to write() to it when the send buffer is full, write()  */
 			/*  will fail and return -1, and errno will be set to EWOULDBLOCK       */
 			/************************************************************************/
+			if (errno == SIGPIPE)
+			{
+				std::cout << "SIGPIPE ><<><<<" << std::endl;
+			}
 			if (errno != EWOULDBLOCK)
 			{
 				perror("write");
@@ -221,7 +247,8 @@ void	Server::run()
 		// std::cout << "port: " << _port << std::endl;
 		if(poll(_pollfds.data(), _pollfds.size(), -1) == -1)
 		{
-			perror("poll"); break;
+			perror("poll");
+			break;
 		}
 		for (size_t i = 0; i < _pollfds.size(); i++)
 		{
@@ -246,18 +273,23 @@ void	Server::run()
 					ret = handleRead(i-1);
 					if (ret == -1)
 					{
-						disconnectClient(--i);
-						continue;
+						// disconnectClient(--i);
+						quit(_clients[i-1]);
+						// cleanUnusedClients();
+						// continue;
 					}
-					while ((cmd = getCommand(i-1)) != "")
+					else
 					{
-						try
+						while ((cmd = getCommand(i-1)) != "")
 						{
-							handleCommand(cmd, i-1);
-						}
-						catch ( string& res )
-						{
-							reply(_clients[i-1], res);
+							try
+							{
+								handleCommand(cmd, i-1);
+							}
+							catch ( string& res )
+							{
+								reply(_clients[i-1], res);
+							}
 						}
 					}
 				}
@@ -275,8 +307,9 @@ void	Server::run()
 				ret = handleWrite(i-1);
 				if (ret == -1)
 				{
-					disconnectClient(--i);
-					continue;
+					// disconnectClient(--i);
+					// continue;
+					quit(_clients[i-1]);
 				}
 			}
 			if (_pollfds[i].revents & POLLERR)	// client Connection reset (RST) 
@@ -288,7 +321,8 @@ void	Server::run()
 				}
 				else
 				{
-					disconnectClient(--i);
+					// disconnectClient(--i);
+					quit(_clients[i-1]);
 				}
 			}
 		}
@@ -378,6 +412,23 @@ int Server::getIndexOfClient(const clientIter& currIter)
     clientIter	beginIter = _clients.begin();
 	// return (std::distance(currIter, beginIter));
 	return (currIter - beginIter);
+}
+
+void Server::broadcastToJoinedChannels(Client& client, string &msg)
+{
+    std::set<string>    joinedChans;
+
+    joinedChans = client.getChannels();
+
+    std::set<string>::iterator it = joinedChans.begin();
+    for ( ; it != joinedChans.end(); it++)
+    {
+        channelIter itCha = doesChannelExist(*it);
+        if (itCha != _channels.end())
+        {
+            this->broadcastMsg(client, msg, *itCha);
+        }
+    }
 }
 
 void Server::printClients(void)
