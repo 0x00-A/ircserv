@@ -33,13 +33,13 @@ void Server::nick(Client &client)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
     }
-    if (checkAlreadyNick(this->_params[1]) == false)
-    {
-        throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
-    }
     if (this->_params.size() < 2)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given");
+    }
+    if (checkAlreadyNick(this->_params[1]) == false)
+    {
+        throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (this->_params[1].size() >= 16)
     {
