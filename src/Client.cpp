@@ -132,11 +132,11 @@ bool Client::checkNick(string &nick)
     for (size_t i = 1; i < nick.size(); ++i)
     {
         char current = nick[i];
-        if (!isalnum(current) &&
-            current != '-' && current != '[' && current != ']' &&
-            current != '\\' && current != '`' && current != '^' &&
-            current != '{' && current != '}')
+        if (!isalnum(current) && current != '_' && current != '[' && \
+            current != ']' && current != '\\' && current != '`' && \
+            current != '^' &&  current != '{' && current != '}')
         {
+            cout << ":::::: char :" << nick[i] << endl;
             return false;
         }
     }

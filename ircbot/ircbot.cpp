@@ -192,14 +192,7 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 	}
 	else if (tokens[1] == "PRIVMSG")
 	{
-			for (size_t i = 0; i < _loggedUsers.size(); i++)
-			{
-				std::cout << user << " ";
-			}
-			std::cout << std::endl;
-		// :n2!~u2@127.0.0.1 PRIVMSG n1 :logtime
 		string userNick = tokens[0].substr(1, tokens[0].find_first_of('!') - 1);
-
 
 		if (tokens[3][tokens[3].size() - 1] == '\n')
         	tokens[3].erase(tokens[3].size() - 1, 1);
@@ -211,10 +204,7 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 			response = "PRIVMSG " + userNick + " :Logtime for " + userNick + " is: " + itos(getTime(userNick)) + " min\n";
 			write(_botSock, response.data(), response.length());
 		}
-		//
-		std::cout << ">>>>>>>>> handle privmsg <<<<<<<<<" << std::endl;
 		checkOffensiveWords(tokens);
-		
 	}
 	else if (tokens[1] == "JOIN" || tokens[1] == "KICK")
 	{
