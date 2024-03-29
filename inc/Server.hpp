@@ -77,6 +77,7 @@ class Server
 
 		/***********************[ SERVER ]***********************/
 		void parseargs(void) const;
+		void _Operator(std::string nick, std::string chName, Client &cli ,bool _Op);
 
 	public:
 		Server(const string &port, const string &passwd);

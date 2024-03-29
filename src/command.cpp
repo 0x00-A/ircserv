@@ -431,68 +431,68 @@ void Server::removeExtraPlusMinus(string &s)
 	}
 }
 
-void    Server::mode(Client& client)
-{
-    std::queue<std::pair<string, string> >      modes;
-    channelIter                                 chan;
-    string                                      paramsave;
-    string                                      modesave;
+// void    Server::mode(Client& client)
+// {
+//     std::queue<std::pair<string, string> >      modes;
+//     channelIter                                 chan;
+//     string                                      paramsave;
+//     string                                      modesave;
 
-    if (!client.isConnected())
-    {
-        throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + \
-        client.getNick()  + " :You have not registered");
-    }
-    if (_params.size() < 2)
-    {
-        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
-        client.getNick() + " " + _params[0]  + " :Not enough parameters");
-    }
-    if ( (chan = doesChannelExist(_params[1])) == _channels.end())
-    {
-        throw (":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + \
-        client.getNick() + " " + _params[1]  + " :No such channel");
-    }
-    if (_params.size() == 2)
-    {
-        reply(client, (":ft_irc.1337.ma " + itos(RPL_CHANNELMODEIS) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
-        throw (":ft_irc.1337.ma " + itos(RPL_CREATIONTIME) + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
-    }
-    parseModes(modes, client);
-    if (!chan->isUserOperator(client.getNick()))
-    {
-        throw (":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + \
-        client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
-	}
-	while (!modes.empty())
-	{
-		std::pair<string, string> m = modes.front();
-		switch (m.first[1])
-		{
-			case ('o'):
-			handleOperatorFlag(m, modesave, paramsave, chan, client);
-			break;
-			case ('l'):
-			handleLimitFlag(m, modesave, paramsave, chan);
-			break;
-			case ('k'):
-			handlePasskeyFlag(m, modesave, paramsave, chan);
-			break;
-			case ('i'):
-			handleInviteFlag(m, modesave, chan);
-			break;
-			case ('t'):
-			handleTopicFlag(m, modesave, chan);
-			break;
-		}
-		modes.pop();
-	}
-	removeExtraPlusMinus(modesave);
-	if (!modesave.empty())
-		throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
-}
+//     if (!client.isConnected())
+//     {
+//         throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + \
+//         client.getNick()  + " :You have not registered");
+//     }
+//     if (_params.size() < 2)
+//     {
+//         throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
+//         client.getNick() + " " + _params[0]  + " :Not enough parameters");
+//     }
+//     if ( (chan = doesChannelExist(_params[1])) == _channels.end())
+//     {
+//         throw (":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + \
+//         client.getNick() + " " + _params[1]  + " :No such channel");
+//     }
+//     if (_params.size() == 2)
+//     {
+//         reply(client, (":ft_irc.1337.ma " + itos(RPL_CHANNELMODEIS) + " " + \
+//         client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
+//         throw (":ft_irc.1337.ma " + itos(RPL_CREATIONTIME) + " " + \
+//         client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
+//     }
+//     parseModes(modes, client);
+//     if (!chan->isUserOperator(client.getNick()))
+//     {
+//         throw (":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + \
+//         client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
+// 	}
+// 	while (!modes.empty())
+// 	{
+// 		std::pair<string, string> m = modes.front();
+// 		switch (m.first[1])
+// 		{
+// 			case ('o'):
+// 			handleOperatorFlag(m, modesave, paramsave, chan, client);
+// 			break;
+// 			case ('l'):
+// 			handleLimitFlag(m, modesave, paramsave, chan);
+// 			break;
+// 			case ('k'):
+// 			handlePasskeyFlag(m, modesave, paramsave, chan);
+// 			break;
+// 			case ('i'):
+// 			handleInviteFlag(m, modesave, chan);
+// 			break;
+// 			case ('t'):
+// 			handleTopicFlag(m, modesave, chan);
+// 			break;
+// 		}
+// 		modes.pop();
+// 	}
+// 	removeExtraPlusMinus(modesave);
+// 	if (!modesave.empty())
+// 		throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
+// }
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -536,7 +536,7 @@ void Server::kick(Client& client)
         reply(client, ":ft_irc.1337.ma " + itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel");
         return;
     }
-    std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + reason;
+    std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
     reply(client, kickMessage);
 	broadcastMsg(client, kickMessage, *chanit);
 	removeUserFromChannel(key, channelName);
@@ -616,30 +616,28 @@ void Server::topic(Client& client)
         return;
     }
 
-    // If a topic is provided, set the new topic
-    if (_params.size() > 2) {
-        // Check if the client is a channel operator if the channel mode is +t
-        if (chanit->hasMode('t') || !chanit->isUserOperator(client.getNick())) {
+    if(_params.size() > 2) {
+
+        if (chanit->hasTopic() && !chanit->isUserOperator(client.getNick())) {
             reply(client, ":ft_irc.1337.ma " + itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator");
             return;
         }
-
+        
         std::string newTopic = _params[2];
-
         chanit->setTopic(newTopic);
         chanit->setHasTopic(true);
+
+        reply(client, ":ft_irc.1337.ma " + itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + newTopic);
         std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
         broadcastMsg(client, msg, *chanit);
     }
 	else {
-        // If no topic is provided, return the current topic
         std::string currentTopic = chanit->getTopic();
-        if (currentTopic.empty()) {
+        if (currentTopic.empty())
             reply(client, ":ft_irc.1337.ma " + itos(RPL_NOTOPIC) + " " + client.getNick() + " " + channelName + " :No topic is set");
-        }
-		else {
+		else 
             reply(client, ":ft_irc.1337.ma " + itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + currentTopic);
-        }
+        return;
     }
 }
 
