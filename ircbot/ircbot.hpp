@@ -20,7 +20,8 @@ using std::string;
 
 class ircbot
 {
-	public:
+	private:
+
 		class	User
 		{
 			public:
@@ -28,35 +29,34 @@ class ircbot
 				int _timer;
 				User(const string& nick);
 		};
+
+		typedef std::vector<User>::iterator userIter;
+		typedef std::vector<string>::iterator opIter;
 	private:
 
-		// int		_ircSock;
-		int		_botSock;
-		string	_passwd;
-		string	_ircPort;
-		std::string	_recvbuf;
-		string	_nick;
-		string	_channel;
-		std::vector<string> _operators;
-		std::vector<string> _wordlist;
+		int						_botSock;
+		string					_passwd;
+		string					_ircPort;
+		std::string				_recvbuf;
+		string					_nick;
+		string					_channel;
+		std::vector<string> 	_operators;
+		std::vector<string> 	_wordlist;
+		std::vector<User> 		loggedUsers;
 
-		void	registerBot( void );
-		void	handleRead( void );
-		string	getCommand( void );
-		void	parseCommand( string&, std::vector<string>& );
-		void	handleCommand( std::vector<string>& );
-		string	getUserNick( string& token );
-		void	checkOffensiveWords( std::vector<string>& tokens );
-		bool	hasBadWords( string& str );
-
-		std::vector<User> loggedUsers;
-
-
-		void	logtime(std::vector<string>& tokens);
+		void					registerBot( void );
+		void					handleRead( void );
+		string					getCommand( void );
+		void					parseCommand( string&, std::vector<string>& );
+		void					handleCommand( std::vector<string>& );
+		string					getUserNick( string& token );
+		void					checkOffensiveWords( std::vector<string>& tokens );
+		bool					hasBadWords( string& str );
+		void					updateOperators( std::vector<string>& tokens );
+		void					logtime(std::vector<string>& tokens);
 
 	public:
 
-		typedef std::vector<User>::iterator userIter;
 		~ircbot();
 
 		ircbot( string, string, string, string );
@@ -122,7 +122,7 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 			_wordlist.push_back(s);
 		}
 	}
-	_wordlist.push_back("fuck");
+	// _wordlist.push_back("fuck");
 }
 
 struct tm *ircbot::getCurrentTime() 
@@ -336,7 +336,10 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 	{
 		logtime(tokens);
 	}
-	// if (cmd.find())
+	else if (tokens[1] == "MODE" && (tokens[3] == "+o" || tokens[3] == "-o"))
+	{
+		updateOperators(tokens);
+	}
 }
 
 string ircbot::getUserNick(string &token)
@@ -353,13 +356,15 @@ void ircbot::checkOffensiveWords(std::vector<string> &tokens)
 
 	if (hasBadWords(tokens.back()))
 	{
-		for (std::vector<string>::iterator it = _operators.begin(); it < _operators.end(); it++)
-		{
-			/* code */
-			string reply = "PRIVMSG " + *it + " :user " + userNick + " used a bad word\n";
-			if (*it != userNick)
-				write(_botSock, reply.data(), reply.length());
-		}
+		// for (std::vector<string>::iterator it = _operators.begin(); it < _operators.end(); it++)
+		// {
+		// 	/* code */
+		// 	string reply = "PRIVMSG " + *it + " :" + userNick + " used a bad word in channel " + tokens[2] + "\r\n";
+		// 	if (*it != userNick)
+		// 		write(_botSock, reply.data(), reply.length());
+		// }
+		string reply = "PRIVMSG " + tokens[2] + " :Please refrain from using inappropriate language, " + userNick + ".\r\n";
+		write(_botSock, reply.data(), reply.length());
 	}
 }
 
@@ -375,6 +380,23 @@ bool ircbot::hasBadWords(string &str)
 			return (true);
 	}
 	return (false);
+}
+
+void ircbot::updateOperators(std::vector<string> &tokens)
+{
+	opIter it;
+
+	if (tokens[3] == "+o")
+	{
+		_operators.push_back(tokens[4]);
+	}
+	if (tokens[3] == "-o")
+	{
+		if ( (it = std::find(_operators.begin(), _operators.end(), tokens[4])) != _operators.end())
+		{
+			_operators.erase(it);
+		}
+	}
 }
 
 void ircbot::logtime(std::vector<string>& tokens)
@@ -428,7 +450,6 @@ void	ircbot::run()
 			parseCommand(cmd, tokens);
 			// handle command
 			handleCommand(tokens);
-			// cut cmd from buffer
 			tokens.clear();
 		}
 	}
@@ -436,7 +457,6 @@ void	ircbot::run()
 
 ircbot::~ircbot()
 {
-	// close(_ircSock);
 	close(_botSock);
 }
 
