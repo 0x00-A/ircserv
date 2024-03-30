@@ -231,9 +231,9 @@ void	ircbot::registerBot()
 	string				cmd;
 
 	std::stringstream ss;
-    // ss << "PASS " << _passwd << "\r\n";
+    ss << "PASS " << _passwd << "\r\n";
     ss << "NICK " << _nick << "\r\n";
-    // ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
+    ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
     ss << "JOIN " << _channel << "\r\n";
 
 	sendReply(ss.str());
