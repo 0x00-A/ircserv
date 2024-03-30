@@ -67,18 +67,19 @@ class Server
 		string 			getMembers(Channel &ch);
 
 		/***********************[ MODE ]***********************/
-		bool 			parseModes(std::queue<std::pair<string, string> > &modes, Client &cli);
+		bool 			parseModes( std::queue<std::pair<string, string> > &modes, Client &cli );
 
-		void 			handleOperatorFlag(strPair &, string &, string &, channelIter &, Client &);
-		void 			handleLimitFlag(strPair &, string &, string &, channelIter &);
-		void 			handlePasskeyFlag(strPair &, string &, string &, channelIter &);
-		void 			handleInviteFlag(strPair &, string &, channelIter &);
-		void 			handleTopicFlag(strPair &, string &, channelIter &);
-		void 			removeExtraPlusMinus(string &);
+		void 			handleOperatorFlag( strPair &, string &, string &, channelIter &, Client & );
+		void 			handleLimitFlag( strPair &, string &, string &, channelIter & );
+		void 			handlePasskeyFlag( strPair &, string &, string &, channelIter & );
+		void 			handleInviteFlag( strPair &, string &, channelIter & );
+		void 			handleTopicFlag( strPair &, string &, channelIter & );
+		void 			removeExtraPlusMinus( string & );
+		bool			badFormKey( string & );
 
 		/***********************[ SERVER ]***********************/
 		void 			parseargs(void) const;
-		void 			_Operator(std::string nick, std::string chName, Client &cli ,bool _Op);
+		// void 			_Operator(std::string nick, std::string chName, Client &cli ,bool _Op);
 
 	public:
 

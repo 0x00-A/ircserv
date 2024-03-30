@@ -290,11 +290,18 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         }
         char c = _params[2][i];
         if (c == 'o' || c == 'l' || c == 'k' || c == 't' || c == 'i')
-        {
-            if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+")) && !(k < _params.size()))
+        {   
+            if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
+                && (!(k < _params.size()) || _params[k].find_first_not_of(" ") == string::npos))
             {
                 throw ( ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + \
                 client.getNick() + " " + _params[0]  + " :Not enough parametersss" );
+            }
+            if (c == 'k' && sign == "+")
+            {
+                if (badFormKey(_params[k]))
+                    throw (":ft_irc.1337.ma " + itos(ERR_INVALIDKEY) + " " + client.getNick() + " " + _params[1] + \
+                            " :Key is not well-formed");
             }
             if (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
                 modes.push(std::make_pair(sign + _params[2].substr(i, 1), _params[k++]));
@@ -359,6 +366,8 @@ void Server::handlePasskeyFlag(strPair &m, string &modesave, string &paramsave, 
 {
 	if (m.first == "+k")
 	{
+        if (m.second.empty())
+            return;
 		chan->setMode(m.first);
 		chan->setPasskey(m.second);
 		modesave += m.first;
@@ -422,6 +431,13 @@ void Server::removeExtraPlusMinus(string &s)
 	}
 }
 
+bool Server::badFormKey(string &key)
+{
+    if (key.find_first_of(" ") != std::string::npos)
+        return (false);
+    return (true);
+}
+
 void    Server::mode(Client& client)
 {
     std::queue<std::pair<string, string> >      modes;
@@ -463,20 +479,20 @@ void    Server::mode(Client& client)
 		switch (m.first[1])
 		{
 			case ('o'):
-			handleOperatorFlag(m, modesave, paramsave, chan, client);
-			break;
+			    handleOperatorFlag(m, modesave, paramsave, chan, client);
+			    break;
 			case ('l'):
-			handleLimitFlag(m, modesave, paramsave, chan);
-			break;
+			    handleLimitFlag(m, modesave, paramsave, chan);
+			    break;
 			case ('k'):
-			handlePasskeyFlag(m, modesave, paramsave, chan);
-			break;
+			    handlePasskeyFlag(m, modesave, paramsave, chan);
+			    break;
 			case ('i'):
-			handleInviteFlag(m, modesave, chan);
-			break;
+			    handleInviteFlag(m, modesave, chan);
+			    break;
 			case ('t'):
-			handleTopicFlag(m, modesave, chan);
-			break;
+			    handleTopicFlag(m, modesave, chan);
+			    break;
 		}
 		modes.pop();
 	}
