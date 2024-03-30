@@ -23,10 +23,17 @@ void Server::mode(Client& client) {
         return;
     }
 
-    if (_params.size() < 3) {
+    if (_params.size() < 2) {
         reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " MODE :Not enough parameters\r\n");
         return;
     }
+
+    if(_params.size() == 2) {
+        reply(client, ":ft_irc.1337.ma " + itos(RPL_CHANNELMODEIS) + " " + client.getNick() +  " " + channelName + chanit->channelModeIs());
+        return;
+        
+    }
+    
 
     std::string channelName = _params[1];
     channelIter chanit = doesChannelExist(channelName);
