@@ -58,7 +58,7 @@ class Server
 		int 			handleWrite(int id);
 		string 			getCommand(int id);
 		void 			disconnectClient(int id);
-		void 			cleanUnusedClients(void);
+		void 			cleanDisconnectdClients(void);
 		void 			closeAllOpenSockets(void);
 		int 			getIndexOfClient(const clientIter &currIter);
 		int 			getIndexOfClient(const Client &cli);

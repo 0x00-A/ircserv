@@ -83,7 +83,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 					return ;
 				}
 			}
-			if (_channels[i].hasUserLimit())
+			if (_channels[i].hasUserLimit() && !client.isInvitedToChannel(channel.first))
 			{
 				if (_channels[i].getUserLimit() <= _channels[i].getSize())
 				{

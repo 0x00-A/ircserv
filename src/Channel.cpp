@@ -1,5 +1,8 @@
 #include "Channel.hpp"
 
+Channel::Channel()
+{}
+
 Channel::Channel(const string &channelName, const string &admin)
 {
     _admin = admin;
@@ -71,12 +74,22 @@ bool Channel::partUser(const string& user)
 void Channel::swapUser(const string &oldUser, const string &newUser)
 {
     std::set<string>::iterator itUser = _users.begin();
+
     for ( ; itUser != _users.end(); itUser++)
     {
-        cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-        cout << "olduser: " << oldUser << endl;
-        cout << "newuser: " << *itUser << endl;
-        if (*itUser == oldUser)
+        string  oldAdmin = ("@" + oldUser);
+        string  newAdmin = ("@" + newUser);
+
+        cout << "::::::::::::::::::::::::::" << endl;
+        cout << "user: " << *itUser << endl;
+        cout << "::::::::::::::::::::::::::" << endl;
+        if (*itUser ==  oldAdmin)
+        {
+            _users.erase(oldAdmin);
+            _users.insert(newAdmin);
+            break;
+        }
+        else if (*itUser == oldUser)
         {
             _users.erase(oldUser);
             _users.insert(newUser);
@@ -198,6 +211,11 @@ void Channel::printUsers()
         cout << *it << " ";
     }
     cout << endl;
+}
+
+void Channel::setUsers(std::set<string> &users)
+{
+    _users = users;
 }
 
 bool Channel::setChannelOperator(const string &user)

@@ -39,6 +39,7 @@ class Channel
 		// iterator here 
 		typedef	std::set<string>::iterator setIter;
 
+		Channel();
 		Channel(const string& channelName, const string& admin);
 		
 		~Channel();
@@ -97,6 +98,7 @@ class Channel
 
 
 		void				printUsers( void );
+		void				setUsers(std::set<string>& users);
 
 		//////////////////////////////////
 		void kickUser(const std::string& userToKick);

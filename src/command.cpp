@@ -33,14 +33,13 @@ void Server::nick(Client &client)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
     }
-    // ERROR container overflow _params[1] is not a valid addr test cmd: nick
-    if (checkAlreadyNick(this->_params[1]) == false)
-    {
-        throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
-    }
     if (this->_params.size() < 2)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given");
+    }
+    if (checkAlreadyNick(this->_params[1]) == false)
+    {
+        throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (this->_params[1].size() >= 16)
     {
@@ -101,12 +100,12 @@ void Server::quit(Client &client)
     response = client.identifier() + " QUIT :Client Quit";
     broadcastToJoinedChannels(client, response);
     response += "\r\nERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)\r\n";
-    // write(client.getSockfd(), response.c_str(), response.length());
-    reply(client, response);
+    write(client.getSockfd(), response.c_str(), response.length());
+    // reply(client, response);
     // response = "ERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)\r\n";
     // write(client.getSockfd(), response.c_str(), response.length());
-    // _pollfds[getIndexOfClient(client) + 1].fd = -1;
-    _disconnectedClients.push_back(client.fd);
+    _pollfds[getIndexOfClient(client) + 1].fd = -1;
+    // _disconnectedClients.push_back(client.getSockfd());
 }
 
 void Server::join(Client &client)

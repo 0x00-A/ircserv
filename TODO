@@ -55,3 +55,7 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 [ ] handle SIGPIPE
 [x] fix time mode
 [ ] :lalala!~x@197.230.30.146 QUIT :EOF from client (when a user disconnect broadcast to channels)
+
+
+
+mode key remove space

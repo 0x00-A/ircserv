@@ -326,7 +326,7 @@ void	Server::run()
 				}
 			}
 		}
-		cleanUnusedClients();
+		cleanDisconnectdClients();
 	}
 	closeAllOpenSockets();
 }
@@ -358,7 +358,7 @@ string Server::getHostname(void) const
 	return (_hostname);
 }
 
-void Server::cleanUnusedClients()
+void Server::cleanDisconnectdClients()
 {
 	for (size_t i = 0; i < _pollfds.size(); i++)
 	{
@@ -417,6 +417,9 @@ int Server::getIndexOfClient(const clientIter& currIter)
 void Server::broadcastToJoinedChannels(Client& client, string &msg)
 {
     std::set<string>    joinedChans;
+    // std::set<string>	allreadysend;
+	std::set<string>	tempUsers;
+	Channel				tmpChannel;
 
     joinedChans = client.getChannels();
 
@@ -426,9 +429,36 @@ void Server::broadcastToJoinedChannels(Client& client, string &msg)
         channelIter itCha = doesChannelExist(*it);
         if (itCha != _channels.end())
         {
-            this->broadcastMsg(client, msg, *itCha);
+			std::set<string> users = itCha->getUserList();
+			for (std::set<string>::iterator it = users.begin(); it != users.end(); it++)
+			{
+				 tempUsers.insert(*it);
+			}
         }
     }
+	tmpChannel.setUsers(tempUsers);
+	this->broadcastMsg(client, msg, tmpChannel);
+    // for ( ; it != joinedChans.end(); it++)
+    // {
+    //     channelIter itCha = doesChannelExist(*it);
+    //     if (itCha != _channels.end())
+    //     {
+    //         std::set<string> users;
+    //         users = itCha->getUserList();
+    //         std::set<string>::iterator itUser = users.begin();
+    //         for ( ; itUser != users.end(); itUser++)
+    //         {   
+    //             clientIter itClient = doesUserExit(*itUser);
+    //             if (itClient != _clients.end())
+    //             {
+    //                 if (allreadysend.count(itClient->getNick()) > 0)
+	// 					continue ;
+    //                 allreadysend.insert(itClient->getNick());
+    //                 reply(*itClient, msg);
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 void Server::printClients(void)
