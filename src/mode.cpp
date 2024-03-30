@@ -23,17 +23,24 @@
 //         return;
 //     }
 
-//     if (_params.size() < 3) {
-//         reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " MODE :Not enough parameters\r\n");
-//         return;
-//     }
+    // if (_params.size() < 2) {
+    //     reply(client, ":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " MODE :Not enough parameters\r\n");
+    //     return;
+    // }
 
-//     std::string channelName = _params[1];
-//     channelIter chanit = doesChannelExist(channelName);
-//     if (chanit == _channels.end()) {
-//         reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel\r\n");
-//         return;
-//     }
+    // if(_params.size() == 2) {
+    //     reply(client, ":ft_irc.1337.ma " + itos(RPL_CHANNELMODEIS) + " " + client.getNick() +  " " + channelName + chanit->channelModeIs());
+    //     return;
+        
+    // }
+    
+
+    // std::string channelName = _params[1];
+    // channelIter chanit = doesChannelExist(channelName);
+    // if (chanit == _channels.end()) {
+    //     reply(client, ":ft_irc.1337.ma " + itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel\r\n");
+    //     return;
+    // }
 
 //     if (!chanit->isUserInChannel(client.getNick())) {
 //         reply(client, ":ft_irc.1337.ma " + itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel\r\n");
