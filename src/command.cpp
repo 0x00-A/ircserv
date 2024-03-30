@@ -366,8 +366,6 @@ void Server::handlePasskeyFlag(strPair &m, string &modesave, string &paramsave, 
 {
 	if (m.first == "+k")
 	{
-        if (m.second.empty())
-            return;
 		chan->setMode(m.first);
 		chan->setPasskey(m.second);
 		modesave += m.first;

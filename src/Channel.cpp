@@ -258,7 +258,15 @@ void Channel::setTopic(const string &topic)
 
 void Channel::setPasskey(const string &key)
 {
-    _passkey = key;
+    stringstream    ss;
+    string          word, res;
+
+    ss << key;
+    while (ss >> word)
+    {
+        res += word;
+    }
+    _passkey = res;
     _hasPasskey = true;
 }
 
