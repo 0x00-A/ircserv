@@ -45,6 +45,7 @@ void Server::changeNick(Client & client)
 {
     string              response;
     std::set<string>    channelsJ;
+    std::set<string> allreadysend;
 
     response = client.identifier() + " NICK :" + this->_params[1];
     channelsJ = client.getChannels();
@@ -65,11 +66,12 @@ void Server::changeNick(Client & client)
                 users = itCha->getUserList();
                 std::set<string>::iterator itUser = users.begin();
                 for ( ; itUser != users.end(); itUser++)
-                {
+                {   
                     clientIter itClient = doesUserExit(*itUser);
-
                     if (itClient != _clients.end())
                     {
+                        if (allreadysend.count(itClient->getNick()) > 0) continue ;
+                        allreadysend.insert(itClient->getNick());
                         reply(*itClient, response);
                     }
                 }
