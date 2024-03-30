@@ -87,7 +87,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getUserLimit() <= _channels[i].getSize())
 				{
-					response =  (":ft_irc.1337.ma "  + itos(ERR_CHANNELISFULL) + _channels[i].getName() + " :Cannot join channel (+l)");
+					response =  (":ft_irc.1337.ma "  + itos(ERR_CHANNELISFULL) + " " + _channels[i].getName() + " :Cannot join channel (+l)");
 					reply(client, response);
 					return ;
 				}

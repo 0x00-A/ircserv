@@ -111,7 +111,7 @@ int Server::handleNewConnection()
 	cout << "client connected - fd: " << connfd << " client host: " << ip << endl;
 
 	// for testing	/********* DELETE **********/
-	_clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + std::to_string(connfd) + "\n";
+	// _clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + std::to_string(connfd) + "\n";
 	// _pollfds.back().events |= POLLOUT;
 	return (0);
 }

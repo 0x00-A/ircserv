@@ -103,7 +103,7 @@ class Server
 		void 			handleCommand(string &cmd, int id);
 		void 			parseCommand(string &cmd);
 		void 			to_upper(string& str);
-		string 			trim_comma(const string &str);
+		string 			trim_comma(const string &str, int flg);
 		void 			initPrivmsg(Client &client);
 		void 			initJoin(Client &client);
 

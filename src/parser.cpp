@@ -73,7 +73,7 @@ void Server::handleCommand(string& cmd, int id)
     }
 }
 
-string Server::trim_comma(const string &str)
+string Server::trim_comma(const string &str, int flg)
 {
     string result;
     bool prev_is_comma = false;
@@ -95,10 +95,13 @@ string Server::trim_comma(const string &str)
             prev_is_comma = false;
         }
     }
-    if (result[0] == ',')
+    if (flg)
+    {
+        if (result[0] == ',')
         result.erase(0, 1);
-    if (result[result.size() - 1] == ',')
+        if (result[result.size() - 1] == ',')
         result.erase(result.size() - 1, 1);
+    }
     return result;
 }
 
@@ -116,7 +119,7 @@ void Server::initPrivmsg(Client &client)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NOTEXTTOSEND) + " " + client.getNick()  + " ::No text to send");
     }
-    string clients = trim_comma(_params[1]);
+    string clients = trim_comma(_params[1], 1);
     stringstream ss(clients);
     string token;
     while (std::getline(ss, token, ','))
@@ -141,19 +144,24 @@ void Server::initJoin(Client &client)
         throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + \
                 " JOIN" + " :Not enough parameters");
     }
-    line = trim_comma(_params[1]);
+    line = trim_comma(_params[1], 1);
     stringstream ss(line);
     if (_params.size() > 2)
     {
         keys = true;
-        line = trim_comma(_params[2]);
+        line = trim_comma(_params[2], 0);
+        cout << "linekey: " << line << endl;
         ssk << line;
     }
     while (std::getline(ss, chan, ','))
     {
         key = "";
         if (keys)
+        {
             std::getline(ssk, key, ',');
+            cout << " >> key " << key << endl;
+
+        }
         if (seenChannels.count(chan) > 0) 
         {
             response = ":ft_irc.1337.ma " + itos(ERR_TOOMANYTARGETS) + " " +  client.getNick() + \

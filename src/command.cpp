@@ -37,10 +37,6 @@ void Server::nick(Client &client)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given");
     }
-    if (checkAlreadyNick(this->_params[1]) == false)
-    {
-        throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
-    }
     if (this->_params[1].size() >= 16)
     {
         this->_params[1].erase(15);
@@ -48,6 +44,10 @@ void Server::nick(Client &client)
     if (client.checkNick(this->_params[1]) == false)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_ERRONEUSNICKNAME) + " " + client.getNick()  + " :Erroneus nickname");
+    }
+    if (checkAlreadyNick(this->_params[1]) == false)
+    {
+        throw (":ft_irc.1337.ma " + itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (client.getHasUsedNick() == true && !client.isConnected())
     {
