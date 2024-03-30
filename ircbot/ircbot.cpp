@@ -358,7 +358,7 @@ void ircbot::checkOffensiveWords(std::vector<string> &tokens)
 	userNick = getUserNick(tokens[0]);
 	if (hasBadWords(tokens.back()))
 	{
-		sendReply("PRIVMSG " + _channel + " :Please refrain from using inappropriate language, " + userNick + ".\n");
+		sendReply("PRIVMSG " + userNick + " :Please refrain from using inappropriate language.\n");
 		addBadUser(userNick);
 	}
 }
@@ -462,7 +462,7 @@ void ircbot::removeUser(const string &user)
 		if (it->_nick == user)
 		{
 			_loggedUsers.erase(it);
-			return;
+			break;
 		}
 	}
 	for (strVecIter it = _operators.begin(); it < _operators.end(); it++)
@@ -470,7 +470,7 @@ void ircbot::removeUser(const string &user)
 		if (*it == user)
 		{
 			_operators.erase(it);
-			return;
+			break;
 		}
 	}
 	for (strVecIter it = _badUsers.begin(); it < _badUsers.end(); it++)
@@ -478,7 +478,7 @@ void ircbot::removeUser(const string &user)
 		if (*it == user)
 		{
 			_badUsers.erase(it);
-			return;
+			break;
 		}
 	}
 	std::cout << "BOT INFO: removed user `" << user << "`" << std::endl;
@@ -492,7 +492,7 @@ void ircbot::updateUserNick(const string &old_nick, const string &new_nick)
 		{
 			*it = new_nick;
 			std::cout << "user `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
-			return;
+			break;
 		}
 	}
 	for (strVecIter it = _operators.begin(); it < _operators.end(); it++)
@@ -501,7 +501,7 @@ void ircbot::updateUserNick(const string &old_nick, const string &new_nick)
 		{
 			*it = new_nick;
 			std::cout << "operator `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
-			return;
+			break;
 		}
 	}
 	for (strVecIter it = _badUsers.begin(); it < _badUsers.end(); it++)
@@ -510,7 +510,7 @@ void ircbot::updateUserNick(const string &old_nick, const string &new_nick)
 		{
 			*it = new_nick;
 			std::cout << "blacklist nick  `" << old_nick << "` changed to `" << new_nick << "`" << std::endl;
-			return;
+			break;
 		}
 	}
 	std::cout << "BOT INFO: user `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;

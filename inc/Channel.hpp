@@ -91,6 +91,7 @@ class Channel
 		void				setHasUserLimit( bool stat );
 		void				setHasInvite( bool stat );
 		void				setHasTopic( bool stat );
+		void				setUsers(std::set<string>& users);
 
 
 		
@@ -98,7 +99,6 @@ class Channel
 
 
 		void				printUsers( void );
-		void				setUsers(std::set<string>& users);
 
 		//////////////////////////////////
 		void kickUser(const std::string& userToKick);

@@ -1,7 +1,8 @@
 #include "Channel.hpp"
 
 Channel::Channel()
-{}
+{
+}
 
 Channel::Channel(const string &channelName, const string &admin)
 {
@@ -42,11 +43,6 @@ bool Channel::isUserInChannel(const string &user) const
 
 bool Channel::isUserOperator(const string &user) const
 {
-    // if (!isUserInChannel(user))
-    //     return (false);
-    // if (_operators.find(user) != _operators.end())
-    //     return (true);
-    // return (false);
     return (_users.find("@" + user) != _users.end());
 }
 
