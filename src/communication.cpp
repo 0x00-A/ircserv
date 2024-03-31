@@ -31,12 +31,14 @@ void Server::welcomeClient(Client &client)
 {
 	string	response;
 
-	response  = _servname + " " + itos(RPL_WELCOME) + " " + client.getNick() +  " :Welcome to the " + _servname + " Network, " + \
-				client.getNick() + "!" + client.getUsername() + "@" + client.getIPAddr();
+	response  = _servname + " " + itos(RPL_WELCOME) + " " + client.getNick() +  \
+    " :Welcome to the " + _servname + " Network, " + client.identifier();
 	reply(client, response);
-	response = _servname + " " + itos(RPL_YOURHOST) + " " + client.getNick() + " :Your host is " + _servname + ", running version " + "version: 01";
+	response = _servname + " " + itos(RPL_YOURHOST) + " " + client.getNick() + \
+    " :Your host is " + _servname + ", running version " + "version: 01";
 	reply(client, response);
-	response = _servname + " " + itos(RPL_CREATED) + " " + client.getNick() + " :This server was created " + getStartTime();
+	response = _servname + " " + itos(RPL_CREATED) + " " + client.getNick() + \
+    " :This server was created " + getStartTime();
 	reply(client, response);
 }
 
@@ -48,7 +50,6 @@ void Server::changeNick(Client & client)
 
     response = client.identifier() + " NICK :" + this->_params[1];
     channelsJ = client.getChannels();
-
     if (channelsJ.empty())
     {
         reply(client, response);
@@ -69,7 +70,8 @@ void Server::changeNick(Client & client)
                     clientIter itClient = doesUserExit(*itUser);
                     if (itClient != _clients.end())
                     {
-                        if (allreadysend.count(itClient->getNick()) > 0) continue ;
+                        if (allreadysend.count(itClient->getNick()) > 0)
+                            continue ;
                         allreadysend.insert(itClient->getNick());
                         reply(*itClient, response);
                     }

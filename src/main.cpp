@@ -1,8 +1,14 @@
 #include "Socket.hpp"
 #include "Server.hpp"
 
+void	sighandler(int sig)
+{
+	cout << sig << " SIGPIPE recieved\n";
+}
+
 int	main(int ac, char** av)
 {
+	signal(SIGPIPE, sighandler);
 	if (ac == 3)
 	{
 		try

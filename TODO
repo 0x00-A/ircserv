@@ -64,3 +64,12 @@ invite someone without operator priv
 
 send(_botSock, msg, len, MSG_NOSIGNAL);
 
++ what is unbound socket and what happens when we call bind()
+- what is diff bitween write/send read/recv
++ complete server
+
+
++    check in poll         
+			if (errno == EINTR) // (interrupted system call)
+        		continue;
+

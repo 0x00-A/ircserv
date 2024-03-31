@@ -46,7 +46,7 @@ Server::Server(const string& port, const string& passwd)
     // this->commandMap["I"] = &Server::invite;
     // this->commandMap["T"] = &Server::topic;
 
-	signal(SIGPIPE, SIG_IGN);
+	// signal(SIGPIPE, SIG_IGN);
 }
 
 Server::~Server()
@@ -109,13 +109,9 @@ void Server::disconnectClient(int id)
 
 	clientIter			cli_it;
 	pollfdIter			poll_it;
+
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
-
-	// string              response;
-
-    // response = cli_it->identifier() + " QUIT :Client Quit";
-    // broadcastToJoinedChannels(*cli_it, response);
 	exitUserFromChannels(cli_it);
 	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
 	cli_it->closeSocket();
