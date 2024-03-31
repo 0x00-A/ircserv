@@ -36,11 +36,8 @@ void  Server::parseCommand(string &command)
 
     if ( (pos = command.find(" :")) != string::npos)
     {
-        cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
         tmp = command.substr(pos + 2);
-        cout <<  "tmp>>>[1] |" << tmp  << "|" << endl;
         command = command.substr(0, pos);
-        cout <<  "tmp>>>[0] " << command << endl;
     }
     ss << command;
     while (ss >> token)
@@ -53,12 +50,15 @@ void  Server::parseCommand(string &command)
 
 void Server::handleCommand(string& cmd, int id)
 {
+    size_t pos;
     this->_messagClient.clear();
     this->_sendMsgClient.clear();
     this->_params.clear();
     _keys.clear();
     _parsChannels.clear();
 
+    if ((pos = cmd.find("\n")) != string::npos)
+        cmd.erase(pos);
     parseCommand(cmd);
     if (this->_params.empty()) return;
     to_upper(this->_params[0]);

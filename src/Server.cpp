@@ -216,16 +216,16 @@ string Server::getCommand(int id)
 {
 	string& rdBuf = _clients[id].rdBuf();
 	size_t	pos;
-	string	cmd;
+	string	cmd = "";
 
-	cmd = rdBuf;
 	if (!rdBuf.empty() && ((pos = rdBuf.find("\n")) != string::npos))
 	{
+		cmd = rdBuf.substr(0, pos);
 		if ( cmd[pos - 1] == '\r')
 		{
-			cmd.erase(pos - 1);
+			cmd[pos - 1] = '\n';
 		}
-		cout << "cmd:: " << cmd << endl;
+		cout << "cmd: " << cmd << endl;
 		rdBuf = rdBuf.substr(pos + 1);
 	}
 	return (cmd);
