@@ -7,7 +7,8 @@ void Server::checkSpamClient(Client& client)
     {
         if (it->getNick() == client.getNick() && it->isConnected() == false)
         {
-            string response = "ERROR :Closing Link: " +  it->getNick() +  " by ft_irc.1337.ma (Overridden by other sign on)\r\n";
+            string response = "ERROR :Closing Link: " +  it->getNick() +  " by " + _servname + \
+                                " (Overridden by other sign on)\r\n";
             send(it->getSockfd(), response.c_str(), response.length(), 0);
             it->closeSocket();
             _pollfds[getIndexOfClient(it) + 1].fd = -1;
@@ -63,12 +64,13 @@ void Server::handleCommand(string& cmd, int id)
     cmdmapIter it = this->commandMap.find(this->_params[0]);
     if (it != this->commandMap.end())
     {
+        cout << "cmd: " << cmd << endl;
         (this->*it->second)(_clients[id]);
     }
     else if (_clients[id].isConnected())
     {
 
-        throw ( ":ft_irc.1337.ma " + itos(ERR_UNKNOWNCOMMAND) + " " + \
+        throw ( _servname + " " + itos(ERR_UNKNOWNCOMMAND) + " " + \
         _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }
 }
@@ -109,15 +111,15 @@ void Server::initPrivmsg(Client &client)
 {
     if (!client.isConnected())
     {
-        throw (":ft_irc.1337.ma " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
+        throw (_servname + " " + itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        throw (":ft_irc.1337.ma " + itos(ERR_NORECIPIENT) + " " + client.getNick()  + " :No recipient given (" + _params[0] + ")");
+        throw (_servname + " " + itos(ERR_NORECIPIENT) + " " + client.getNick()  + " :No recipient given (" + _params[0] + ")");
     }
     if (_params.size() < 3)
     {
-        throw (":ft_irc.1337.ma " + itos(ERR_NOTEXTTOSEND) + " " + client.getNick()  + " ::No text to send");
+        throw (_servname + " " + itos(ERR_NOTEXTTOSEND) + " " + client.getNick()  + " ::No text to send");
     }
     string clients = trim_comma(_params[1], 1);
     stringstream ss(clients);
@@ -141,7 +143,7 @@ void Server::initJoin(Client &client)
 
     if (_params.size() < 2)
     {
-        throw (":ft_irc.1337.ma " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + \
+        throw (_servname + " " + itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + \
                 " JOIN" + " :Not enough parameters");
     }
     line = trim_comma(_params[1], 1);
@@ -164,7 +166,7 @@ void Server::initJoin(Client &client)
         }
         if (seenChannels.count(chan) > 0) 
         {
-            response = ":ft_irc.1337.ma " + itos(ERR_TOOMANYTARGETS) + " " +  client.getNick() + \
+            response = _servname + " " + itos(ERR_TOOMANYTARGETS) + " " +  client.getNick() + \
                     " :Duplicate recipients";
             reply(client, response);
             continue ;

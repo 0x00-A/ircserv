@@ -14,6 +14,10 @@
 # include <fstream>
 # include <iomanip>
 # include "numReplies.hpp"
+# include <algorithm>
+# include <ctime>
+# include <sys/types.h>
+# include <strings.h>
 
 # define BUF_SIZE 1024
 

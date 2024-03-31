@@ -46,16 +46,21 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 <<<< for rachid >>>>
 [ ] :lalala!~s@197.230.30.146 QUIT :Quit: comment (handle quit comment sent in broadcast to channels)
-
+[ ] command paramitres (maximum of fifteen (15))
+[ ] remove reply prefix
 
 
 
 ###############################
 [ ] close fds CTRL-c
-[ ] handle SIGPIPE
+[v] handle SIGPIPE < handled in unix check macos >
 [x] fix time mode
 [ ] :lalala!~x@197.230.30.146 QUIT :EOF from client (when a user disconnect broadcast to channels)
+[ ] server::_hostname (remove unused var)
 
 
+invite someone without operator priv
 
-mode key remove space
+
+send(_botSock, msg, len, MSG_NOSIGNAL);
+

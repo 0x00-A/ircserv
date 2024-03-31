@@ -24,6 +24,11 @@ Channel::Channel(const string &channelName, const string &admin)
 
 Channel::~Channel() {}
 
+// bool Channel::operator==(const Channel &rhs) const
+// {
+// 	return (this->getName() == rhs.getName());
+// }
+
 bool Channel::joinUser(const string& user)
 {
     // if modes has "+l" >> if _users.size() + 1 > _userLimit > don't add

@@ -16,8 +16,11 @@
 # include <string>
 # include <string.h>
 # include <cstdlib>
-#include <cctype>
+# include <cctype>
 # include <cerrno>
+# include <signal.h>
+# include <algorithm>
+
 
 using std::string;
 using std::cout;
@@ -27,7 +30,8 @@ using std::endl;
 using std::stringstream;
 
 
-std::string itos(int num);
-struct tm *getCurrentTime();
+std::string		itos(int num);
+struct tm		*getCurrentTime();
+bool			isdigitstring(const string& str);
 
 #endif //IRCSERV_HPP

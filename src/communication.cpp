@@ -2,8 +2,7 @@
 
 void Server::reply(Client &client, string const& msg)
 {
-    string resp = msg + "\r\n";
-    client.sdBuf().push(resp);
+    client.sdBuf().push(msg + "\r\n");
     _pollfds[getIndexOfClient(client) + 1].events |= POLLOUT;
 }
 
@@ -11,7 +10,7 @@ void Server::broadcastMsg(Client &sender, const string &msg, const Channel &chan
 {
 	if (chan.isUserInChannel(sender.getNick()) == false)
 	{
-            reply(sender, ":ft_irc.1337.ma " + itos(ERR_CANNOTSENDTOCHAN) + " " + \
+            reply(sender, _servname + " " + itos(ERR_CANNOTSENDTOCHAN) + " " + \
 				sender.getNick() + " " + chan.getName() + " :Cannot send to channel");
 	}
 	else
@@ -32,12 +31,12 @@ void Server::welcomeClient(Client &client)
 {
 	string	response;
 
-	response  = ":ft_irc.1337.ma " + itos(RPL_WELCOME) + " " + client.getNick() +  " :Welcome to the " + "ft_irc.1337.ma" + " Network, " + \
+	response  = _servname + " " + itos(RPL_WELCOME) + " " + client.getNick() +  " :Welcome to the " + _servname + " Network, " + \
 				client.getNick() + "!" + client.getUsername() + "@" + client.getIPAddr();
 	reply(client, response);
-	response = ":ft_irc.1337.ma " + itos(RPL_YOURHOST) + " " + client.getNick() + " :Your host is " + "ft_irc.1337.ma" + ", running version " + "version: 01";
+	response = _servname + " " + itos(RPL_YOURHOST) + " " + client.getNick() + " :Your host is " + _servname + ", running version " + "version: 01";
 	reply(client, response);
-	response = ":ft_irc.1337.ma " + itos(RPL_CREATED) + " " + client.getNick() + " :This server was created " + getStartTime();
+	response = _servname + " " + itos(RPL_CREATED) + " " + client.getNick() + " :This server was created " + getStartTime();
 	reply(client, response);
 }
 

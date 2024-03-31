@@ -73,7 +73,7 @@ void Client::setHasUsedUser(bool value)
     this->_hasUsedUser = value;
 }
 
-void Client::inviteToChannel(string &channelName)
+void Client::inviteToChannel(const string& channelName)
 {
     if (!isInvitedToChannel(channelName))
     {
@@ -81,21 +81,31 @@ void Client::inviteToChannel(string &channelName)
     }
 }
 
-void Client::uninviteFromChannel(string &channelName)
+void Client::uninviteFromChannel(const string& channelName)
 {
     if (isInvitedToChannel(channelName))
     {
+        // for (std::vector<string>::iterator it = _invitedChannels.begin(); it != _invitedChannels.end(); it++)
+        // {
+        //     if (*it == channelName)
+        //         _invitedChannels.erase(it);
+        // }
         _invitedChannels.erase(std::find(_invitedChannels.begin(), _invitedChannels.end(), channelName));
     }
 }
 
-bool Client::isInvitedToChannel(string &channelName) const
+bool Client::isInvitedToChannel(const string& channelName) const
 {
     std::vector<string>::const_iterator it = std::find(_invitedChannels.begin(), _invitedChannels.end(), channelName);
     if (it != _invitedChannels.end())
     {
         return true;
     }
+    // for (std::vector<string>::const_iterator it = _invitedChannels.begin(); it != _invitedChannels.end(); it++)
+    // {
+    //     if (*it == channelName)
+    //         return (true);
+    // }
     return false;
 }
 

@@ -43,6 +43,7 @@ class Server
 		std::vector<std::pair<string, string> > 	_parsChannels;
 		std::vector<string> 						_keys;
 		string 										_messagClient;
+		string										_servname;
 
 		std::vector<int>							_disconnectedClients;
 
@@ -79,7 +80,6 @@ class Server
 
 		/***********************[ SERVER ]***********************/
 		void 			parseargs(void) const;
-		// void 			_Operator(std::string nick, std::string chName, Client &cli ,bool _Op);
 
 	public:
 
@@ -93,10 +93,6 @@ class Server
 		string			getHostname( void ) const;
 
 		void 			welcomeClient(Client &client);
-		
-		// functions for debuging
-		void 			printClients(void);
-		void 			printpollfds(void);
 
 		// ============================================================ //
 		// parser functions
@@ -135,8 +131,6 @@ class Server
 		void 			joinChannel(Client &client, std::pair<string, string> channel);
 		void 			channelWelcomeMessages(Client &client, Channel &channel);
 		void 			joinedAChannel(Client &client, Channel &channel);
-		// bool channelSendMsg(Client& client, string& ch); 
-		// bool nickSendMsg(Client& client, string& nick);
 		
 		channelIter 	doesChannelExist(const string &chan);
 		clientIter 		doesUserExit(const string nick);

@@ -9,6 +9,7 @@ Server::Server(const string& port, const string& passwd)
 {
 	parseargs();
 	// socket part
+	_servname = ":ft_irc.1337.ma";
 	_socket.bindSocket(_port);
 	_socket.listenSocket();
 	_socket.setSocketNonBlocking();
@@ -34,30 +35,25 @@ Server::Server(const string& port, const string& passwd)
 
 
 	// temp
-	this->commandMap["P"] = &Server::pass;
-    this->commandMap["U"] = &Server::user;
-    this->commandMap["N"] = &Server::nick;
-    this->commandMap["Q"] = &Server::quit;
-    this->commandMap["J"] = &Server::join;
-    this->commandMap["PM"] = &Server::privmsg;
-    this->commandMap["M"] = &Server::mode;
-    this->commandMap["K"] = &Server::kick;
-    this->commandMap["I"] = &Server::invite;
-    this->commandMap["T"] = &Server::topic;
+	// this->commandMap["P"] = &Server::pass;
+    // this->commandMap["U"] = &Server::user;
+    // this->commandMap["N"] = &Server::nick;
+    // this->commandMap["Q"] = &Server::quit;
+    // this->commandMap["J"] = &Server::join;
+    // this->commandMap["PM"] = &Server::privmsg;
+    // this->commandMap["M"] = &Server::mode;
+    // this->commandMap["K"] = &Server::kick;
+    // this->commandMap["I"] = &Server::invite;
+    // this->commandMap["T"] = &Server::topic;
 
-	// signal(SIGPIPE, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 }
 
 Server::~Server()
 {
 }
 
-string itos(int num)
-{
-    std::ostringstream oss;
-    oss << std::setw(3) << std::setfill('0') << num;
-    return oss.str();
-}
+
 
 void Server::to_upper(string& str) 
 {
@@ -65,15 +61,6 @@ void Server::to_upper(string& str)
 	{
         str[i] = static_cast<char>(std::toupper(str[i]));
 	}
-}
-
-struct tm *getCurrentTime() 
-{
-    time_t rawtime;
-    struct tm *timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    return timeinfo;
 }
 
 int Server::handleNewConnection()
@@ -111,7 +98,8 @@ int Server::handleNewConnection()
 	cout << "client connected - fd: " << connfd << " client host: " << ip << endl;
 
 	// for testing	/********* DELETE **********/
-	_clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + std::to_string(connfd) + "\n";
+	stringstream ss; ss << connfd;
+	// _clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + ss.str() + "\n";
 	// _pollfds.back().events |= POLLOUT;
 	return (0);
 }
@@ -137,7 +125,7 @@ void Server::disconnectClient(int id)
 
 int Server::handleRead(int id)
 {
-	char		readbuf[513];
+	char		readbuf[RD_BUF_SIZE + 1];
 	ssize_t		bytesread;
 
 	do
@@ -152,28 +140,29 @@ int Server::handleRead(int id)
 			}
 			return (0);
 		}
-		if (bytesread == 0)
+		if (bytesread == 0) // is this neccessary? or add it in previous check
 		{
 			return (-1);
 		}
 		// append to client read buffer
 		readbuf[bytesread] = '\0';
 		_clients[id].rdBuf() += string(readbuf);
-		// cout << "fd " << _clients[id].getSockfd() << " rdbuf: " << _clients[id].rdBuf() << endl;
-	} while (true);
+		if (_clients[id].rdBuf().length() > RD_BUF_SIZE)
+		{
+			// :tngnet.nl.quakenet.org 417 * :Input line was too long
+			cout << "Line too long\n\n";
+			_clients[id].rdBuf().clear();
+			reply (_clients[id], string(ERR_INPUTTOOLONG) + " " + _clients[id].getNick() + " :Input line was too long");
+			return (0);
+		}
+	} while (_clients[id].rdBuf().find("\n") == string::npos);
+	return (0);
 }
 
 int	Server::handleWrite(int id)
 {
 	ssize_t sent_data;
 	std::queue<string>& buffer = _clients[id].sdBuf();
-
-	// just for debuging
-	if (buffer.empty())
-	{
-		cout << "send Buffer empty returning - fd: " << _clients[id].getSockfd() << endl;
-		return (0);
-	}
 
 	while (!buffer.empty())
 	{
@@ -186,7 +175,7 @@ int	Server::handleWrite(int id)
 			/*  you attempt to write() to it when the send buffer is full, write()  */
 			/*  will fail and return -1, and errno will be set to EWOULDBLOCK       */
 			/************************************************************************/
-			if (errno == SIGPIPE)
+			if (errno == EPIPE)
 			{
 				std::cout << "SIGPIPE ><<><<<" << std::endl;
 			}
@@ -225,7 +214,7 @@ string Server::getCommand(int id)
 		{
 			cmd[pos - 1] = '\n';
 		}
-		cout << "cmd: " << cmd << endl;
+		// cout << "cmd: " << cmd << endl;
 		rdBuf = rdBuf.substr(pos + 1);
 	}
 	return (cmd);
@@ -387,7 +376,6 @@ int Server::getIndexOfClient(const Client &cli)
 
 Server::clientIter Server::getClientIterator(const Client &cli)
 {
-    // return (std::find(_clients.begin(), _clients.end(), cli));
 	for (clientIter it = _clients.begin(); it < _clients.end(); it++)
 	{
 		if (it->getSockfd() == cli.getSockfd())
@@ -417,12 +405,10 @@ int Server::getIndexOfClient(const clientIter& currIter)
 void Server::broadcastToJoinedChannels(Client& client, string &msg)
 {
     std::set<string>    joinedChans;
-    // std::set<string>	allreadysend;
 	std::set<string>	tempUsers;
 	Channel				tmpChannel;
 
     joinedChans = client.getChannels();
-
     std::set<string>::iterator it = joinedChans.begin();
     for ( ; it != joinedChans.end(); it++)
     {
@@ -438,74 +424,4 @@ void Server::broadcastToJoinedChannels(Client& client, string &msg)
     }
 	tmpChannel.setUsers(tempUsers);
 	this->broadcastMsg(client, msg, tmpChannel);
-    // for ( ; it != joinedChans.end(); it++)
-    // {
-    //     channelIter itCha = doesChannelExist(*it);
-    //     if (itCha != _channels.end())
-    //     {
-    //         std::set<string> users;
-    //         users = itCha->getUserList();
-    //         std::set<string>::iterator itUser = users.begin();
-    //         for ( ; itUser != users.end(); itUser++)
-    //         {   
-    //             clientIter itClient = doesUserExit(*itUser);
-    //             if (itClient != _clients.end())
-    //             {
-    //                 if (allreadysend.count(itClient->getNick()) > 0)
-	// 					continue ;
-    //                 allreadysend.insert(itClient->getNick());
-    //                 reply(*itClient, msg);
-    //             }
-    //         }
-    //     }
-    // }
-}
-
-void Server::printClients(void)
-{
-	clientIter it;
-
-    // Define column headers
-	cout << "----------------------------------------\n";
-    cout << std::left << std::setw(5) << "id"
-              << std::setw(10) << "fd"
-              << std::setw(15) << "ip"
-              << std::setw(10) << "port" << endl;
-
-    // Print separator line
-    cout << std::setfill('-') << std::setw(40) << "" << endl;
-    cout << std::setfill(' ');
-
-    // Print data rows
-	// int id = 0;
-    for (it = _clients.begin(); it < _clients.end(); it++) {
-        cout << std::left << std::setw(5) << getIndexOfClient(it)
-                  << std::setw(10) << it->getSockfd()
-                  << std::setw(15) << it->getIPAddr()
-                  << std::setw(10) << it->getPort() << endl;
-    }
-	cout << "\n";
-}
-
-void Server::printpollfds(void)
-{
-	pollfdIter it;
-
-    // Define column headers
-	cout << "----------------------------------------\n";
-    cout << std::left << std::setw(5) << "id"
-              << std::setw(10) << "fd"
-              << std::setw(15)  << endl;
-
-    // Print separator line
-    cout << std::setfill('-') << std::setw(40) << "" << endl;
-    cout << std::setfill(' ');
-
-    // Print data rows
-	int id = 0;
-    for (it = _pollfds.begin(); it < _pollfds.end(); it++) {
-        cout << std::left << std::setw(5) << id++
-                  << std::setw(10) << it->fd << endl;
-    }
-	cout << "\n";
 }
