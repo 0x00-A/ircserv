@@ -122,6 +122,7 @@ class Server
 		void 			quit(Client &client);
 		void 			join(Client &client);
 		void 			privmsg(Client &client);
+		void 			notice(Client &client);
 		void 			mode(Client &client);
 		void 			names(Client &client);
 

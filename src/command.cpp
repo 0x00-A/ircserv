@@ -1,7 +1,7 @@
 #include "Server.hpp"
 #include "Channel.hpp"
 
-
+// :qsd!~ff@197.230.30.146 NOTICE okm :hihihihih
 void Server::pass(Client &client)
 {
     if (client.isConnected())
@@ -186,6 +186,19 @@ void Server::privmsg(Client &client)
     }   
 }
 
+void Server::notice(Client &client)
+{
+    string              response;
+    clientIter          cliIt;
+
+    if (_params.size() < 3)
+        return ;
+    if ( (cliIt = doesUserExit(_params[1])) != _clients.end())
+    {
+        response = client.identifier() + " NOTICE " + cliIt->getNick() + " :" +  _params[2];
+        reply(*cliIt, response);
+    }
+}
 
 void Server::names(Client &client)
 {
