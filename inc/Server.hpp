@@ -79,7 +79,7 @@ class Server
 
 		/***********************[ SERVER ]***********************/
 		void 			parseargs(void) const;
-		// void 			_Operator(std::string nick, std::string chName, Client &cli ,bool _Op);
+		void 			_Operator(std::string nick, std::string chName, Client &cli ,bool _Op);
 
 	public:
 
