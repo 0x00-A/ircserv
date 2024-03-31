@@ -10,7 +10,7 @@ SRC = main.cpp ircbot.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))
 
-NAME = ircbot
+NAME = ../ircbot
 
 all: $(NAME)
 
