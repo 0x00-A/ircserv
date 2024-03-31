@@ -37,6 +37,7 @@ void Server::nick(Client &client)
     {
         throw (":ft_irc.1337.ma " + itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given");
     }
+    cout << "cmd:" << this->_params[0] << " arg:" <<  this->_params[1]  << "||" << endl;
     if (this->_params[1].size() >= 16)
     {
         this->_params[1].erase(15);

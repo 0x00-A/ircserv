@@ -36,8 +36,11 @@ void  Server::parseCommand(string &command)
 
     if ( (pos = command.find(" :")) != string::npos)
     {
+        cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
         tmp = command.substr(pos + 2);
+        cout <<  "tmp>>>[1] |" << tmp  << "|" << endl;
         command = command.substr(0, pos);
+        cout <<  "tmp>>>[0] " << command << endl;
     }
     ss << command;
     while (ss >> token)

@@ -490,7 +490,7 @@ void ircbot::updateUserNick(const string &old_nick, const string &new_nick)
 	{
 		if (it->_nick == old_nick)
 		{
-			*it = new_nick;
+			it->_nick = new_nick;
 			std::cout << "user `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
 			break;
 		}
