@@ -4,9 +4,11 @@ FSAN = -fsanitize=address
 SRCDIR = src
 OBJDIR = obj
 INCLUDES = ./inc
+BOT_PATH = ./bot
+BOT_NAME = ircbot
 
 SRC = main.cpp Socket.cpp Server.cpp Client.cpp command.cpp parser.cpp channels.cpp Channel.cpp \
-		communication.cpp
+		communication.cpp utils.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))
 
@@ -27,12 +29,17 @@ $(OBJDIR) :
 
 clean :
 	@rm -rf $(OBJDIR)
+	@make clean -C $(BOT_PATH)
 
 fclean : clean
 	@rm -f $(NAME)
 	@rm -rf ../.vscode
+	@make fclean -C $(BOT_PATH)
 
 re : fclean all
+
+bonus:
+	make -C $(BOT_PATH)
 
 -include $(DEP)
 

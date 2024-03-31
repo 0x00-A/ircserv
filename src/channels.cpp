@@ -16,19 +16,12 @@ string		Server::getMembers(Channel& ch)
 
 }
 
-string		channelInfo(const string& nick, const string& nameCha)
-{
-    string response;
-	response = ":ft_irc.1337.ma " + itos(RPL_NAMREPLY) + " " + nick + " @ " +  nameCha + " :";
-	return (response);
-
-}
 void Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
 
 
 	reply(client, client.identifier() + " JOIN " + ch.getName());
-	// reply(client, ":ft_irc.1337.ma MODE " + ch.getName() + " " + ch.channelModeIs());
+	// reply(client, _servname + " MODE " + ch.getName() + " " + ch.channelModeIs());
 	if (ch.isUserOperator(client.getNick()))
 		reply(client, client.identifier() + " MODE " + ch.getName() + " " + "+t");
 
@@ -67,7 +60,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (!client.isInvitedToChannel(channel.first)) 
 				{
-					response =  (":ft_irc.1337.ma "  + itos(ERR_INVITEONLYCHAN) + " " + client.getNick()  + " " + \
+					response =  (_servname + " " + itos(ERR_INVITEONLYCHAN) + " " + client.getNick()  + " " + \
 						_channels[i].getName() + " :Cannot join channel, you must be invited (+i)");
 					reply(client, response);
 					return ;
@@ -77,7 +70,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getPasskey() != channel.second)
 				{
-					response =  (":" + client.getIPAddr() + " "  + itos(ERR_BADCHANNELKEY) + client.getNick() \
+					response =  (":" + client.getIPAddr() + " "  + _servname + " " + itos(ERR_BADCHANNELKEY) + client.getNick() \
 					+ " " + channel.first + " :Cannot join channel (+K) - bad key");
 					reply(client, response);
 					return ;
@@ -87,7 +80,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getUserLimit() <= _channels[i].getSize())
 				{
-					response =  (":ft_irc.1337.ma "  + itos(ERR_CHANNELISFULL) + " " + _channels[i].getName() + " :Cannot join channel (+l)");
+					response =  (_servname + " " + itos(ERR_CHANNELISFULL) + " " + _channels[i].getName() + " :Cannot join channel (+l)");
 					reply(client, response);
 					return ;
 				}
@@ -154,7 +147,7 @@ void Server::showChannelNames(Client &client, Channel &ch)
 	string 			    prefix;
 	std::set<string>	users;
 
-	prefix = channelInfo(client.getNick(), ch.getName());
+	prefix = _servname + " " + itos(RPL_NAMREPLY) + " " + client.getNick() + " @ " +  ch.getName() + " :";
 	users = ch.getUserList();
 	size_t newlen;
 	response = prefix;
@@ -164,7 +157,7 @@ void Server::showChannelNames(Client &client, Channel &ch)
 			newlen = response.size() + 1 + it->size();
 		else
 			newlen = response.size() + it->size();
-		if (newlen > 510)
+		if (newlen > RD_BUF_SIZE - 2)
 		{
 			reply(client, response);
 			response = prefix;
@@ -178,7 +171,7 @@ void Server::showChannelNames(Client &client, Channel &ch)
 	}
 	if (response != prefix)
         reply(client, response);
-	
-	response = ":ft_irc.1337.ma " + itos(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + " :End of /NAMES list.";
+	response = _servname + " " + itos(RPL_ENDOFNAMES) + " " + client.getNick() + " " +  ch.getName() + \
+				" :End of /NAMES list.";
 	reply(client, response);
 }

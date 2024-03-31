@@ -24,6 +24,11 @@ Channel::Channel(const string &channelName, const string &admin)
 
 Channel::~Channel() {}
 
+// bool Channel::operator==(const Channel &rhs) const
+// {
+// 	return (this->getName() == rhs.getName());
+// }
+
 bool Channel::joinUser(const string& user)
 {
     // if modes has "+l" >> if _users.size() + 1 > _userLimit > don't add
@@ -258,7 +263,15 @@ void Channel::setTopic(const string &topic)
 
 void Channel::setPasskey(const string &key)
 {
-    _passkey = key;
+    stringstream    ss;
+    string          word, res;
+
+    ss << key;
+    while (ss >> word)
+    {
+        res += word;
+    }
+    _passkey = res;
     _hasPasskey = true;
 }
 

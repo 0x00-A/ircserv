@@ -38,6 +38,8 @@
 #define ERR_PASSWDMISMATCH 464
 
 #define ERR_INVALIDKEY 525
+#define ERR_KEYALREADYSET 467
+#define ERR_INPUTTOOLONG "417"
 
 #define RPL_CHANNELMODEIS 324
 #define RPL_WELCOME 001
@@ -113,12 +115,12 @@ class Client
 		void 				setHasPassed(bool value);
 		void 				setHasUsedNick(bool value);
 		void 				setHasUsedUser(bool value);
-		void 				inviteToChannel(string& channelName);
-		void 				uninviteFromChannel(string &channelName);
+		void 				inviteToChannel(const string& channelName);
+		void 				uninviteFromChannel(const string& channelName);
+		bool 				isInvitedToChannel( const string& channelName ) const;
 		
 		bool 				isConnected();
 		
-		bool 				isInvitedToChannel( string& channelName ) const;
 		// struct tm 			*getStartTimeToClinet();
 		bool 				getHasPassed();
 		bool 				getHasUsedNick();

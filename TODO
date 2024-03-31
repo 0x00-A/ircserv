@@ -46,18 +46,34 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 <<<< for rachid >>>>
 [ ] :lalala!~s@197.230.30.146 QUIT :Quit: comment (handle quit comment sent in broadcast to channels)
-
+[ ] command paramitres (maximum of fifteen (15))
+[ ] remove reply prefix
 
 
 
 ###############################
 [ ] close fds CTRL-c
-[ ] handle SIGPIPE
+[v] handle SIGPIPE < handled in unix check macos >
 [x] fix time mode
 [ ] :lalala!~x@197.230.30.146 QUIT :EOF from client (when a user disconnect broadcast to channels)
+[ ] server::_hostname (remove unused var)
 
 
+invite someone without operator priv
 
+
+send(_botSock, msg, len, MSG_NOSIGNAL);
+
++ what is unbound socket and what happens when we call bind()
+- what is diff bitween write/send read/recv
++ complete server
+
+
++    check in poll         
+			if (errno == EINTR) // (interrupted system call)
+        		continue;
+
+<<<<<<< HEAD
 mode key remove space
 
 
@@ -65,3 +81,5 @@ mode key remove space
 
 
 forbidin :: string.back, 
+=======
+>>>>>>> 685271faf650bd95402bb62f9183839e1e90e0e4

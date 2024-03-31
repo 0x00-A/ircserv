@@ -44,6 +44,8 @@ class Channel
 		
 		~Channel();
 
+		bool	operator==(const Channel& rhs) const;
+
 		bool				joinUser( const string& user );
 		bool				partUser( const string& user );
 		void 				swapUser(const string &oldUser, const string &newUser);
