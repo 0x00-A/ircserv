@@ -19,9 +19,13 @@
 #define CHANNELLEN 50
 
 #define TOPICLEN 390
-#define MODES 4
+#define MODES 20
+#define CHANMODES "k,l,i,t"
+#define MAXCHANNELS 250
 
 #define RD_BUF_SIZE 512
+
+
 #define CHANNEL 1
 #define CLIENT 2
 #define NOSUCHCHANNEL 3
@@ -39,6 +43,7 @@ class Server
 		typedef std::pair<string, string> strPair;
 
 	private:
+
 		const string 								_port;
 		const string 								_passwd;
 		int 										_servfd;
@@ -82,12 +87,13 @@ class Server
 		bool 			parseModes( std::queue<std::pair<string, string> > &modes, Client &cli );
 
 		void 			handleOperatorFlag( strPair &, string &, string &, channelIter &, Client & );
-		void 			handleLimitFlag( strPair &, string &, string &, channelIter & );
+		void 			handleLimitFlag( strPair &, string &, string &, channelIter &, Client & );
 		void 			handlePasskeyFlag( strPair &, string &, string &, channelIter & );
 		void 			handleInviteFlag( strPair &, string &, channelIter & );
 		void 			handleTopicFlag( strPair &, string &, channelIter &, Client & );
 		void 			removeExtraPlusMinus( string & );
 		bool			badFormKey( string & );
+		bool			checkValidLimit( string & );
 
 		/***********************[ SERVER ]***********************/
 		void 			parseargs(void) const;
@@ -155,6 +161,7 @@ class Server
 
 		// send messg
 		void 			reply(Client &client, string const &reply);
+
 };
 
 #endif // SERVER_HPP

@@ -146,6 +146,7 @@ void    Server::mode(Client& client)
     channelIter                                 chan;
     string                                      paramsave;
     string                                      modesave;
+    int                                         modeCount = 0;
 
     if (!client.isConnected())
     {
@@ -177,6 +178,8 @@ void    Server::mode(Client& client)
 	}
 	while (!modes.empty())
 	{
+        if (modeCount >= MODES)
+            break;
 		std::pair<string, string> m = modes.front();
 		switch (m.first[1])
 		{
@@ -184,7 +187,7 @@ void    Server::mode(Client& client)
 			    handleOperatorFlag(m, modesave, paramsave, chan, client);
 			    break;
 			case ('l'):
-			    handleLimitFlag(m, modesave, paramsave, chan);
+			    handleLimitFlag(m, modesave, paramsave, chan, client);
 			    break;
 			case ('k'):
 			    handlePasskeyFlag(m, modesave, paramsave, chan);
@@ -197,6 +200,7 @@ void    Server::mode(Client& client)
 			    break;
 		}
 		modes.pop();
+        modeCount++;
 	}
 	removeExtraPlusMinus(modesave);
 	if (!modesave.empty())
@@ -277,11 +281,11 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     }
 }
 
-void Server::handleLimitFlag(strPair &m, string &modesave, string &paramsave, channelIter &chan)
+void Server::handleLimitFlag(strPair &m, string &modesave, string &paramsave, channelIter &chan, Client& cli)
 {
 	if (m.first == "+l")
 	{
-		if (isdigitstring(m.second))
+		if (checkValidLimit(m.second))
 		{
 			chan->setMode(m.first);
 			chan->setHasUserLimit(true);
@@ -289,6 +293,11 @@ void Server::handleLimitFlag(strPair &m, string &modesave, string &paramsave, ch
 			modesave += m.first;
 			paramsave += " " + m.second;
 		}
+        else
+        {
+            reply(cli, ERR_INVALIDMODEPARAM + " " + cli.getNick() + " " + chan->getName() + \
+                    " ::Invalid limit mode parameter. Syntax: <limit>.");
+        }
 	}
 	else if (m.first == "-l")
 	{
@@ -335,22 +344,21 @@ void Server::handleInviteFlag(strPair &m, string &modesave, channelIter &chan)
 
 void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan, Client &cli)
 {
-    // :lalala!~x@197.230.30.146 MODE #ch111 -t
-        // (m.first == "+t") ? chan->setHasTopic(true) : chan->setHasTopic(false);
-        // modesave += m.first;
-    if (m.first == "+k" && !chan->hasTopic())
+    if (m.first == "+t" && !chan->hasTopic())
     {
         chan->setMode(m.first);
         chan->setHasTopic(true);
         broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
         modesave += m.first;
+        cout << chan->getName() << " MODE +t\n";
     }
-    else if (m.first == "-k" && chan->hasTopic())
+    else if (m.first == "-t" && chan->hasTopic())
     {
         chan->setMode(m.first);
         chan->setHasTopic(false);
         broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
         modesave += m.first;
+        cout << chan->getName() << " MODE -t\n";
     }
 }
 
@@ -389,3 +397,13 @@ bool Server::badFormKey(string &key)
     return (true);
 }
 
+bool Server::checkValidLimit(string &s)
+{
+    if (!isdigitstring(s) || s.length() > 19)
+        return (false);
+    long long int n;
+    n = std::strtoll(s.c_str(), NULL, 10);
+    if (n > __LONG_MAX__)
+        return (false);
+    return (true);
+}

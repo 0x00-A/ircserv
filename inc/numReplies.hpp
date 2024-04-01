@@ -36,6 +36,7 @@
 #define ERR_INVALIDKEY string("525")
 #define ERR_KEYALREADYSET string("467")
 #define ERR_INPUTTOOLONG string("417")
+#define ERR_NOMOTD string("422")
 
 #define RPL_MOTDSTART string("375")
 #define RPL_MOTD string("372")
@@ -48,5 +49,7 @@
 #define RPL_NOTOPIC string("331")
 #define RPL_TOPIC string("332")
 #define RPL_INVITING string("341")
+#define RPL_ISUPPORT string("005")
+#define ERR_INVALIDMODEPARAM string("696")
 
 #endif

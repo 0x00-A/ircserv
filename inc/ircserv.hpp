@@ -20,6 +20,7 @@
 # include <cerrno>
 # include <signal.h>
 # include <algorithm>
+# include <fstream>
 # include "numReplies.hpp"
 
 

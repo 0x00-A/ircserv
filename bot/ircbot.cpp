@@ -132,20 +132,20 @@ string ircbot::itos(int num)
 ircbot::ircbot(string passwd, string port, string nick, string chan)
 	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick), _channel(chan)
 {
-	const int	enable = 1;
+	// const int	enable = 1;
 
 	if ( (_botSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		std::perror("socket");
 		exit(1);
 	}
-	if (setsockopt(_botSock, SOL_SOCKET, SO_NOSIGPIPE, &enable, sizeof(int)))
-	{
-		perror("setsockopt");
-	}
+	// if (setsockopt(_botSock, SOL_SOCKET, SO_NOSIGPIPE, &enable, sizeof(int)))
+	// {
+	// 	perror("setsockopt");
+	// }
 	
 	// store data
-	std::ifstream infile("offensive_words.txt");
+	std::ifstream infile("../data/offensive_words.txt");
 	if (infile.is_open())
 	{
 		string s;
