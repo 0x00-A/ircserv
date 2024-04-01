@@ -23,7 +23,8 @@ struct tm *getCurrentTime()
 
 string itos(int num)
 {
-    std::ostringstream oss;
-    oss << std::setw(3) << std::setfill('0') << num;
-    return oss.str();
+    stringstream ss;
+    // oss << std::setw(3) << std::setfill('0') << num;
+    ss << num;
+    return ss.str();
 }

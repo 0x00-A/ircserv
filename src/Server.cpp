@@ -33,6 +33,7 @@ Server::Server(const string& port, const string& passwd)
     this->commandMap["KICK"] = &Server::kick;
     this->commandMap["INVITE"] = &Server::invite;
     this->commandMap["TOPIC"] = &Server::topic;
+    this->commandMap["LUSERS"] = &Server::lusers;
 
 
 	// temp
@@ -101,6 +102,48 @@ int Server::handleNewConnection()
 	// _clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + ss.str() + "\n";
 	// _pollfds.back().events |= POLLOUT;
 	return (0);
+}
+
+int Server::getUnknownConnections()
+{
+	int unknownConnections;
+
+	unknownConnections = 0;
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].isConnected() == false)
+		{
+			unknownConnections++;
+		}
+	}
+    return (unknownConnections);
+}
+
+int Server::getKnownConnections()
+{
+	int knownConnections;
+
+	knownConnections = 0;
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].isConnected() == true)
+		{
+			knownConnections++;
+		}
+	}
+    return (knownConnections);
+}
+
+int Server::getExistingChannels()
+{
+	int channelsExisting;
+
+	channelsExisting = 0;
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		channelsExisting++;
+	}
+    return (channelsExisting);
 }
 
 void Server::disconnectClient(int id)

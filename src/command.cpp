@@ -39,7 +39,7 @@ void Server::nick(Client &client)
     }
     if (this->_params[1].size() >= NICKLEN)
     {
-        this->_params[1].erase(15);
+        this->_params[1].erase(NICKLEN);
     }
     if (client.checkNick(this->_params[1]) == false)
     {
@@ -84,7 +84,7 @@ void Server::user(Client &client)
                 " :Not enough parameters");
     }
     if (this->_params[1].size() > USERNAMELEN)
-        this->_params[1].erase(9);
+        this->_params[1].erase(USERNAMELEN);
     client.setHasUsedUser(true);
     client.setUsername(this->_params[1]);
     if (_clients.size() > 1 && client.getHasUsedNick())
@@ -215,6 +215,26 @@ void Server::names(Client &client)
         }
     }
 }
+
+void Server::lusers(Client &client) 
+{
+    // int totalClients = getTotalClients(); // Replace this with the actual total number of clients
+
+    // Response messages
+    // std::string message1 = "251 " + client.getNick() + " :" + "There are " + itos(_clients.size()) + " users and 1000 invisible on 1 servers";
+    // std::string message2 = "252 " + client.getNick() + " 0 :operator(s) online";
+    string message;
+
+    message = "253 " + client.getNick() + " " + itos(getUnknownConnections()) + " :unknown connection(s)";
+    reply(client, message);
+    message = "254 " + client.getNick() + " " + itos(getExistingChannels()) + " :channels formed";
+    reply(client, message);
+    message = "255 " + client.getNick() + " :" + "I have " + itos(getKnownConnections()) + " clients and 1 servers";
+    reply(client, message);
+
+}
+
+
 
 /********************************************************************************/
 /* The MODE command is provided so that channel operators may change the        */

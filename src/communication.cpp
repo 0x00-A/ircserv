@@ -40,6 +40,7 @@ void Server::welcomeClient(Client &client)
 	response = RPL_CREATED + " " + client.getNick() + \
     " :This server was created " + getStartTime();
 	reply(client, response);
+    lusers(client);
 }
 
 void Server::changeNick(Client & client)

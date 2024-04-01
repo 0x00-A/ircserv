@@ -73,6 +73,9 @@ class Server
 		clientIter 		getClientIterator(const Client &cli);
 		clientIter 		getClientIterator(const string &nick);
 		string 			getMembers(Channel &ch);
+		int				getUnknownConnections();
+		int				getKnownConnections();
+		int				getExistingChannels();
 
 		/***********************[ MODE ]***********************/
 		bool 			parseModes( std::queue<std::pair<string, string> > &modes, Client &cli );
@@ -128,6 +131,7 @@ class Server
 		void 			notice(Client &client);
 		void 			mode(Client &client);
 		void 			names(Client &client);
+		void 			lusers(Client &client);
 
 		void    		kick(Client& client);
 		void 			invite(Client& client);

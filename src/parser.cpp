@@ -174,6 +174,10 @@ void Server::initJoin(Client &client)
             reply(client, response);
             continue ;
         }
+        if (chan.size() >= CHANNELLEN)
+        {
+            chan.erase(CHANNELLEN);
+        }
         seenChannels.insert(chan);
         _parsChannels.push_back(std::make_pair(chan, key));
     }
