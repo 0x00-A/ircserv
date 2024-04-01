@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+int	isServerUp = true;
+
 Server::Server(const string& port, const string& passwd)
 	: _port(port), _passwd(passwd)
 {
@@ -34,16 +36,16 @@ Server::Server(const string& port, const string& passwd)
 
 
 	// temp
-	// this->commandMap["P"] = &Server::pass;
-    // this->commandMap["U"] = &Server::user;
-    // this->commandMap["N"] = &Server::nick;
-    // this->commandMap["Q"] = &Server::quit;
-    // this->commandMap["J"] = &Server::join;
-    // this->commandMap["PM"] = &Server::privmsg;
-    // this->commandMap["M"] = &Server::mode;
-    // this->commandMap["K"] = &Server::kick;
-    // this->commandMap["I"] = &Server::invite;
-    // this->commandMap["T"] = &Server::topic;
+	this->commandMap["P"] = &Server::pass;
+    this->commandMap["U"] = &Server::user;
+    this->commandMap["N"] = &Server::nick;
+    this->commandMap["Q"] = &Server::quit;
+    this->commandMap["J"] = &Server::join;
+    this->commandMap["PM"] = &Server::privmsg;
+    this->commandMap["M"] = &Server::mode;
+    this->commandMap["K"] = &Server::kick;
+    this->commandMap["I"] = &Server::invite;
+    this->commandMap["T"] = &Server::topic;
 }
 
 Server::~Server()
@@ -186,7 +188,7 @@ void	Server::run()
 
 	cout << "Server running" << endl;
 	setStartTime();
-	while (true)
+	while (isServerUp)
 	{
 		if(poll(_pollfds.data(), _pollfds.size(), -1) == -1)
 		{

@@ -193,7 +193,7 @@ void    Server::mode(Client& client)
 			    handleInviteFlag(m, modesave, chan);
 			    break;
 			case ('t'):
-			    handleTopicFlag(m, modesave, chan);
+			    handleTopicFlag(m, modesave, chan, client);
 			    break;
 		}
 		modes.pop();
@@ -333,11 +333,23 @@ void Server::handleInviteFlag(strPair &m, string &modesave, channelIter &chan)
 	}
 }
 
-void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan)
+void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan, Client &cli)
 {
-    if (chan->setMode(m.first))
+    // :lalala!~x@197.230.30.146 MODE #ch111 -t
+        // (m.first == "+t") ? chan->setHasTopic(true) : chan->setHasTopic(false);
+        // modesave += m.first;
+    if (m.first == "+k" && !chan->hasTopic())
     {
-        (m.first == "+t") ? chan->setHasTopic(true) : chan->setHasTopic(false);
+        chan->setMode(m.first);
+        chan->setHasTopic(true);
+        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
+        modesave += m.first;
+    }
+    else if (m.first == "-k" && chan->hasTopic())
+    {
+        chan->setMode(m.first);
+        chan->setHasTopic(false);
+        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
         modesave += m.first;
     }
 }

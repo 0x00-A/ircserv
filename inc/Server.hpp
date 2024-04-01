@@ -26,6 +26,8 @@
 #define CLIENT 2
 #define NOSUCHCHANNEL 3
 
+extern int	isServerUp;
+
 class Server
 {
 
@@ -83,7 +85,7 @@ class Server
 		void 			handleLimitFlag( strPair &, string &, string &, channelIter & );
 		void 			handlePasskeyFlag( strPair &, string &, string &, channelIter & );
 		void 			handleInviteFlag( strPair &, string &, channelIter & );
-		void 			handleTopicFlag( strPair &, string &, channelIter & );
+		void 			handleTopicFlag( strPair &, string &, channelIter &, Client & );
 		void 			removeExtraPlusMinus( string & );
 		bool			badFormKey( string & );
 
