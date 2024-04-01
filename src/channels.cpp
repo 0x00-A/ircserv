@@ -1,26 +1,47 @@
 #include "Server.hpp"
 
-string		Server::getMembers(Channel& ch)
+void Server::broadcastToJoinedChannels(Client& client, string &msg)
 {
-    string response;
+    std::set<string>    joinedChans;
+	std::set<string>	tempUsers;
+	Channel				tmpChannel;
 
-	std::set<string>  members = ch.getUserList();
-	std::set<string>::iterator it = members.begin();
-	for ( ; it != members.end(); it++)
-	{
-		response += " " + *it;
-	}
-	if (response[0] == ' ')
-		response.erase(0, 1);
-	return response;
-
+    joinedChans = client.getChannels();
+    std::set<string>::iterator it = joinedChans.begin();
+    for ( ; it != joinedChans.end(); it++)
+    {
+        channelIter itCha = doesChannelExist(*it);
+        if (itCha != _channels.end())
+        {
+			std::set<string> users = itCha->getUserList();
+			for (std::set<string>::iterator it = users.begin(); it != users.end(); it++)
+			{
+				 tempUsers.insert(*it);
+			}
+        }
+    }
+	tmpChannel.setUsers(tempUsers);
+	this->broadcastMsg(client, msg, tmpChannel);
 }
 
+// string		Server::getMembers(Channel& ch)
+// {
+//     string response;
+
+// 	std::set<string>  members = ch.getUserList();
+// 	std::set<string>::iterator it = members.begin();
+// 	for ( ; it != members.end(); it++)
+// 	{
+// 		response += " " + *it;
+// 	}
+// 	if (response[0] == ' ')
+// 		response.erase(0, 1);
+// 	return response;
+
+// }
 
 void Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
-
-
 	reply(client, client.identifier() + " JOIN " + ch.getName());
 	// reply(client, _servname + " MODE " + ch.getName( + " " + ch.channelModeIs());
 	if (ch.isUserOperator(client.getNick()))
@@ -32,7 +53,7 @@ void Server::channelWelcomeMessages(Client &client, Channel& ch)
 void Server::joinedAChannel(Client& client, Channel& channel)
 {
 	string 						response;
-	std::set<string>	users;
+	std::set<string>			users;
 	clientIter					cliIter;
 
 	users = channel.getUserList();
@@ -42,7 +63,8 @@ void Server::joinedAChannel(Client& client, Channel& channel)
 		cliIter = getClientIterator(*it);
 		if (cliIter != _clients.end())
 		{
-			if (client.getNick() == *it) continue;
+			if (client.getNick() == *it)
+				continue;
 			reply(*cliIter, response);
 		}
 	}

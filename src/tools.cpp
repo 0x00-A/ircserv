@@ -28,3 +28,11 @@ string itos(int num)
     ss << num;
     return ss.str();
 }
+
+void to_upper(string& str) 
+{
+	for (size_t i = 0; i < str.size() ; i++)
+	{
+        str[i] = static_cast<char>(std::toupper(str[i]));
+	}
+}

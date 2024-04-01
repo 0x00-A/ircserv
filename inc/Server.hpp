@@ -44,7 +44,6 @@ class Server
 		std::vector<Client> 						_clients;
 		Socket 										_socket;
 		string 										_startTime;
-		std::string									_hostname;
 		std::vector<string> 						_params;
 		std::vector<std::pair<string, int> > 		_sendMsgClient;
 		std::vector<std::pair<string, string> > 	_parsChannels;
@@ -52,7 +51,7 @@ class Server
 		string 										_messagClient;
 		string										_servname;
 
-		std::vector<int>							_disconnectedClients;
+		// std::vector<int>							_disconnectedClients;
 
 		std::map<string, void (Server::*)(Client &)> commandMap;
 
@@ -100,7 +99,6 @@ class Server
 		// for get time in start
 		void 			setStartTime(void);
 		string 			getStartTime(void) const;
-		string			getHostname( void ) const;
 
 		void 			welcomeClient(Client &client);
 
@@ -108,7 +106,6 @@ class Server
 		// parser functions
 		void 			handleCommand(string &cmd, int id);
 		void 			parseCommand(string &cmd);
-		void 			to_upper(string& str);
 		string 			trim_comma(const string &str, int flg);
 		void 			initPrivmsg(Client &client);
 		void 			initJoin(Client &client);

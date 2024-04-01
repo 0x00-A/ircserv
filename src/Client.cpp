@@ -12,8 +12,6 @@ Client::Client(const string &ip, int port, int sockfd)
 	_real = "";
 	_hostname = "";
 	_recvBuf = "";
-	// _isRegistered = false;
-	// _isOperator = false;
 	_hasPassed = false;
 	_hasUsedNick = false;  
 	_hasUsedUser = false;
@@ -53,11 +51,6 @@ std::queue<string>& Client::sdBuf(void)
 	return (_sendBuf);
 }
 
-// void Client::setStartTimeToClinet()
-// {
-//     _startTime = getCurrentTime();
-// }
-
 void Client::setHasPassed(bool value)
 {
     this->_hasPassed = value;
@@ -81,38 +74,26 @@ void Client::inviteToChannel(const string& channelName)
     }
 }
 
-void Client::uninviteFromChannel(const string& channelName)
+void Client::uninviteFromChannel(const string& chan)
 {
-    if (isInvitedToChannel(channelName))
-    {
-        // for (std::vector<string>::iterator it = _invitedChannels.begin(); it != _invitedChannels.end(); it++)
-        // {
-        //     if (*it == channelName)
-        //         _invitedChannels.erase(it);
-        // }
-        _invitedChannels.erase(std::find(_invitedChannels.begin(), _invitedChannels.end(), channelName));
-    }
+    std::vector<string>::iterator it;
+
+    it = std::find(_invitedChannels.begin(), _invitedChannels.end(), chan);
+    if (it != _invitedChannels.end())
+        _invitedChannels.erase(it);
 }
 
-bool Client::isInvitedToChannel(const string& channelName) const
+bool Client::isInvitedToChannel(const string& chan) const
 {
-    std::vector<string>::const_iterator it = std::find(_invitedChannels.begin(), _invitedChannels.end(), channelName);
+    std::vector<string>::const_iterator it;
+    
+    it = std::find(_invitedChannels.begin(), _invitedChannels.end(), chan);
     if (it != _invitedChannels.end())
     {
         return true;
     }
-    // for (std::vector<string>::const_iterator it = _invitedChannels.begin(); it != _invitedChannels.end(); it++)
-    // {
-    //     if (*it == channelName)
-    //         return (true);
-    // }
     return false;
 }
-
-// struct tm *Client::getStartTimeToClinet()
-// {
-//     return (_startTime);
-// }
 
 bool Client::getHasPassed()
 {
@@ -178,20 +159,6 @@ void Client::addChannels(string &channel)
     _channels.insert(channel);
 }
 
-// void Client::exitFromChannels()
-// {
-//     std::vector<string>::iterator it = _channels.begin();
-//     for (it; it < _channels.end(); it++)
-//     {
-        
-//     }
-// }
-
-// void Client::addChannels(Channel &channel)
-// {
-//     _channels.insert(channel);
-// }
-
 void Client::setNick(string nick)
 {
     this->_nick = nick;
@@ -204,6 +171,5 @@ void Client::setUsername(string username)
 
 bool Client::isConnected()
 {
-    // return (true);
     return (_hasUsedNick && _hasUsedUser && _hasPassed);
 }

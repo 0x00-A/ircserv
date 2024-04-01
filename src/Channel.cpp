@@ -10,7 +10,7 @@ Channel::Channel(const string &channelName, const string &admin)
     _name = channelName;
     _modes = "+t";
     _topic = "";
-    _userLimit = -1;		// or string?
+    _userLimit = -1;
     _passkey = "";
     _hasInvite = false;
     _hasPasskey = false;
@@ -22,81 +22,8 @@ Channel::Channel(const string &channelName, const string &admin)
     setChannelOperator(admin);
 }
 
-Channel::~Channel() {}
-
-// bool Channel::operator==(const Channel &rhs) const
-// {
-// 	return (this->getName() == rhs.getName());
-// }
-
-bool Channel::joinUser(const string& user)
+Channel::~Channel() 
 {
-    // if modes has "+l" >> if _users.size() + 1 > _userLimit > don't add
-    if ((_users.insert(user)).second)
-    {
-        cout << user << " joined channel " << _name << endl;
-        return (true);
-    }
-    cout << user << " already in channel " << _name << endl;
-    return (false);
-}
-
-bool Channel::isUserInChannel(const string &user) const
-{
-    return (_users.find(user) != _users.end() || _users.find("@" + user) != _users.end() );
-}
-
-bool Channel::isUserOperator(const string &user) const
-{
-    return (_users.find("@" + user) != _users.end());
-}
-
-bool Channel::unsetChannelOperator(const string &user)
-{
-    if (!isUserInChannel(user) || !isUserOperator(user))
-        return (false);
-    _users.erase("@" + user);
-    _users.insert(user);
-    cout << user << " is no longer an operator in channel " << _name << endl;
-    return (true);
-}
-
-bool Channel::partUser(const string& user)
-{
-    if (_users.erase(user) || _users.erase("@" + user))     // returns Number of elements removed (0 or 1)
-    {
-        cout << user << " left channel " << _name << endl;
-        return (true);
-    }
-    cout << user << " is not in channel " << _name << endl;
-    return (false);
-}
-
-void Channel::swapUser(const string &oldUser, const string &newUser)
-{
-    std::set<string>::iterator itUser = _users.begin();
-
-    for ( ; itUser != _users.end(); itUser++)
-    {
-        string  oldAdmin = ("@" + oldUser);
-        string  newAdmin = ("@" + newUser);
-
-        cout << "::::::::::::::::::::::::::" << endl;
-        cout << "user: " << *itUser << endl;
-        cout << "::::::::::::::::::::::::::" << endl;
-        if (*itUser ==  oldAdmin)
-        {
-            _users.erase(oldAdmin);
-            _users.insert(newAdmin);
-            break;
-        }
-        else if (*itUser == oldUser)
-        {
-            _users.erase(oldUser);
-            _users.insert(newUser);
-            break;
-        }
-    }
 }
 
 std::set<string> Channel::getUserList() const
@@ -129,9 +56,6 @@ bool Channel::empty(void) const
     return (_users.size() == 0);
 }
 
-
-
-
 bool Channel::hasPasskey(void) const
 {
 	return (_hasPasskey);
@@ -151,9 +75,6 @@ bool Channel::hasTopic(void) const
 {
 	return (_hasTopic);
 }
-
-
-
 
 void Channel::setHasPasskey(bool stat)
 {
@@ -175,43 +96,9 @@ void Channel::setHasTopic(bool stat)
     _hasTopic = stat;
 }
 
-
-
-
 bool Channel::hasMode(char mode) const
 {
 	return (_modes.find(mode) != string::npos);
-}
-
-string Channel::channelModeIs() const
-{
-    stringstream s;
-    s << _modes;
-    for (size_t i = 0; i < _modes.size(); i++)
-    {
-        if (_modes[i] == 'k')
-        {
-            s << (" " + this->getPasskey());
-        }
-        if (_modes[i] == 'l')
-        {
-            s << " " ;
-            s << this->getUserLimit();
-        }
-    }
-    std::cout << ">>>>>> " <<  s.str() << std::endl;
-    return (s.str());
-}
-
-void Channel::printUsers()
-{
-    cout << "Users in channel " << _name << ": ";
-
-    for (std::set<string>::iterator it = _users.begin(); it != _users.end(); it++)
-    {
-        cout << *it << " ";
-    }
-    cout << endl;
 }
 
 void Channel::setUsers(std::set<string> &users)
@@ -277,14 +164,9 @@ void Channel::setPasskey(const string &key)
 
 void Channel::setUserLimit(string limit)
 {
-    // TODO: parse limit
-    _userLimit = std::atoi(limit.c_str());
+    _userLimit = std::strtol(limit.c_str(), NULL, 10);
     _hasLimit = true;
 }
-
-
-
-
 
 void Channel::unsetTopic( void )
 {

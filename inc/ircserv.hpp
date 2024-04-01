@@ -34,5 +34,6 @@ using std::stringstream;
 std::string		itos(int num);
 struct tm		*getCurrentTime();
 bool			isdigitstring(const string& str);
+void            to_upper(string& str);
 
 #endif //IRCSERV_HPP

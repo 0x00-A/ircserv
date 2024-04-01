@@ -62,10 +62,8 @@ class ircbot
 		void					updateOperators( std::vector<string>& tokens );
 		void					updateUsers(std::vector<string>& tokens);
 		void					logUsers( string& users );
-
 		void					blacklistReply( string& nick );
 		void					logtimeReply( string& nick );
-
 		std::string				itos(int num);
 		long					getTime(const string& user);
 		void					removeUser(const string& user);

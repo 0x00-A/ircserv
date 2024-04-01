@@ -1,23 +1,55 @@
 #include "Server.hpp"
+#include "Channel.hpp"
+
+void Server::notice(Client &client)
+{
+    string              response;
+    clientIter          cliIt;
+
+    if (_params.size() < 3)
+        return ;
+    if ( (cliIt = doesUserExit(_params[1])) != _clients.end())
+    {
+        response = client.identifier() + " NOTICE " + cliIt->getNick() + " :" +  _params[2];
+        reply(*cliIt, response);
+    }
+}
+
+void Server::names(Client &client)
+{
+    channelIter         chanIt;
+    string              response;
+
+    if (_params.size() >= 2)
+    {
+        if ( (chanIt = doesChannelExist(_params[1])) != _channels.end())
+        {
+            showChannelNames(client, *chanIt);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < _channels.size() ; i++)
+        {
+            showChannelNames(client, _channels[i]);
+        }
+    }
+}
+
+void Server::lusers(Client &client) 
+{
+    string message;
+
+    message = "253 " + client.getNick() + " " + itos(getUnknownConnections()) + " :unknown connection(s)";
+    reply(client, message);
+    message = "254 " + client.getNick() + " " + itos(getExistingChannels()) + " :channels formed";
+    reply(client, message);
+    message = "255 " + client.getNick() + " :" + "I have " + itos(getKnownConnections()) + " clients and 1 servers";
+    reply(client, message);
+}
 
 void	Server::motd(Client& client)
 {
-	/*
-	C -> MOTD
-	S <- :irc.example.com 375 chris :- irc.example.com Message of the Day -
-	S <- :irc.example.com 372 chris :- ExampleNet is a really cool network!
-	S <- :irc.example.com 372 chris :- No spamming please, thank you!
-	S <- :irc.example.com 376 chris :End of /MOTD command.
-	*/
-	/*
-  __  _         _              _  _____ _____ _____ 
- / _|| |_      (_) _ __  ___  / ||___ /|___ /|___  |
-| |_ | __|     | || '__|/ __| | |  |_ \  |_ \   / / 
-
-|  _|| |_      | || |  | (__  | | ___) |___) | / /  
-|_|   \__|_____|_||_|   \___| |_||____/|____/ /_/   
-         |_____|                                    
-	*/
 	reply(client, RPL_MOTDSTART + " " + client.getNick() + " :- " + _servname + " Message of the Day -");
 	reply(client, RPL_MOTD + " " + client.getNick() + " :-                                                      ");
 	reply(client, RPL_MOTD + " " + client.getNick() + " :-   __  _         _               _  _____ _____ _____ ");

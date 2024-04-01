@@ -111,7 +111,6 @@ void ircbot::logtimeReply(string &nick)
 {
 	string response;
 
-	// TODO: handle users not in the channel !!
 	if (!isMember(nick))
 	{
 		response = "PRIVMSG " + nick + " :You're not on the channel\n";
@@ -165,7 +164,7 @@ long ircbot::getTimeInMinutes()
     return currentTime / 60;
 }
 
-void ircbot::debugInfo(void)
+void ircbot::debugInfo(void)	// only for debug
 {
 	if (!_loggedUsers.empty())
 	{
@@ -235,7 +234,6 @@ void	ircbot::registerBot()
     ss << "NICK " << _nick << "\r\n";
     ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
     ss << "JOIN " << _channel << "\r\n";
-
 	sendReply(ss.str());
 }
 
@@ -253,7 +251,6 @@ void	ircbot::handleRead()
 	}
 	buffer[read_size] = '\0';
 	_recvbuf += buffer;
-	// std::cout << "buf: " << _recvbuf << std::endl;
 }
 
 string	ircbot::getCommand()
@@ -264,8 +261,6 @@ string	ircbot::getCommand()
 	if ( (pos = _recvbuf.find("\n")) != std::string::npos)
 	{
 		cmd = _recvbuf.substr(0, pos);
-		// std::cout << "cmd: " << cmd << std::endl;
-
 		_recvbuf = _recvbuf.substr(pos + 1);
 	}
 	return (cmd);
@@ -273,14 +268,10 @@ string	ircbot::getCommand()
 
 void ircbot::parseCommand(string &cmd, std::vector<string> &tokens)
 {
-    size_t pos;
-    std::stringstream ss;
-    string token, tmp = "";
+    size_t				pos;
+    std::stringstream	ss;
+    string 				token, tmp = "";
 
-	// if (tokens[3][tokens[3].size() - 1] == '\n')
-	// 	tokens[3].erase(tokens[3].size() - 1, 1);
-	// if (tokens[3][tokens[3].size() - 1] == '\r')
-	// 	tokens[3].erase(tokens[3].size() - 1, 1);
 	if (cmd[cmd.size() - 1] == '\n')
 	{
 		cmd.erase(cmd.size() - 1, 1);
@@ -334,7 +325,6 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 	}
 	else if (command == "JOIN" || command == "KICK" || command == "QUIT" || command == "NICK")
 	{
-		// TODO: handle quit and NICK
 		updateUsers(tokens);
 		debugInfo();
 	}
@@ -402,14 +392,13 @@ void ircbot::updateUsers(std::vector<string>& tokens)
 
 	if (tokens[1] == "JOIN")
 	{
-		if (user == _nick) return ;
+		if (user == _nick)
+			return ;
 		User cli(user);
 		_loggedUsers.push_back(cli);
 	}
 	else if (tokens[1] == "KICK" || tokens[1] == "QUIT")
 	{
-		// TODO: remove from _operatos
-		// TODO: remove from _badUsers list
 		userIter it =  doesUserExit(user);
 		if (it != _loggedUsers.end())
 		{
@@ -418,9 +407,6 @@ void ircbot::updateUsers(std::vector<string>& tokens)
 	}
 	else if ((tokens[1] == "NICK"))
 	{
-		// TODO: change in _operatos
-		// TODO: change in _badUsers
-		// TODO: change in _loggedUsers
 		userIter it =  doesUserExit(user);
 		if (it != _loggedUsers.end())
 		{
@@ -436,10 +422,8 @@ void ircbot::logUsers(string &users)
 	std::stringstream ss(users);
 	while (ss >> user)
 	{
-		if (user == _nick || "@" + user == _nick) continue ;
-
-		// TODO: handle "@" in nicknames of operatos and TEST !! 
-
+		if (user == _nick || "@" + user == _nick)
+			continue ;
 		if (user[0] == '@')
 		{
 			_operators.push_back(user.substr(1));
