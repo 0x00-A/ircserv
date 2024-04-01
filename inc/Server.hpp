@@ -132,6 +132,7 @@ class Server
 		void 			mode(Client &client);
 		void 			names(Client &client);
 		void 			lusers(Client &client);
+		void			motd(Client& client);
 
 		void    		kick(Client& client);
 		void 			invite(Client& client);

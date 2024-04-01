@@ -40,6 +40,10 @@
 #define ERR_KEYALREADYSET string("467")
 #define ERR_INPUTTOOLONG string("417")
 
+#define RPL_MOTDSTART string("375")
+#define RPL_MOTD string("372")
+#define RPL_ENDOFMOTD string("376")
+
 #define RPL_CHANNELMODEIS string("324")
 #define RPL_WELCOME string("001")
 #define RPL_YOURHOST string("002")

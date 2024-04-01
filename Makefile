@@ -8,7 +8,7 @@ BOT_PATH = ./bot
 BOT_NAME = ircbot
 
 SRC = main.cpp Socket.cpp Server.cpp Client.cpp command.cpp parser.cpp channels.cpp Channel.cpp \
-		communication.cpp utils.cpp
+		communication.cpp utils.cpp motd.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))
 

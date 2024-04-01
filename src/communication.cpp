@@ -41,6 +41,8 @@ void Server::welcomeClient(Client &client)
     " :This server was created " + getStartTime();
 	reply(client, response);
     lusers(client);
+    // :calcium.libera.chat 005 aaa CHANMODES=eIbq,k,flj,CFLMPQRSTcgimnprstuz CHANLIMIT=#:250 PREFIX=(ov)@+ MAXLIST=bqeI:100 MODES=4 NETWORK=Libera.Chat STATUSMSG=@+ CASEMAPPING=rfc1459 NICKLEN=16 MAXNICKLEN=16 CHANNELLEN=50 TOPICLEN=390 :are supported by this server
+    motd(client);
 }
 
 void Server::changeNick(Client & client)

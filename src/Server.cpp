@@ -34,6 +34,7 @@ Server::Server(const string& port, const string& passwd)
     this->commandMap["INVITE"] = &Server::invite;
     this->commandMap["TOPIC"] = &Server::topic;
     this->commandMap["LUSERS"] = &Server::lusers;
+    this->commandMap["MOTD"] = &Server::motd;
 
 
 	// temp
