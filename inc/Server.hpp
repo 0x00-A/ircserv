@@ -14,6 +14,13 @@
 
 #define SA struct sockaddr
 
+#define NICKLEN 16
+#define USERNAMELEN 9
+#define CHANNELLEN 50
+
+#define TOPICLEN 390
+#define MODES 20
+
 #define RD_BUF_SIZE 512
 #define CHANNEL 1
 #define CLIENT 2

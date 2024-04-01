@@ -73,7 +73,6 @@ send(_botSock, msg, len, MSG_NOSIGNAL);
 			if (errno == EINTR) // (interrupted system call)
         		continue;
 
-<<<<<<< HEAD
 mode key remove space
 
 
@@ -81,5 +80,11 @@ mode key remove space
 
 
 forbidin :: string.back, 
-=======
->>>>>>> 685271faf650bd95402bb62f9183839e1e90e0e4
+
+
+
+mode #ch1111 -o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka
+mode #ch1111 -l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5
+
+
+NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390
