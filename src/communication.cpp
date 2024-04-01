@@ -10,7 +10,7 @@ void Server::broadcastMsg(Client &sender, const string &msg, const Channel &chan
 {
 	if (chan.isUserInChannel(sender.getNick()) == false)
 	{
-            reply(sender, /*_servname + " " + */itos(ERR_CANNOTSENDTOCHAN) + " " + \
+            reply(sender, ERR_CANNOTSENDTOCHAN + " " + \
 				sender.getNick() + " " + chan.getName() + " :Cannot send to channel");
 	}
 	else
@@ -31,13 +31,13 @@ void Server::welcomeClient(Client &client)
 {
 	string	response;
 
-	response  = /*_servname + " " + */itos(RPL_WELCOME) + " " + client.getNick() +  \
+	response  = RPL_WELCOME + " " + client.getNick() +  \
     " :Welcome to the " + _servname + " Network, " + client.identifier();
 	reply(client, response);
-	response = /*_servname + " " + */itos(RPL_YOURHOST) + " " + client.getNick() + \
+	response = RPL_YOURHOST + " " + client.getNick() + \
     " :Your host is " + _servname + ", running version " + "version: 01";
 	reply(client, response);
-	response = /*_servname + " " + */itos(RPL_CREATED) + " " + client.getNick() + \
+	response = RPL_CREATED + " " + client.getNick() + \
     " :This server was created " + getStartTime();
 	reply(client, response);
 }

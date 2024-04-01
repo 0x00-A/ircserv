@@ -147,7 +147,7 @@ int Server::handleRead(int id)
 			// :tngnet.nl.quakenet.org 417 * :Input line was too long
 			cout << "Line too long\n\n";
 			_clients[id].rdBuf().clear();
-			reply (_clients[id], string(ERR_INPUTTOOLONG) + " " + _clients[id].getNick() + " :Input line was too long");
+			reply (_clients[id], ERR_INPUTTOOLONG + " " + _clients[id].getNick() + " :Input line was too long");
 			return (0);
 		}
 	} while (_clients[id].rdBuf().find("\n") == string::npos);

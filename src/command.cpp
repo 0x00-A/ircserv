@@ -6,11 +6,11 @@ void Server::pass(Client &client)
 {
     if (client.isConnected())
     {
-        throw (/*_servname + " " + */itos(ERR_ALREADYREGISTRED) + " " + client.getNick()  + " :You may not reregister");
+        throw (ERR_ALREADYREGISTRED + " " + client.getNick()  + " :You may not reregister");
     }
     if (this->_params.size() < 2)
     {
-        throw (/*_servname + " " + */itos(ERR_NEEDMOREPARAMS) + " " + client.getNick()  + " " + this->_params[0] + \
+        throw (ERR_NEEDMOREPARAMS + " " + client.getNick()  + " " + this->_params[0] + \
                 " :Not enough parameters");
     }
     if (this->_params[1] == this->_passwd)
@@ -20,7 +20,7 @@ void Server::pass(Client &client)
     else
     {
         client.setHasPassed(false);
-        throw (/*_servname + " " + */itos(ERR_PASSWDMISMATCH) + " " + client.getNick()  + " " + this->_params[1] + \
+        throw (ERR_PASSWDMISMATCH + " " + client.getNick()  + " " + this->_params[1] + \
                 " :Password incorrect");
     }
 }
@@ -31,11 +31,11 @@ void Server::nick(Client &client)
 
     if (client.getHasPassed() == false)
     {
-        throw (/*_servname + " " + */itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
+        throw (ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
     }
     if (this->_params.size() < 2)
     {
-        throw (/*_servname + " " + */itos(ERR_NONICKNAMEGIVEN) + " " + client.getNick()  + " :No nickname given");
+        throw (ERR_NONICKNAMEGIVEN + " " + client.getNick()  + " :No nickname given");
     }
     if (this->_params[1].size() >= NICKLEN)
     {
@@ -43,11 +43,11 @@ void Server::nick(Client &client)
     }
     if (client.checkNick(this->_params[1]) == false)
     {
-        throw (/*_servname + " " + */itos(ERR_ERRONEUSNICKNAME) + " " + client.getNick()  + " :Erroneus nickname");
+        throw (ERR_ERRONEUSNICKNAME + " " + client.getNick()  + " :Erroneus nickname");
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
-        throw (/*_servname + " " + */itos(ERR_NICKNAMEINUSE) + " " + client.getNick()  + " :Nickname is already in use");
+        throw (ERR_NICKNAMEINUSE + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (client.getHasUsedNick() == true && !client.isConnected())
     {
@@ -72,15 +72,15 @@ void Server::user(Client &client)
 {
     if (client.isConnected())
     {
-        throw (/*_servname + " " + */itos(ERR_ALREADYREGISTRED) + " " + client.getNick()  + " :You may not reregister");
+        throw (ERR_ALREADYREGISTRED + " " + client.getNick()  + " :You may not reregister");
     }
     if (client.getHasPassed() == false)
     {
-        throw (/*_servname + " " + */itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
+        throw (ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
     }
     if (this->_params.size() < 5)
     {
-        throw (/*_servname + " " + */itos(ERR_NEEDMOREPARAMS) + " " + client.getNick()  + " " + this->_params[0] + \
+        throw (ERR_NEEDMOREPARAMS + " " + client.getNick()  + " " + this->_params[0] + \
                 " :Not enough parameters");
     }
     if (this->_params[1].size() > USERNAMELEN)
@@ -111,7 +111,7 @@ void Server::join(Client &client)
 
     if (!client.isConnected())
     {
-        throw (/*_servname + " " + */itos(ERR_NOTREGISTERED) + " " + client.getNick()  + \
+        throw (ERR_NOTREGISTERED + " " + client.getNick()  + \
                 " :You have not registered");
     }
     initJoin(client);
@@ -119,7 +119,7 @@ void Server::join(Client &client)
     {
         if (_parsChannels[i].first[0] != '#')
         {
-            response = /*_servname + " " + */itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + _parsChannels[i].first + \
+            response = ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + _parsChannels[i].first + \
                     " :No such channel";
             reply(client, response);
         }
@@ -144,7 +144,7 @@ void Server::privmsg(Client &client)
     {
         if (seenNicks.count(_sendMsgClient[i].first) > 0) 
         {
-            response = /*_servname + " " + */itos(ERR_TOOMANYTARGETS) + " " +  client.getNick() + \
+            response = ERR_TOOMANYTARGETS + " " +  client.getNick() + \
                         " :Duplicate recipients";
             reply(client, response);
             continue ;
@@ -159,8 +159,8 @@ void Server::privmsg(Client &client)
             }
             else
             {
-                response = (/*_servname + " " + */itos(ERR_NOSUCHCHANNEL) + " " +  client.getNick() + " " + \
-                            _sendMsgClient[i].first + " :No such channel");
+                response = (ERR_NOSUCHCHANNEL) + " " +  client.getNick() + " " + \
+                            _sendMsgClient[i].first + " :No such channel";
                 reply(client, response);
             }
         }
@@ -173,7 +173,7 @@ void Server::privmsg(Client &client)
             }
             else
             {
-                response = /*_servname + " " + */itos(ERR_NOSUCHNICK) + " " +  client.getNick() + " " + \
+                response = ERR_NOSUCHNICK + " " +  client.getNick() + " " + \
                                 _sendMsgClient[i].first + " :No such nick/channel";
                 reply(client, response);
             }
@@ -303,20 +303,20 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
             if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
                 && (!(k < _params.size()) || _params[k].find_first_not_of(" ") == string::npos))
             {
-                throw ( /*_servname + " " + */itos(ERR_NEEDMOREPARAMS) + " " + \
+                throw ( ERR_NEEDMOREPARAMS + " " + \
                 client.getNick() + " " + _params[0]  + " :Not enough parametersss" );
             }
             if (c == 'k' && sign == "+")
             {
                 /* TEST */
                 if (badFormKey(_params[k]))
-                    throw (/*_servname + " " + */itos(ERR_INVALIDKEY) + " " + client.getNick() + " " + _params[1] + \
+                    throw (ERR_INVALIDKEY + " " + client.getNick() + " " + _params[1] + \
                             " :Key is not well-formed");
                 if (doesChannelExist(_params[1])->hasPasskey())
                 {
                     // channel key already set
                     // :underworld2.no.quakenet.org 467 lalala #ch1 :Channel key already set
-                    reply(client, /*_servname + " " + */itos(ERR_KEYALREADYSET) + " " + client.getNick() + " " + \
+                    reply(client, ERR_KEYALREADYSET + " " + client.getNick() + " " + \
                         _params[1] + " :Channel key already set");
                 }
             }
@@ -327,7 +327,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         }
         else
         {
-            throw ( /*_servname + " " + */itos(ERR_UNKNOWNMODE) + " " + client.getNick() + \
+            throw ( ERR_UNKNOWNMODE + " " + client.getNick() + \
             " " + _params[2].substr(i, 1) + " :is an unknown mode char to me" );
         }
     }
@@ -338,12 +338,12 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
 {
     if (doesUserExit(m.second) == _clients.end())
     {
-        reply(cli, /*_servname + " " + */itos(ERR_NOSUCHNICK) + " " + \
+        reply(cli, ERR_NOSUCHNICK + " " + \
             cli.getNick() + " " + m.second + " :No such nick");
     }
     else if (!chan->isUserInChannel(m.second))
     {
-        reply(cli, /*_servname + " " + */itos(ERR_USERNOTINCHANNEL) + " " + \
+        reply(cli, ERR_USERNOTINCHANNEL + " " + \
             cli.getNick() + " " + _params[1] + " :They aren't on that channel");
     }
     else if (m.first == "+o" && chan->setChannelOperator(m.second))
@@ -469,30 +469,30 @@ void    Server::mode(Client& client)
 
     if (!client.isConnected())
     {
-        throw (/*_servname + " " + */itos(ERR_NOTREGISTERED) + " " + \
+        throw (ERR_NOTREGISTERED + " " + \
         client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        throw (/*_servname + " " + */itos(ERR_NEEDMOREPARAMS) + " " + \
+        throw (ERR_NEEDMOREPARAMS + " " + \
         client.getNick() + " " + _params[0]  + " :Not enough parameters");
     }
     if ( (chan = doesChannelExist(_params[1])) == _channels.end())
     {
-        throw (/*_servname + " " + */itos(ERR_NOSUCHCHANNEL) + " " + \
+        throw (ERR_NOSUCHCHANNEL + " " + \
         client.getNick() + " " + _params[1]  + " :No such channel");
     }
     if (_params.size() == 2)
     {
-        reply(client, (/*_servname + " " + */itos(RPL_CHANNELMODEIS) + " " + \
+        reply(client, (RPL_CHANNELMODEIS + " " + \
         client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
-        throw (/*_servname + " " + */itos(RPL_CREATIONTIME) + " " + \
+        throw (RPL_CREATIONTIME + " " + \
         client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))
     {
-        throw (/*_servname + " " + */itos(ERR_CHANOPRIVSNEEDED) + " " + \
+        throw (ERR_CHANOPRIVSNEEDED + " " + \
         client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
 	}
 	while (!modes.empty())
@@ -531,11 +531,11 @@ void Server::kick(Client& client)
     // :q1!~f@197.230.30.146 KICK #edc q4 :q4
     // :q1!~f@197.230.30.146 KICK #edc q3 :speck english
     if (!client.isConnected()) {
-        reply(client, /*_servname + " " + */itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered");
+        reply(client, ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
         return;
     }
     if (_params.size() < 3) {
-        reply(client, /*_servname + " " + */itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " KICK :Not enough parameters");
+        reply(client, ERR_NEEDMOREPARAMS + " " + client.getNick() + " KICK :Not enough parameters");
         return;
     }
 
@@ -545,24 +545,24 @@ void Server::kick(Client& client)
 
 	channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
-        reply(client, /*_servname + " " + */itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel");
+        reply(client, ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + channelName + " :No such channel");
         return;
     }
     if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, /*_servname + " " + */itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel");
+        reply(client, ERR_NOTONCHANNEL + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        reply(client, /*_servname + " " + */itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator");
+        reply(client, ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " :You're not channel operator");
         return;
     }
 
 	if (doesUserExit(key) == _clients.end()) {
-        reply(client, /*_servname + " " + */itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + channelName + " :No such nick/channel");
+        reply(client, ERR_NOSUCHNICK + " " + client.getNick() + " " + channelName + " :No such nick/channel");
         return;
 	}
     if (!chanit->isUserInChannel(key)) {
-        reply(client, /*_servname + " " + */itos(ERR_USERNOTINCHANNEL) + " " + client.getNick() + " " + channelName + " :they are not on that channel");
+        reply(client, ERR_USERNOTINCHANNEL + " " + client.getNick() + " " + channelName + " :they are not on that channel");
         return;
     }
     std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
@@ -590,27 +590,27 @@ void Server::invite(Client& client)
 
 	channelIter chanit = doesChannelExist(chanName);
     if (chanit == _channels.end()) {
-        throw (/*_servname + " " + */itos(ERR_NOSUCHCHANNEL) + client.getNick() + " " + chanName + \
+        throw (ERR_NOSUCHCHANNEL + client.getNick() + " " + chanName + \
                 " :No such channel");
     }
 	if (!chanit->isUserInChannel(client.getNick())) {
-        throw (/*_servname + " " + */itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + chanName + \
+        throw (ERR_NOTONCHANNEL + " " + client.getNick() + " " + chanName + \
                 " :You're not on that channel");
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        throw (/*_servname + " " + */itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " " + chanName + \
+        throw (ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + chanName + \
                 " :You're not channel operator");
     }
     if ( (invitedUserIter = doesUserExit(invitedUser)) == _clients.end()){
-        throw (/*_servname + " " + */itos(ERR_NOSUCHNICK) + " " + client.getNick() + " " + invitedUser + \
+        throw (ERR_NOSUCHNICK + " " + client.getNick() + " " + invitedUser + \
                 " :No such nick");
     }
     if (chanit->isUserInChannel(invitedUser)) {
-        throw (/*_servname + " " + */itos(ERR_USERONCHANNEL) + " "+ client.getNick() + " " + invitedUser + " " + \
+        throw (ERR_USERONCHANNEL + " "+ client.getNick() + " " + invitedUser + " " + \
                 chanName + " :is already on channel");
     }
     // message sent to the inviter
-    reply(client, /*_servname + " " + */itos(RPL_INVITING) + " " + client.getNick() + " " + invitedUser + " " + chanName);
+    reply(client, RPL_INVITING + " " + client.getNick() + " " + invitedUser + " " + chanName);
     // message sent to the invitedUserIter
     reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " " + chanName);
     invitedUserIter->inviteToChannel(chanName);
@@ -624,31 +624,31 @@ void Server::invite(Client& client)
 void Server::topic(Client& client)
 {
     if (!client.isConnected()) {
-        reply(client, /*_servname + " " + */itos(ERR_NOTREGISTERED) + " " + client.getNick() + " :You have not registered");
+        reply(client, ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
         return;
     }
 
     if (_params.size() < 2) {
-        reply(client, /*_servname + " " + */itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + " TOPIC :Not enough parameters");
+        reply(client, ERR_NEEDMOREPARAMS + " " + client.getNick() + " TOPIC :Not enough parameters");
         return;
     }
 
     std::string channelName = _params[1];
     channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
-        reply(client, /*_servname + " " + */itos(ERR_NOSUCHCHANNEL) + " " + client.getNick() + " " + channelName + " :No such channel");
+        reply(client, ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + channelName + " :No such channel");
         return;
     }
 
     if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, /*_servname + " " + */itos(ERR_NOTONCHANNEL) + " " + client.getNick() + " " + channelName + " :You're not on that channel");
+        reply(client, ERR_NOTONCHANNEL + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
 
     if(_params.size() > 2) {
 
         if (chanit->hasTopic() && !chanit->isUserOperator(client.getNick())) {
-            reply(client, /*_servname + " " + */itos(ERR_CHANOPRIVSNEEDED) + " " + client.getNick() + " :You're not channel operator");
+            reply(client, ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " :You're not channel operator");
             return;
         }
         
@@ -656,16 +656,16 @@ void Server::topic(Client& client)
         chanit->setTopic(newTopic);
         chanit->setHasTopic(true);
 
-        reply(client, /*_servname + " " + */itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + newTopic);
+        reply(client, RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + newTopic);
         std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
         broadcastMsg(client, msg, *chanit);
     }
 	else {
         std::string currentTopic = chanit->getTopic();
         if (currentTopic.empty())
-            reply(client, /*_servname + " " + */itos(RPL_NOTOPIC) + " " + client.getNick() + " " + channelName + " :No topic is set");
+            reply(client, RPL_NOTOPIC + " " + client.getNick() + " " + channelName + " :No topic is set");
 		else 
-            reply(client, /*_servname + " " + */itos(RPL_TOPIC) + " " + client.getNick() + " " + channelName + " :" + currentTopic);
+            reply(client, RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + currentTopic);
         return;
     }
 }

@@ -73,7 +73,7 @@ void Server::handleCommand(string& cmd, int id)
     else if (_clients[id].isConnected())
     {
 
-        throw ( /*_servname + " " + */itos(ERR_UNKNOWNCOMMAND) + " " + \
+        throw ( ERR_UNKNOWNCOMMAND + " " + \
         _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }
 }
@@ -114,15 +114,15 @@ void Server::initPrivmsg(Client &client)
 {
     if (!client.isConnected())
     {
-        throw (/*_servname + " " + */itos(ERR_NOTREGISTERED) + " " + client.getNick()  + " :You have not registered");
+        throw (ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        throw (/*_servname + " " + */itos(ERR_NORECIPIENT) + " " + client.getNick()  + " :No recipient given (" + _params[0] + ")");
+        throw (ERR_NORECIPIENT + " " + client.getNick()  + " :No recipient given (" + _params[0] + ")");
     }
     if (_params.size() < 3)
     {
-        throw (/*_servname + " " + */itos(ERR_NOTEXTTOSEND) + " " + client.getNick()  + " ::No text to send");
+        throw (ERR_NOTEXTTOSEND + " " + client.getNick()  + " ::No text to send");
     }
     string clients = trim_comma(_params[1], 1);
     stringstream ss(clients);
@@ -146,7 +146,7 @@ void Server::initJoin(Client &client)
 
     if (_params.size() < 2)
     {
-        throw (/*_servname + " " + */itos(ERR_NEEDMOREPARAMS) + " " + client.getNick() + \
+        throw (ERR_NEEDMOREPARAMS + " " + client.getNick() + \
                 " JOIN" + " :Not enough parameters");
     }
     line = trim_comma(_params[1], 1);
@@ -169,7 +169,7 @@ void Server::initJoin(Client &client)
         }
         if (seenChannels.count(chan) > 0) 
         {
-            response = /*_servname + " " + */itos(ERR_TOOMANYTARGETS) + " " +  client.getNick() + \
+            response = ERR_TOOMANYTARGETS + " " +  client.getNick() + \
                     " :Duplicate recipients";
             reply(client, response);
             continue ;
