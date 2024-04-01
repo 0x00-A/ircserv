@@ -218,11 +218,6 @@ void Server::names(Client &client)
 
 void Server::lusers(Client &client) 
 {
-    // int totalClients = getTotalClients(); // Replace this with the actual total number of clients
-
-    // Response messages
-    // std::string message1 = "251 " + client.getNick() + " :" + "There are " + itos(_clients.size()) + " users and 1000 invisible on 1 servers";
-    // std::string message2 = "252 " + client.getNick() + " 0 :operator(s) online";
     string message;
 
     message = "253 " + client.getNick() + " " + itos(getUnknownConnections()) + " :unknown connection(s)";
@@ -231,7 +226,6 @@ void Server::lusers(Client &client)
     reply(client, message);
     message = "255 " + client.getNick() + " :" + "I have " + itos(getKnownConnections()) + " clients and 1 servers";
     reply(client, message);
-
 }
 
 

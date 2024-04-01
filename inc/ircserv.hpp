@@ -20,6 +20,7 @@
 # include <cerrno>
 # include <signal.h>
 # include <algorithm>
+# include "numReplies.hpp"
 
 
 using std::string;
