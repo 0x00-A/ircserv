@@ -7,12 +7,6 @@ ircbot::User::User(const string& nick) : _nick(nick)
 
 ircbot::userIter ircbot::doesUserExit(const string& user)
 {
-	// std::cout << "::::::::::::::::::::::::::::::::::" << std::endl;
-	// for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
-	// {
-	// 	std::cout << ":::: > " << it->_nick << " <" << std::endl;
-	// }
-	// std::cout << "::::::::::::::::::::::::::::::::::" << std::endl;
 	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
 	{
 		if (it->_nick == user)// || it->_nick == ("@" + user))
@@ -25,7 +19,6 @@ ircbot::userIter ircbot::doesUserExit(const string& user)
 
 bool ircbot::isOperator(string &user)
 {
-	// strVecIter it = std::find(_operators.begin(), _operators.end(), user);
 	return (std::find(_operators.begin(), _operators.end(), user) != _operators.end());
 }
 
@@ -47,7 +40,6 @@ string ircbot::getBadUsers(void)
 	
 	for (size_t i = 0; i < _badUsers.size(); i++)
 	{
-		// if (_badUsers[i].empty()) continue;
 		if (i != 0)
 			r += " ";
 		if (isOperator(_badUsers[i]))
@@ -74,7 +66,7 @@ void ircbot::addBadUser(string &user)
 
 void ircbot::sendReply(const string &reply)
 {
-	if (write(_botSock, reply.data(), reply.length()) <= 0)
+	if (write(_ircSock, reply.data(), reply.length()) <= 0)
 	{
 		std::perror("write");
 		throw (string("The bot was unable to send a reply to the server"));
@@ -124,9 +116,9 @@ void ircbot::logtimeReply(string &nick)
 
 string ircbot::itos(int num)
 {
-    std::ostringstream oss;
-    oss << num;
-    return oss.str();
+	std::ostringstream oss;
+	oss << num;
+	return oss.str();
 }
 
 ircbot::ircbot(string passwd, string port, string nick, string chan)
@@ -134,18 +126,26 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 {
 	// const int	enable = 1;
 
-	if ( (_botSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	if ( (_ircSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		std::perror("socket");
 		exit(1);
 	}
-	// if (setsockopt(_botSock, SOL_SOCKET, SO_NOSIGPIPE, &enable, sizeof(int)))
+	if ( (_weatherSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	{
+		std::perror("socket");
+		close(_ircSock);
+		exit(1);
+	}
+	_weatherServIP = "37.139.20.5";
+	// if (setsockopt(_ircSock, SOL_SOCKET, SO_NOSIGPIPE, &enable, sizeof(int)))
 	// {
 	// 	perror("setsockopt");
 	// }
+	signal(SIGPIPE, SIG_IGN);
 	
 	// store data
-	std::ifstream infile("../data/offensive_words.txt");
+	std::ifstream infile("./data/offensive_words.txt");
 	if (infile.is_open())
 	{
 		string s;
@@ -154,14 +154,18 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 			_wordlist.push_back(s);
 		}
 	}
+	else
+	{
+		std::cerr << "could't open file needed by bot\n";
+	}
 }
 
 long ircbot::getTimeInMinutes()
 {
 	std::time_t currentTime;
-    std::time(&currentTime);
+	std::time(&currentTime);
 
-    return currentTime / 60;
+	return currentTime / 60;
 }
 
 void ircbot::debugInfo(void)	// only for debug
@@ -202,12 +206,12 @@ long	ircbot::getTime(const string& user)
 	if (it != _loggedUsers.end())
 	{
 		long res = getTimeInMinutes() - it->_timer;
-    	return (res);
+		return (res);
 	}
-    return 0;
+	return 0;
 }
 
-void	ircbot::connectToServer()
+void	ircbot::connectToIRCServer()
 {
 	struct sockaddr_in servaddr;
 
@@ -216,25 +220,68 @@ void	ircbot::connectToServer()
 	servaddr.sin_port = htons(std::atoi(_ircPort.c_str()));
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	if (connect(_botSock, (struct sockaddr*) &servaddr, sizeof(servaddr)) != 0)
+	// TODO ip addr of irc serv 
+
+	if (connect(_ircSock, (struct sockaddr*) &servaddr, sizeof(servaddr)) != 0)
 	{
 		std::perror("connect");
-		throw (string("The bot was unable to connect to server"));
+		throw (string("The bot was unable to connect to IRC server"));
 	}
 	std::cout << "Connected to server successfully" << std::endl;
 }
 
-void	ircbot::registerBot()
+void ircbot::connectToWeatherServer(void)
+{
+	struct sockaddr_in serv_addr;
+
+	uint32_t ipInt = inet_addr(_weatherServIP.c_str());
+	if (ipInt == INADDR_NONE)
+	{
+		std::perror("inet_addr");
+		close(_weatherSock);
+		throw (string("Invalid IP address for weather server"));
+	}
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(80);
+	serv_addr.sin_addr.s_addr = ipInt;
+
+	if (connect(_weatherSock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+	{
+		std::perror("connect");
+		close(_weatherSock);
+		throw (string("Connection to weather server Failed"));
+	}
+}
+
+void	ircbot::IRCServRegister()
 {
 	std::vector<string> tokens;
 	string				cmd;
 
 	std::stringstream ss;
-    ss << "PASS " << _passwd << "\r\n";
-    ss << "NICK " << _nick << "\r\n";
-    ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
-    ss << "JOIN " << _channel << "\r\n";
+	ss << "PASS " << _passwd << "\r\n";
+	ss << "NICK " << _nick << "\r\n";
+	ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
+	ss << "JOIN " << _channel << "\r\n";
 	sendReply(ss.str());
+}
+
+string ircbot::getWeatherInfo()
+{
+    char buffer[1024] = {0};
+
+    std::string request = 
+        "GET /data/2.5/weather?q=Casablanca,MA,uk&APPID=851bb946327ee4bdc5230fe57cd6439f HTTP/1.1\r\n"
+        "Host: 37.139.20.5\r\n"
+        "Connection: close\r\n\r\n";
+
+    write(_weatherSock, request.c_str(), request.size());
+    read(_weatherSock, buffer, sizeof(buffer)-1);
+
+    // std::string response = buffer;
+	std::cout << "buf: " << buffer << std::endl;
+	return (buffer);
 }
 
 void	ircbot::handleRead()
@@ -243,7 +290,7 @@ void	ircbot::handleRead()
 	char				buffer[BUF_SIZE];
 
 
-	read_size = read(_botSock, buffer, sizeof(buffer) - 1);
+	read_size = read(_ircSock, buffer, sizeof(buffer) - 1);
 	if (read_size <= 0)
 	{
 		std::perror("read");
@@ -268,9 +315,9 @@ string	ircbot::getCommand()
 
 void ircbot::parseCommand(string &cmd, std::vector<string> &tokens)
 {
-    size_t				pos;
-    std::stringstream	ss;
-    string 				token, tmp = "";
+	size_t				pos;
+	std::stringstream	ss;
+	string 				token, tmp = "";
 
 	if (cmd[cmd.size() - 1] == '\n')
 	{
@@ -280,18 +327,77 @@ void ircbot::parseCommand(string &cmd, std::vector<string> &tokens)
 	{
 		cmd.erase(cmd.size() - 1, 1);
 	}
-    if ( (pos = cmd.find(" :")) != string::npos)
-    {
-        tmp = cmd.substr(pos + 2);
-        cmd = cmd.substr(0, pos);
+	if ( (pos = cmd.find(" :")) != string::npos)
+	{
+		tmp = cmd.substr(pos + 2);
+		cmd = cmd.substr(0, pos);
+	}
+	ss << cmd;
+	while (ss >> token)
+	{
+		tokens.push_back(token);
+	}
+	if (!tmp.empty())
+		tokens.push_back(tmp);
+}
+
+std::string ircbot::parseInfo(std::string marker, string endMarker, std::string& response)
+{
+    size_t MarkerPos = response.find(marker);
+    if (MarkerPos != std::string::npos)
+	{
+        size_t start = MarkerPos + marker.size();
+        size_t end = response.find(endMarker, start);
+        std::string info = response.substr(start, end - start);
+        // std::cout << "info: " << info << std::endl;
+        return (info);
     }
-    ss << cmd;
-    while (ss >> token)
-    {
-        tokens.push_back(token);
+	else
+	{
+        // std::cout << "info not found in response" << std::endl;
+        return ("no info found");
     }
-    if (!tmp.empty())
-        tokens.push_back(tmp);
+}
+
+void ircbot::sendWeatherInfo(string& client_nick)
+{
+	connectToWeatherServer();
+
+	string	response = getWeatherInfo();
+
+	std::cout << "res: " << response << std::endl;
+	// if (response.empty()){}
+
+	std::string res, reply;
+
+    std::cout << std::endl;
+    
+    reply = "Weather for " + parseInfo("\"name\":\"", "\"", response) + ", " + parseInfo("\"country\":\"", "\"", response) + ":\n";
+	sendReply("PRIVMSG " + client_nick + " :" + reply);
+    
+    reply = "- Coordinates: Longitude " + parseInfo("\"lon\":", "\"", response) + " Latitude " + parseInfo("\"lat\":", "}", response) + "\n";
+	sendReply("PRIVMSG " + client_nick + " :" + reply);
+
+    reply = "- Weather Main: " + parseInfo("\"main\":\"", "\"", response) + "\n";
+	sendReply("PRIVMSG " + client_nick + " :" + reply);
+
+    reply = "- Weather Description: " + parseInfo("\"description\":\"", "\"", response) + "\n";
+	sendReply("PRIVMSG " + client_nick + " :" + reply);
+    
+    // res = parseInfo("\"temp\":", ",", response);
+	double d = std::strtod(parseInfo("\"temp\":", ",", response).c_str(), NULL);
+	d -= 273.15;
+	std::stringstream ss;
+	ss << d;
+    reply = "- Temperature: " + ss.str() + " Celsius\n";
+	sendReply("PRIVMSG " + client_nick + " :" + reply);
+
+    reply = "- Humidity: " + parseInfo("\"humidity\":", "}", response) + "%\n";
+	sendReply("PRIVMSG " + client_nick + " :" + reply);
+
+    reply = "- Wind Speed: " + parseInfo("\"speed\":", ",", response) + " m/s\n";
+	sendReply("PRIVMSG " + client_nick + " :" + reply);
+	close(_weatherSock);
 }
 
 void	ircbot::handleCommand(std::vector<string>& tokens)
@@ -321,6 +427,10 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 		if (tokens[2] != _nick)		// not just a privmsg to bot
 		{
 			checkOffensiveWords(tokens);
+		}
+		if (tokens[2] == _nick && tokens.back() == "weather")		// not just a privmsg to bot
+		{
+			sendWeatherInfo(userNick);
 		}
 	}
 	else if (command == "JOIN" || command == "KICK" || command == "QUIT" || command == "NICK")
@@ -506,7 +616,8 @@ void	ircbot::run()
 	std::vector<string> tokens;
 	string				response, cmd;
 
-	registerBot();
+	IRCServRegister();
+	getWeatherInfo();
 	while (true)
 	{
 		handleRead();
@@ -524,5 +635,6 @@ void	ircbot::run()
 
 ircbot::~ircbot()
 {
-	close(_botSock);
+	close(_ircSock);
+	// close(_weatherSock);
 }

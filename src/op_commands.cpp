@@ -87,7 +87,7 @@ void Server::invite(Client& client)
     // message sent to the inviter
     reply(client, RPL_INVITING + " " + client.getNick() + " " + invitedUser + " " + chanName);
     // message sent to the invited user
-    reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " " + chanName);
+    reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " :" + chanName);
     invitedUserIter->inviteToChannel(chanName);
 }
 
@@ -140,6 +140,9 @@ void Server::topic(Client& client)
             reply(client, ":ft_irc.1337.ma " + RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + currentTopic);
         return;
     }
+        // std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
+        // reply(client, msg);
+        // broadcastMsg(client, msg, *chanit);
 }
 
 void    Server::mode(Client& client)
