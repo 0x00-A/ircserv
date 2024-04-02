@@ -18,7 +18,7 @@
 #define USERNAMELEN 9
 #define CHANNELLEN 50
 
-#define TOPICLEN 390
+#define TOPICLEN 10
 #define MODES 20
 
 #define RD_BUF_SIZE 512
