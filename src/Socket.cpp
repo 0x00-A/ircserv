@@ -68,3 +68,4 @@ void Socket::closeSocket(void)
 {
 	close(_sockfd);
 }
+

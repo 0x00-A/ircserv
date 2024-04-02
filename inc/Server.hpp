@@ -16,7 +16,7 @@
 #define TOPICLEN 10
 #define MODES 20
 #define CHANMODES "k,l,i,t"
-#define MAXCHANNELS 250
+#define MAXCHANNELS 3
 
 #define CHANNEL 1
 #define CLIENT 2
