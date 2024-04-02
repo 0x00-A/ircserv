@@ -66,28 +66,26 @@ void Server::invite(Client& client)
 
 	channelIter chanit = doesChannelExist(chanName);
     if (chanit == _channels.end()) {
-        throw (ERR_NOSUCHCHANNEL + client.getNick() + " " + chanName + \
-                " :No such channel");
+        throw (ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + chanName + \
+                " :No such channel"); G
     }
 	if (!chanit->isUserInChannel(client.getNick())) {
         throw (ERR_NOTONCHANNEL + " " + client.getNick() + " " + chanName + \
-                " :You're not on that channel");
+                " :You're not on that channel"); G
     }
     if (!chanit->isUserOperator(client.getNick())) {
         throw (ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + chanName + \
-                " :You're not channel operator");
+                " :You're not a channel operator"); G
     }
     if ( (invitedUserIter = doesUserExit(invitedUser)) == _clients.end()){
         throw (ERR_NOSUCHNICK + " " + client.getNick() + " " + invitedUser + \
-                " :No such nick");
+                " :No such nick/channel"); G
     }
     if (chanit->isUserInChannel(invitedUser)) {
         throw (ERR_USERONCHANNEL + " "+ client.getNick() + " " + invitedUser + " " + \
                 chanName + " :is already on channel");
     }
-    // message sent to the inviter
     reply(client, RPL_INVITING + " " + client.getNick() + " " + invitedUser + " " + chanName);
-    // message sent to the invited user
     reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " :" + chanName);
     invitedUserIter->inviteToChannel(chanName);
 }
@@ -141,9 +139,6 @@ void Server::topic(Client& client)
             reply(client, ":ft_irc.1337.ma " + RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + currentTopic);
         return;
     }
-        // std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
-        // reply(client, msg);
-        // broadcastMsg(client, msg, *chanit);
 }
 
 void    Server::mode(Client& client)
