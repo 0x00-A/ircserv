@@ -2,29 +2,22 @@
 #define SERVER_HPP
 
 #include "ircserv.hpp"
-
-#include <poll.h>
-#include <arpa/inet.h>
-
-#include <netdb.h>
-
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Socket.hpp"
+#include <poll.h>
 
 #define SA struct sockaddr
+
+#define RD_BUF_SIZE 512
 
 #define NICKLEN 16
 #define USERNAMELEN 9
 #define CHANNELLEN 50
-
 #define TOPICLEN 390
 #define MODES 20
 #define CHANMODES "k,l,i,t"
 #define MAXCHANNELS 250
-
-#define RD_BUF_SIZE 512
-
 
 #define CHANNEL 1
 #define CLIENT 2

@@ -84,7 +84,7 @@ forbidin :: string.back,
 
 
 mode #ch1111 -o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka
-mode #ch1111 -l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5
+mode #cc -l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l+w+z 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5
 
 
 NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390 CHANLIMIT=#:250 

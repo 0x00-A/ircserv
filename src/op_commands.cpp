@@ -214,8 +214,12 @@ void    Server::mode(Client& client)
 bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Client& client)
 {
     string sign = "+";
+    int     modeCount = 0;
+
     for (size_t i = 0, k = 3; i < _params[2].size(); i++)
     {
+        if (modeCount >= MODES)
+            break;
         if (_params[2][i] == '-' || _params[2][i] == '+')
         {
             sign = _params[2].substr(i, 1);
@@ -223,7 +227,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         }
         char c = _params[2][i];
         if (c == 'o' || c == 'l' || c == 'k' || c == 't' || c == 'i')
-        {   
+        {
             if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
                 && (!(k < _params.size()) || _params[k].find_first_not_of(" ") == string::npos))
             {
@@ -251,6 +255,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
             throw ( ERR_UNKNOWNMODE + " " + client.getNick() + \
             " " + _params[2].substr(i, 1) + " :is an unknown mode char to me" );
         }
+        modeCount++;
     }
     return (true);
 }
