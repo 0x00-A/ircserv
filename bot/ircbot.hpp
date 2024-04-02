@@ -19,6 +19,8 @@
 # include <sys/types.h>
 # include <strings.h>
 
+extern int IsBotRunning;
+
 # define BUF_SIZE 1024
 
 using std::string;

@@ -1,5 +1,7 @@
 #include "ircbot.hpp"
 
+int IsBotRunning = true;
+
 ircbot::User::User(const string& nick) : _nick(nick)
 {
 	_timer = getTimeInMinutes();
@@ -131,12 +133,7 @@ ircbot::ircbot(string passwd, string port, string nick, string chan)
 		std::perror("socket");
 		exit(1);
 	}
-	if ( (_weatherSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-	{
-		std::perror("socket");
-		close(_ircSock);
-		exit(1);
-	}
+
 	_weatherServIP = "37.139.20.5";
 	// if (setsockopt(_ircSock, SOL_SOCKET, SO_NOSIGPIPE, &enable, sizeof(int)))
 	// {
@@ -233,6 +230,13 @@ void	ircbot::connectToIRCServer()
 void ircbot::connectToWeatherServer(void)
 {
 	struct sockaddr_in serv_addr;
+
+	if ( (_weatherSock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	{
+		std::perror("socket");
+		close(_ircSock);
+		exit(1);
+	}
 
 	uint32_t ipInt = inet_addr(_weatherServIP.c_str());
 	if (ipInt == INADDR_NONE)
@@ -620,6 +624,8 @@ void	ircbot::run()
 	getWeatherInfo();
 	while (true)
 	{
+		if (!IsBotRunning)
+			break;
 		handleRead();
 		
 		while ( (cmd = getCommand()) != "")
