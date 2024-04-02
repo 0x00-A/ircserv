@@ -50,7 +50,6 @@ void Server::channelWelcomeMessages(Client &client, Channel& ch)
 		reply(client, RPL_TOPICWHOTIME + " " + client.getNick() + " " + ch.getName()  \
 			+ " "  + client.identifier() + " " + itos(ch.getTimeOfTopic()));
 	}
-	// reply(client, _servname + " MODE " + ch.getName( + " " + ch.channelModeIs());
 	if (ch.isUserOperator(client.getNick()))
 		reply(client, client.identifier() + " MODE " + ch.getName() + " " + "+t");
 
@@ -81,6 +80,11 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 {
 	string response;
 
+	if (client.getChannels().size() >= MAXCHANNELS)
+	{
+		throw (ERR_TOOMANYCHANNELS + " " + client.getNick() + " " + channel.first + \
+				" :You have joined too many channels");
+	}
 	for (size_t i = 0; i < this->_channels.size(); i++)
 	{
 		if (this->_channels[i].getName() == channel.first)

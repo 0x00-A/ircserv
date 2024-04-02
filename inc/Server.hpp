@@ -7,8 +7,6 @@
 #include "Socket.hpp"
 #include <poll.h>
 
-#define SA struct sockaddr
-
 #define RD_BUF_SIZE 512
 
 #define NICKLEN 16
@@ -18,7 +16,7 @@
 #define TOPICLEN 10
 #define MODES 20
 #define CHANMODES "k,l,i,t"
-#define MAXCHANNELS 250
+#define MAXCHANNELS 3
 
 #define CHANNEL 1
 #define CLIENT 2
@@ -51,8 +49,6 @@ class Server
 		std::vector<string> 						_keys;
 		string 										_messagClient;
 		string										_servname;
-
-		// std::vector<int>							_disconnectedClients;
 
 		std::map<string, void (Server::*)(Client &)> commandMap;
 

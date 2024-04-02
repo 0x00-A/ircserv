@@ -21,8 +21,6 @@
 # include <signal.h>
 # include <algorithm>
 # include <fstream>
-// # include <netdb.h>
-// #include <arpa/inet.h>
 # include "numReplies.hpp"
 
 

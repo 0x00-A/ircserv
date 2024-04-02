@@ -86,7 +86,7 @@ void Server::invite(Client& client)
     // message sent to the inviter
     reply(client, RPL_INVITING + " " + client.getNick() + " " + invitedUser + " " + chanName);
     // message sent to the invited user
-    reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " " + chanName);
+    reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " :" + chanName);
     invitedUserIter->inviteToChannel(chanName);
 }
 
@@ -138,6 +138,9 @@ void Server::topic(Client& client)
         }
         return;
     }
+        // std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
+        // reply(client, msg);
+        // broadcastMsg(client, msg, *chanit);
 }
 
 void    Server::mode(Client& client)
@@ -301,7 +304,7 @@ void Server::handleLimitFlag(strPair &m, string &modesave, string &paramsave, ch
         else
         {
             reply(cli, ERR_INVALIDMODEPARAM + " " + cli.getNick() + " " + chan->getName() + \
-                    " ::Invalid limit mode parameter. Syntax: <limit>.");
+                    " :Invalid limit mode parameter. Syntax: <limit>.");
         }
 	}
 	else if (m.first == "-l")
@@ -406,8 +409,8 @@ bool Server::checkValidLimit(string &s)
 {
     if (!isdigitstring(s) || s.length() > 19)
         return (false);
-    long long int n;
-    n = std::strtoll(s.c_str(), NULL, 10);
+    unsigned long long int n;
+    n = std::strtoull(s.c_str(), NULL, 10);
     if (n > __LONG_MAX__)
         return (false);
     return (true);

@@ -19,6 +19,8 @@
 # include <sys/types.h>
 # include <strings.h>
 
+extern int IsBotRunning;
+
 # define BUF_SIZE 1024
 
 using std::string;
@@ -40,7 +42,8 @@ class ircbot
 
 	private:
 
-		int						_botSock;
+		int						_ircSock;
+		int						_weatherSock;
 		string					_passwd;
 		string					_ircPort;
 		std::string				_recvbuf;
@@ -50,12 +53,15 @@ class ircbot
 		std::vector<string> 	_wordlist;
 		std::vector<User> 		_loggedUsers;
 		std::vector<string>		_badUsers;
+		string					_weatherServIP;
 
-		void					registerBot( void );
+		void					IRCServRegister( void );
+		string					getWeatherInfo( void );
 		void					handleRead( void );
 		string					getCommand( void );
-		void					parseCommand( string&, std::vector<string>& );
-		void					handleCommand( std::vector<string>& );
+		void					parseCommand( string&, std::vector<string>& tokens );
+		void					sendWeatherInfo( string& client_nick );
+		void					handleCommand( std::vector<string>& tokens );
 		string					getUserNick( string& token );
 		void					checkOffensiveWords( std::vector<string>& tokens );
 		bool					hasBadWords( string& str );
@@ -75,6 +81,7 @@ class ircbot
 		void					addBadUser( string& user );
 		void					sendReply(const string& reply);
 		bool					isErrorCode( const string& code );
+		string 					parseInfo(std::string marker, string endMarker, std::string& response);
 	
 	public:
 
@@ -82,7 +89,8 @@ class ircbot
 		~ircbot();
 
 		void					run( void );
-		void					connectToServer( void );
+		void					connectToIRCServer( void );
+		void					connectToWeatherServer( void );
 
 		static long 			getTimeInMinutes();
 
