@@ -3,8 +3,6 @@
 
 void Server::kick(Client& client)
 {
-    // :q1!~f@197.230.30.146 KICK #edc q4 :q4
-    // :q1!~f@197.230.30.146 KICK #edc q3 :speck english
     if (!client.isConnected()) {
         reply(client, ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
         return;
@@ -16,7 +14,6 @@ void Server::kick(Client& client)
 
     std::string channelName = _params[1];
     std::string key = _params[2];
-	std::string reason = (_params.size() > 3) ? _params[3] : "No reason provided";
 
 	channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
@@ -28,24 +25,28 @@ void Server::kick(Client& client)
         return;
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        reply(client, ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " :You're not channel operator");
+        reply(client, ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + channelName + " :You're not a channel operator");
         return;
     }
 
 	if (doesUserExit(key) == _clients.end()) {
-        reply(client, ERR_NOSUCHNICK + " " + client.getNick() + " " + channelName + " :No such nick/channel");
+        reply(client, ERR_NOSUCHNICK + " " + client.getNick() + " " +  key + " :No such nick/channel");
         return;
 	}
     if (!chanit->isUserInChannel(key)) {
-        reply(client, ERR_USERNOTINCHANNEL + " " + client.getNick() + " " + channelName + " :they are not on that channel");
+        reply(client, ERR_USERNOTINCHANNEL + " " + client.getNick() + " " + key + " " + channelName + " :they aren't on that channel");
         return;
     }
-    std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
+    std::string kickMessage;
+
+    if (_params.size() > 3)
+        kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + _params[3];
+    else
+        kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
+
     reply(client, kickMessage);
 	broadcastMsg(client, kickMessage, *chanit);
 	removeUserFromChannel(key, channelName);
-
-    std::cout << "User " << client.getNick() << " kicked " << key << " from " << channelName << "\n";
 }
 
 
