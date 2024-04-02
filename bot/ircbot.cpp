@@ -7,7 +7,7 @@ ircbot::User::User(const string& nick) : _nick(nick)
 	_timer = getTimeInMinutes();
 }
 
-ircbot::userIter ircbot::doesUserExit(const string& user)
+ircbot::userIter ircbot::Channel::doesUserExit(const string& user)
 {
 	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
 	{
@@ -19,12 +19,12 @@ ircbot::userIter ircbot::doesUserExit(const string& user)
 	return (_loggedUsers.end());
 }
 
-bool ircbot::isOperator(string &user)
+bool ircbot::Channel::isOperator(string &user)
 {
 	return (std::find(_operators.begin(), _operators.end(), user) != _operators.end());
 }
 
-bool ircbot::isMember(string &user)
+bool ircbot::Channel::isMember(string &user)
 {
 	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
 	{
@@ -36,7 +36,7 @@ bool ircbot::isMember(string &user)
 	return (false);
 }
 
-string ircbot::getBadUsers(void)
+string ircbot::Channel::getBadUsers(void)
 {
 	string r;
 	
@@ -51,7 +51,7 @@ string ircbot::getBadUsers(void)
 	return (r);
 }
 
-void ircbot::addBadUser(string &user)
+void ircbot::Channel::addBadUser(string &user)
 {
 	static int i;
 	std::vector<string>::iterator it = std::find(_badUsers.begin(), _badUsers.end(), user);
@@ -82,36 +82,36 @@ bool ircbot::isErrorCode(const string &code)
 			|| code == ERR_INVITEONLYCHAN || code == ERR_BADCHANNELKEY || code == ERR_CHANNELISFULL);
 }
 
-void ircbot::blacklistReply(string &nick)
+void ircbot::blacklistReply(string &nick, Channel& chan)
 {
 	string response;
 
-	if (!isMember(nick))
+	if (!chan.isMember(nick))
 	{
-		response = "PRIVMSG " + nick + " :" + _channel + " You're not on the channel\n";
+		response = "PRIVMSG " + nick + " :" + chan._name + " You're not on the channel\n";
 	}
-	if (!isOperator(nick))
+	if (!chan.isOperator(nick))
 	{
-		response = "PRIVMSG " + nick + " :" + _channel + " You're not channel operator\n";
+		response = "PRIVMSG " + nick + " :" + chan._name + " You're not channel operator\n";
 	}
 	else
 	{
-		response = "PRIVMSG " + nick + " :" + _channel + " :" + getBadUsers() + "\n";
+		response = "PRIVMSG " + nick + " :" + chan._name + " :" + chan.getBadUsers() + "\n";
 	}
 	sendReply(response);
 }
 
-void ircbot::logtimeReply(string &nick)
+void ircbot::logtimeReply(string &nick, Channel& chan)
 {
 	string response;
 
-	if (!isMember(nick))
+	if (!chan.isMember(nick))
 	{
 		response = "PRIVMSG " + nick + " :You're not on the channel\n";
 	}
 	else
 	{
-		response = "PRIVMSG " + nick + " :Logtime for " + nick + " is: " + itos(getTime(nick)) + " min\n";
+		response = "PRIVMSG " + nick + " :Logtime for " + nick + " is: " + itos(chan.getTime(nick)) + " min\n";
 	}
 	sendReply(response);
 }
@@ -123,8 +123,8 @@ string ircbot::itos(int num)
 	return oss.str();
 }
 
-ircbot::ircbot(string passwd, string port, string nick, string chan)
-	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick), _channel(chan)
+ircbot::ircbot(string passwd, string port, string nick)
+	: _passwd(passwd), _ircPort(port), _recvbuf(""), _nick(nick)
 {
 	// const int	enable = 1;
 
@@ -165,7 +165,7 @@ long ircbot::getTimeInMinutes()
 	return currentTime / 60;
 }
 
-void ircbot::debugInfo(void)	// only for debug
+void ircbot::Channel::debugInfo(void)	// only for debug
 {
 	if (!_loggedUsers.empty())
 	{
@@ -196,7 +196,7 @@ void ircbot::debugInfo(void)	// only for debug
 	std::cout << std::endl;
 }
 
-long	ircbot::getTime(const string& user)
+long	ircbot::Channel::getTime(const string& user)
 {
 	userIter it =  doesUserExit(user);
 
@@ -264,10 +264,10 @@ void	ircbot::IRCServRegister()
 	string				cmd;
 
 	std::stringstream ss;
-	ss << "PASS " << _passwd << "\r\n";
+	// ss << "PASS " << _passwd << "\r\n";
 	ss << "NICK " << _nick << "\r\n";
-	ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
-	ss << "JOIN " << _channel << "\r\n";
+	// ss << "USER " << _nick << " 0 * :" << _nick << "\r\n";
+	// ss << "JOIN " << _channel << "\r\n";
 	sendReply(ss.str());
 }
 
@@ -284,7 +284,7 @@ string ircbot::getWeatherInfo()
     read(_weatherSock, buffer, sizeof(buffer)-1);
 
     // std::string response = buffer;
-	std::cout << "buf: " << buffer << std::endl;
+	// std::cout << "buf: " << buffer << std::endl;
 	return (buffer);
 }
 
@@ -376,10 +376,12 @@ void ircbot::sendWeatherInfo(string& client_nick)
 
     std::cout << std::endl;
     
-    reply = "Weather for " + parseInfo("\"name\":\"", "\"", response) + ", " + parseInfo("\"country\":\"", "\"", response) + ":\n";
+    reply = "Weather for " + parseInfo("\"name\":\"", "\"", response) + ", " + \
+			parseInfo("\"country\":\"", "\"", response) + ":\n";
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
     
-    reply = "- Coordinates: Longitude " + parseInfo("\"lon\":", "\"", response) + " Latitude " + parseInfo("\"lat\":", "}", response) + "\n";
+    reply = "- Coordinates: Longitude " + parseInfo("\"lon\":", "\"", response) + \
+			" Latitude " + parseInfo("\"lat\":", "}", response) + "\n";
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
 
     reply = "- Weather Main: " + parseInfo("\"main\":\"", "\"", response) + "\n";
@@ -407,46 +409,94 @@ void ircbot::sendWeatherInfo(string& client_nick)
 void	ircbot::handleCommand(std::vector<string>& tokens)
 {
 	string				response, usersList, userNick, command;
+	chanIt				it;
 
 	command = tokens[1];
 	if (isErrorCode(command))
 	{
 		throw (tokens.back());
 	}
+	else if (command == "INVITE")
+	{
+		std::cout << "bot invited to channel " << tokens.back() << std::endl;
+		sendReply("JOIN " + tokens.back() + "\r\n");
+		_channels.push_back(Channel(tokens[2]));
+	}
 	else if (command == RPL_NAMREPLY)
 	{
-		logUsers(tokens.back());
+		it = getChanIt(tokens[2]);
+		it->logUsers(tokens.back());
 	}
 	else if (command == "PRIVMSG")
 	{
 		userNick = getUserNick(tokens[0]);
-		if (tokens[2] == _nick && tokens.back() == "logtime")
-		{
-			logtimeReply(userNick);
-		}
-		if (tokens[2] == _nick && tokens.back() == "blacklist")
-		{	
-			blacklistReply(userNick);
-		}
-		if (tokens[2] != _nick)		// not just a privmsg to bot
-		{
-			checkOffensiveWords(tokens);
-		}
+		std::pair<string, string> pair = parseRequest(tokens.back());
+
+		std::cout << "channel : " << pair.first << " request : " << pair.second << std::endl;
+
+		it = getChanIt(pair.first);
+
 		if (tokens[2] == _nick && tokens.back() == "weather")		// not just a privmsg to bot
 		{
 			sendWeatherInfo(userNick);
 		}
+		else if (tokens[2] != _nick)		// not just a privmsg to bot
+		{
+			checkOffensiveWords(tokens);
+		}
+		else if (tokens[2] == _nick && it == _channels.end())
+		{
+			sendReply("PRIVMSG " + userNick + " :Usage #channel <logtime/blacklist>\n");
+			// return;
+		}
+		else if (tokens[2] == _nick && pair.second == "logtime")
+		{
+			logtimeReply(userNick, *it);
+		}
+		else if (tokens[2] == _nick && pair.second == "blacklist")
+		{	
+			blacklistReply(userNick, *it);
+		}
 	}
 	else if (command == "JOIN" || command == "KICK" || command == "QUIT" || command == "NICK")
 	{
-		updateUsers(tokens);
-		debugInfo();
+		// :user4!~x@127.0.0.1 KICK #c user5 :user5
+		chanIt it = getChanIt(tokens[2]);
+		if (it != _channels.end())
+		{
+			if (tokens[3] == _nick)
+				updateChannels(it);
+			else
+			{
+				it->updateUsers(tokens);
+				it->debugInfo();
+			}
+		}
 	}
 	else if (command == "MODE" && (tokens[3] == "+o" || tokens[3] == "-o"))
 	{
-		updateOperators(tokens);
-		debugInfo();
+		chanIt it = getChanIt(tokens[2]);
+		if (it != _channels.end())
+		{
+			it->updateOperators(tokens);
+			it->debugInfo();
+		}
 	}
+}
+
+void ircbot::updateChannels(chanIt &iter)
+{
+	_channels.erase(iter);
+}
+
+ircbot::chanIt ircbot::getChanIt(string &name)
+{
+	for (chanIt it = _channels.begin(); it < _channels.end(); it++)
+	{
+		if (it->_name == name)
+			return (it);
+	}
+	return (_channels.end());
 }
 
 string ircbot::getUserNick(string &token)
@@ -455,15 +505,36 @@ string ircbot::getUserNick(string &token)
 	return (token.substr(1, pos - 1));
 }
 
+std::pair<string, string> ircbot::parseRequest(string &token)
+{
+	std::pair<string, string>	p;
+	size_t 						end;
+
+	size_t pos = token.find_first_not_of(" ");
+	if (pos != string::npos && token[pos] == '#')
+	{
+		end = token.find_first_of(" ");
+		p.first = token.substr(1, end - 1);
+	}
+	pos = token.find_first_not_of(" ", end);
+	if (pos != string::npos)
+	{
+		p.second = token.substr(pos);
+	}
+	return (std::make_pair("", ""));
+}
+
 void ircbot::checkOffensiveWords(std::vector<string> &tokens)
 {
 	string userNick;
+	chanIt it;
 
 	userNick = getUserNick(tokens[0]);
+	it = getChanIt(tokens[2]);
 	if (hasBadWords(tokens.back()))
 	{
-		sendReply("PRIVMSG " + userNick + " :Please refrain from using inappropriate language.\n");
-		addBadUser(userNick);
+		sendReply("PRIVMSG " + it->_name + " :Please refrain from using inappropriate language, " + userNick + ".\n");
+		it->addBadUser(userNick);
 	}
 }
 
@@ -481,7 +552,7 @@ bool ircbot::hasBadWords(string &str)
 	return (false);
 }
 
-void ircbot::updateOperators(std::vector<string> &tokens)
+void ircbot::Channel::updateOperators(std::vector<string> &tokens)
 {
 	strVecIter it;
 
@@ -498,7 +569,7 @@ void ircbot::updateOperators(std::vector<string> &tokens)
 	}
 }
 
-void ircbot::updateUsers(std::vector<string>& tokens)
+void ircbot::Channel::updateUsers(std::vector<string>& tokens)
 {
 	string user;
 
@@ -506,8 +577,8 @@ void ircbot::updateUsers(std::vector<string>& tokens)
 
 	if (tokens[1] == "JOIN")
 	{
-		if (user == _nick)
-			return ;
+		// if (user == _nick)
+		// 	return ;
 		User cli(user);
 		_loggedUsers.push_back(cli);
 	}
@@ -529,15 +600,19 @@ void ircbot::updateUsers(std::vector<string>& tokens)
 	}
 }
 
-void ircbot::logUsers(string &users)
+ircbot::Channel::Channel(const string &name) : _name(name)
+{
+}
+
+void ircbot::Channel::logUsers(string &users)
 {
 	string				user;
 
 	std::stringstream ss(users);
 	while (ss >> user)
 	{
-		if (user == _nick || "@" + user == _nick)
-			continue ;
+		// if (user == _nick || "@" + user == _nick)
+		// 	continue ;
 		if (user[0] == '@')
 		{
 			_operators.push_back(user.substr(1));
@@ -553,7 +628,7 @@ void ircbot::logUsers(string &users)
 	}
 }
 
-void ircbot::removeUser(const string &user)
+void ircbot::Channel::removeUser(const string &user)
 {
 	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
 	{
@@ -582,7 +657,7 @@ void ircbot::removeUser(const string &user)
 	std::cout << "BOT INFO: removed user `" << user << "`" << std::endl;
 }
 
-void ircbot::updateUserNick(const string &old_nick, const string &new_nick)
+void ircbot::Channel::updateUserNick(const string &old_nick, const string &new_nick)
 {
 	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
 	{
@@ -621,15 +696,16 @@ void	ircbot::run()
 	string				response, cmd;
 
 	IRCServRegister();
-	getWeatherInfo();
+	// getWeatherInfo();
 	while (true)
 	{
-		if (!IsBotRunning)
-			break;
+		// if (!IsBotRunning)
+		// 	break;
 		handleRead();
 		
 		while ( (cmd = getCommand()) != "")
 		{
+			std::cout << "cmd : " << cmd << std::endl;
 			// parse command
 			parseCommand(cmd, tokens);
 			// handle command
