@@ -148,6 +148,14 @@ void Channel::setTopic(const string &topic)
     _topic = topic;
 }
 
+void Channel::setTimeOfTopic(void)
+{
+    std::time_t currentTime;
+    std::time(&currentTime);
+
+    _timeOfTopic = (currentTime / 60);
+}
+
 void Channel::setPasskey(const string &key)
 {
     stringstream    ss;
@@ -177,6 +185,11 @@ void Channel::unsetTopic( void )
 string Channel::getAdmin() const
 {
     return (_admin);
+}
+
+size_t Channel::getTimeOfTopic() const
+{
+    return (_timeOfTopic);
 }
 
 size_t Channel::getSize() const

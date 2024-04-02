@@ -43,6 +43,13 @@ void Server::broadcastToJoinedChannels(Client& client, string &msg)
 void Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
 	reply(client, client.identifier() + " JOIN " + ch.getName());
+
+	if (!ch.getTopic().empty())
+	{
+		reply(client, RPL_TOPIC + " " + client.getNick() + " " +  ch.getName() + " :" + ch.getTopic());
+		reply(client, RPL_TOPICWHOTIME + " " + client.getNick() + " " + ch.getName()  \
+			+ " "  + client.identifier() + " " + itos(ch.getTimeOfTopic()));
+	}
 	// reply(client, _servname + " MODE " + ch.getName( + " " + ch.channelModeIs());
 	if (ch.isUserOperator(client.getNick()))
 		reply(client, client.identifier() + " MODE " + ch.getName() + " " + "+t");

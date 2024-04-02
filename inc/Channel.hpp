@@ -21,6 +21,7 @@ class Channel
 
 
 		string						_topic;
+		size_t						_timeOfTopic;
 		size_t						_userLimit;
 		string						_passkey;
 
@@ -61,6 +62,7 @@ class Channel
 		string				channelModeIs( void ) const;
 
 		void				setTopic(const string& topic);
+		void				setTimeOfTopic( void );
 		void				setPasskey( const string& key );
 		void				setUserLimit( string limit );
 		// void				setInviteOnly();
@@ -71,6 +73,7 @@ class Channel
 		// void				unsetInviteOnly();
 
 		string				getAdmin() const;
+		size_t				getTimeOfTopic() const;
 		size_t				getSize() const;
 		string				getName() const;
 		string				getModes( void ) const;

@@ -4,10 +4,16 @@
 void Server::quit(Client &client)
 {
     string              response;
+    string              reason;
 
-    response = client.identifier() + " QUIT :Client Quit";
+    reason = "Client Quit";
+    if (_params.size() > 1)
+    {
+        reason  = _params[1];
+    }
+    response = client.identifier() + " QUIT :" + reason;
     broadcastToJoinedChannels(client, response);
-    response += "\r\nERROR :Closing Link: " + client.getIPAddr()  + " (Client Quit)\r\n";
+    response += "\r\nERROR :Closing Link: " + client.getIPAddr()  + " (" + reason  + ")\r\n";
     write(client.getSockfd(), response.c_str(), response.length());
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
 }
@@ -116,7 +122,7 @@ void Server::initPrivmsg(Client &client)
         else
             _sendMsgClient.push_back(std::make_pair(token, CLIENT));
     }
-    _messagClient = _params[_params.size() - 1];
+    _messagClient = _params[2];
 }
 
 void Server::initJoin(Client &client)
@@ -136,9 +142,8 @@ void Server::initJoin(Client &client)
     if (_params.size() > 2)
     {
         keys = true;
-        line = trim_comma(_params[2], 0);
-        cout << "linekey: " << line << endl;
-        ssk << line;
+        cout << "linekey: " << _params[2] << endl;
+        ssk << _params[2];
     }
     while (std::getline(ss, chan, ','))
     {
