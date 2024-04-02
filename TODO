@@ -87,6 +87,7 @@ mode #ch1111 -o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+
 mode #cc -l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l+w+z 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5
 
 
+<<<<<<< HEAD
 NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390 CHANLIMIT=#:250 
 
 MODES 4
@@ -96,3 +97,12 @@ CHANLIMIT=#:250
 Received: :molybdenum.libera.chat 405 lalalala0 #chchch250 :You have joined too many channels
 
 :*.freenode.net 696 lalala #chch1 l 2222222222222222222222 :Invalid limit mode parameter. Syntax: <limit>.
+=======
+NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390
+
+
+
+
+topic #yyy11 :
+:qazxsw!~f@197.230.30.146 TOPIC #yyy11 :
+>>>>>>> 4888ddb35619a382de8079f645fc68090387cf9c

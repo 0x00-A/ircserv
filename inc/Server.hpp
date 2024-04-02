@@ -14,7 +14,8 @@
 #define NICKLEN 16
 #define USERNAMELEN 9
 #define CHANNELLEN 50
-#define TOPICLEN 390
+
+#define TOPICLEN 10
 #define MODES 20
 #define CHANMODES "k,l,i,t"
 #define MAXCHANNELS 250
