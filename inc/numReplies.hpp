@@ -48,6 +48,7 @@
 #define RPL_MYINFO string("004")
 #define RPL_NOTOPIC string("331")
 #define RPL_TOPIC string("332")
+#define RPL_TOPICWHOTIME string("333")
 #define RPL_INVITING string("341")
 #define RPL_ISUPPORT string("005")
 #define ERR_INVALIDMODEPARAM string("696")
