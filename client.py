@@ -2,6 +2,24 @@ import socket
 
 clients = []
 
+def read_from_socket(client_socket):
+    # Initialize an empty response
+    response = b""
+
+    # Keep reading until no more data exists
+    while True:
+        try:
+            chunk = client_socket.recv(4096)
+            if not chunk:
+                break  # No more data, exit the loop
+            response += chunk
+        except BlockingIOError:
+            # recv would block, break the loop
+            break
+
+    # Print the received data
+    print(response.decode())
+
 def connect_to_server(host, port, i):
     try:
         # Create a socket object
@@ -11,22 +29,32 @@ def connect_to_server(host, port, i):
         client_socket.connect((host, port))
         
         print(f"Connected to {host} on port {port}")
+        response = client_socket.recv(10000)
+        print("Received:", response.decode())
         
         # Send data to the server
         message = f"user x x x x\nnick lalalala{i}\n"
         client_socket.sendall(message.encode())
 
-        response = client_socket.recv(1024)
+        response = client_socket.recv(10000)
         print("Received:", response.decode())
 
-        for i in range(1000):
+        for i in range(4):
             message = f"join #chchch{i}\n"
             client_socket.sendall(message.encode())
             print("Message sent to server:", message)
         
             # Receive data from the server
-            response = client_socket.recv(1024)
+            response = client_socket.recv(10000)
             print("Received:", response.decode())
+
+        message = f"join #notachannel\n"
+        client_socket.sendall(message.encode())
+        print("Message sent to server:", message)
+    
+        # Receive data from the server
+        response = client_socket.recv(10000)
+        print("Received:", response.decode())
         
         # Close the connection
         clients.append(client_socket)

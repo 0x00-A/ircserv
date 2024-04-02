@@ -3,13 +3,14 @@
 
 void	signalhandler(int sig)
 {
-	if (sig == SIGINT)
+	if (sig == SIGINT || sig == SIGQUIT)
 		isServerUp = false;
 }
 
 int	main(int ac, char** av)
 {
 	signal(SIGINT, signalhandler);
+	signal(SIGQUIT, signalhandler);
 	if (ac == 3)
 	{
 		try

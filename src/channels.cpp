@@ -108,6 +108,13 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 					return ;
 				}
 			}
+			if (client.getChannels().size() >= MAXCHANNELS)
+			{
+				response = ERR_TOOMANYCHANNELS + " " + client.getNick() + " " + _channels[i].getName() + \
+						" :You have joined too many channels";
+				reply(client, response);
+				return;
+			}
 			this->_channels[i].joinUser(client.getNick());
 			client.addChannels(channel.first);
 			channelWelcomeMessages(client, _channels[i]);
@@ -115,6 +122,13 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			client.uninviteFromChannel(channel.first);
 			return ;
 		}
+	}
+	if (client.getChannels().size() >= MAXCHANNELS)
+	{
+		response = ERR_TOOMANYCHANNELS + " " + client.getNick() + " " + _channels[i].getName() + \
+				" :You have joined too many channels";
+		reply(client, response);
+		return;
 	}
 	this->_channels.push_back(Channel(channel.first, client.getNick()));
 	client.addChannels(channel.first);

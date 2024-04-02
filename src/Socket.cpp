@@ -28,7 +28,7 @@ void Socket::bindSocket(string port)
 	bzero(&servaddr, sizeof(struct sockaddr_in));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(std::atoi(port.c_str()));
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); // remove htonl? // INADDR_ANY allows the server to accept a client connection on any interface
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); // INADDR_ANY allows the server to accept a client connection on any interface
 
 	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)))
 	{
@@ -36,7 +36,7 @@ void Socket::bindSocket(string port)
 	}
 
 	// bind The server's port to the socket
-	if (bind(_sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
+	if (bind(_sockfd, reinterpret_cast<SA*>(&servaddr), sizeof(servaddr)) == -1)
 	{
 		perror("bind");
 		closeSocket();

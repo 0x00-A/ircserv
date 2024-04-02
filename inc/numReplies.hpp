@@ -37,6 +37,7 @@
 #define ERR_KEYALREADYSET string("467")
 #define ERR_INPUTTOOLONG string("417")
 #define ERR_NOMOTD string("422")
+#define ERR_TOOMANYCHANNELS string("405")
 
 #define RPL_MOTDSTART string("375")
 #define RPL_MOTD string("372")

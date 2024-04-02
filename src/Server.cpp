@@ -192,6 +192,8 @@ void	Server::run()
 	{
 		if(poll(_pollfds.data(), _pollfds.size(), -1) == -1)
 		{
+			if (errno == EINTR) // (interrupted system call)
+        		continue;
 			perror("poll");
 			break;
 		}

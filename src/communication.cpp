@@ -42,10 +42,10 @@ void Server::welcomeClient(Client &client)
 	reply(client, response);
     // :calcium.libera.chat 005 aaa CHANMODES=k,l,i,t CHANLIMIT=#:250 MODES=4 NETWORK=Libera.Chat NICKLEN=16 CHANNELLEN=50 TOPICLEN=390 :are supported by this server
 	// :hostsailor.ro.quakenet.org 005 lalala WHOX WALLCHOPS WALLVOICES USERIP CPRIVMSG CNOTICE SILENCE=15 MODES=6 MAXCHANNELS=40 MAXBANS=45 NICKLEN=15 :are supported by this server
-	response = RPL_ISUPPORT + " " + client.getNick() + " CHANMODES=" + CHANMODES + " MODES=" + itos(MODES) + " NETWORK=" + \
-			_servname + " NICKLEN=" + itos(NICKLEN) + " MAXCHANNELS=" + itos(MAXCHANNELS) + " TOPICLEN=" + itos(TOPICLEN) + \
-			" USERNAMELEN=" + itos(USERNAMELEN) + " CHANNELLEN=" + itos(CHANNELLEN) + \
-			" :are supported by this server";
+	response = RPL_ISUPPORT + " " + client.getNick() + " CHANMODES=" + CHANMODES + " MODES=" + \
+			itos(MODES) + " NICKLEN=" + itos(NICKLEN) + " MAXCHANNELS=" + itos(MAXCHANNELS) + \
+			" TOPICLEN=" + itos(TOPICLEN) + " USERNAMELEN=" + itos(USERNAMELEN) + " CHANNELLEN=" + \
+			itos(CHANNELLEN) + " :are supported by this server";
 	reply(client, response);
 	// TODO add channel limit
     lusers(client);

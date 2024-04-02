@@ -2,16 +2,9 @@
 
 :Cannot join channel (+l) - channel is full, try again later
 
-if someone join  a channel it is sent to all users not just operators also +o -o nick
-
-the channel ceases to exist when the last client leaves it
 
 Channels also contain a topic. The topic is a line shown to all users when they join the channel, and all users in the channel are notified when the topic of a channel is changed.
 
-problem: if a user joined a channel and then changed the nick name the data in channels he is currently in is not updated
-
-
-+ remove deconnected users from channels
 
 
 if channel already exist (join)
@@ -46,13 +39,11 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 <<<< for rachid >>>>
 [ ] :lalala!~s@197.230.30.146 QUIT :Quit: comment (handle quit comment sent in broadcast to channels)
-[ ] command paramitres (maximum of fifteen (15))
-[ ] remove reply prefix
 
 
 
 ###############################
-[ ] close fds CTRL-c
+[x] close fds CTRL-c
 [v] handle SIGPIPE < handled in unix check macos >
 [x] fix time mode
 [ ] :lalala!~x@197.230.30.146 QUIT :EOF from client (when a user disconnect broadcast to channels)
@@ -87,7 +78,6 @@ mode #ch1111 -o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+
 mode #cc -l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l+w+z 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5
 
 
-<<<<<<< HEAD
 NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390 CHANLIMIT=#:250 
 
 MODES 4
@@ -97,7 +87,6 @@ CHANLIMIT=#:250
 Received: :molybdenum.libera.chat 405 lalalala0 #chchch250 :You have joined too many channels
 
 :*.freenode.net 696 lalala #chch1 l 2222222222222222222222 :Invalid limit mode parameter. Syntax: <limit>.
-=======
 NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390
 
 
@@ -105,4 +94,3 @@ NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390
 
 topic #yyy11 :
 :qazxsw!~f@197.230.30.146 TOPIC #yyy11 :
->>>>>>> 4888ddb35619a382de8079f645fc68090387cf9c
