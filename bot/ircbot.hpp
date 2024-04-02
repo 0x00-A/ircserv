@@ -17,7 +17,9 @@
 # include <algorithm>
 # include <ctime>
 # include <sys/types.h>
-# include <strings.h>
+# include <string>
+# include <signal.h>
+# include <strings.h> // for bzero
 
 extern int IsBotRunning;
 
