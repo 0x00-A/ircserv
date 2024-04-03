@@ -5,6 +5,5 @@ obj
 ircserv
 .DS_Store
 in
-./ircbot/ircbot
-./ircbot/obj
+./bot/obj
 *.py
