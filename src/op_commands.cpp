@@ -51,9 +51,30 @@ void Server::kick(Client& client)
 void Server::invite(Client& client)
 {
     clientIter invitedUserIter;
+
+
     if (!client.isConnected()) {
         reply(client, "451 :You have not registered");
         return;
+    }
+
+    if (_params.size() == 1)
+    {
+        std::vector<string> invitedChannels;
+        string              iChannels;
+
+        invitedChannels = client.getInvitedChannels();
+        if (!invitedChannels.empty())
+        {
+            for (size_t i = 0; i < invitedChannels.size(); i++)
+            {
+                iChannels += invitedChannels[i] + " ";
+            }
+            reply(client, "336 " + client.getNick() + " :" + iChannels);
+        }
+        reply(client, "337 " + client.getNick() + " :End of INVITE list.");
+        return ;
+
     }
     if (_params.size() < 3) {
         reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters");
@@ -138,9 +159,6 @@ void Server::topic(Client& client)
         }
         return;
     }
-        // std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
-        // reply(client, msg);
-        // broadcastMsg(client, msg, *chanit);
 }
 
 void    Server::mode(Client& client)

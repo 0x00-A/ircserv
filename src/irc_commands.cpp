@@ -142,7 +142,6 @@ void Server::initJoin(Client &client)
     if (_params.size() > 2)
     {
         keys = true;
-        cout << "linekey: " << _params[2] << endl;
         ssk << _params[2];
     }
     while (std::getline(ss, chan, ','))

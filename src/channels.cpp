@@ -100,7 +100,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 					return ;
 				}
 			}
-			if (_channels[i].hasPasskey()  && !_channels[i].hasInvite())
+			if (_channels[i].hasPasskey()  && !client.isInvitedToChannel(channel.first))
 			{
 				if (_channels[i].getPasskey() != channel.second)
 				{

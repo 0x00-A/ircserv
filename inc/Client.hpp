@@ -73,11 +73,12 @@ class Client
 		bool 				isConnected();
 		
 		// struct tm 			*getStartTimeToClinet();
-		bool 				getHasPassed();
-		bool 				getHasUsedNick();
-		bool 				getHasUsedUser();
-		
-		string 				identifier( void );
+		std::vector<string> 	getInvitedChannels( void ) const;
+		bool 					getHasPassed();
+		bool 					getHasUsedNick();
+		bool 					getHasUsedUser();
+			
+		string 					identifier( void );
 
 		// bool 			isRegistered(void);
 		bool 				checkNick(string &nick);
