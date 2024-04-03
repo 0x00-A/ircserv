@@ -134,7 +134,7 @@ int Server::handleRead(int id)
 		if (_clients[id].rdBuf().length() > RD_BUF_SIZE)
 		{
 			_clients[id].rdBuf().clear();
-			reply (_clients[id], ERR_INPUTTOOLONG + " " + _clients[id].getNick() + \
+			reply (_clients[id], _servname + " " + ERR_INPUTTOOLONG + " " + _clients[id].getNick() + \
 				" :Input line was too long");
 			return (0);
 		}

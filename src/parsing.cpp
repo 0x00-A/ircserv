@@ -44,7 +44,7 @@ void Server::handleCommand(string& cmd, int id)
     else if (_clients[id].isConnected())
     {
 
-        throw ( ERR_UNKNOWNCOMMAND + " " + \
+        throw ( _servname + " " + ERR_UNKNOWNCOMMAND + " " + \
         _clients[id].getNick() + " " + _params[0]  + " :Unknown command" );
     }
 }

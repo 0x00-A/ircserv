@@ -412,27 +412,36 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 	chanIt				it;
 
 	command = tokens[1];
+	std::cout << "token cmd: " << command << std::endl;
 	if (isErrorCode(command))
 	{
 		throw (tokens.back());
 	}
 	else if (command == "INVITE")
 	{
+		// :user5!~x@127.0.0.1 INVITE bot :#c
 		std::cout << "bot invited to channel " << tokens.back() << std::endl;
 		sendReply("JOIN " + tokens.back() + "\r\n");
-		_channels.push_back(Channel(tokens[2]));
+		_channels.push_back(Channel(tokens.back()));
 	}
 	else if (command == RPL_NAMREPLY)
 	{
-		it = getChanIt(tokens[2]);
-		it->logUsers(tokens.back());
+		// :ft_irc.1337.ma 353 bot @ #c :bot @user5
+		std::cout << "NAMEREPLY\n";
+		it = getChanIt(tokens[4]);
+		if (it != _channels.end())
+		{
+			std::cout << ">> logging users |" << tokens.back() << std::endl;
+			it->logUsers(tokens.back());
+		}
 	}
 	else if (command == "PRIVMSG")
 	{
+		// :user5!~x@127.0.0.1 PRIVMSG bot :hi
 		userNick = getUserNick(tokens[0]);
 		std::pair<string, string> pair = parseRequest(tokens.back());
 
-		std::cout << "channel : " << pair.first << " request : " << pair.second << std::endl;
+		std::cout << "msg : " << tokens.back() << " channel : " << pair.first << " request : " << pair.second << std::endl;
 
 		it = getChanIt(pair.first);
 
@@ -460,7 +469,18 @@ void	ircbot::handleCommand(std::vector<string>& tokens)
 	}
 	else if (command == "JOIN" || command == "KICK" || command == "QUIT" || command == "NICK")
 	{
-		// :user4!~x@127.0.0.1 KICK #c user5 :user5
+		// :u5!~x@127.0.0.1 NICK :u55
+		// :user6!~x@127.0.0.1 QUIT :Client Quit
+		if (command == "KICK" || command == "JOIN")
+		{
+			// :user4!~x@127.0.0.1 KICK #c user5 :user5
+			// :user6!~x@127.0.0.1 JOIN #c
+			chanIt it = getChanIt(tokens[2]);
+			if (tokens[3] == _nick)
+				updateChannels(it);
+			else
+
+		}
 		chanIt it = getChanIt(tokens[2]);
 		if (it != _channels.end())
 		{
@@ -510,18 +530,27 @@ std::pair<string, string> ircbot::parseRequest(string &token)
 	std::pair<string, string>	p;
 	size_t 						end;
 
+
 	size_t pos = token.find_first_not_of(" ");
 	if (pos != string::npos && token[pos] == '#')
 	{
-		end = token.find_first_of(" ");
-		p.first = token.substr(1, end - 1);
+		end = token.find_first_of(" ", pos);
+		p.first = token.substr(pos, end);
 	}
-	pos = token.find_first_not_of(" ", end);
+	else
+	{
+		p.first = "";
+	}
+	pos = token.find_first_not_of(" ", end + 1);
 	if (pos != string::npos)
 	{
 		p.second = token.substr(pos);
 	}
-	return (std::make_pair("", ""));
+	else
+	{
+		p.second = "";
+	}
+	return (p);
 }
 
 void ircbot::checkOffensiveWords(std::vector<string> &tokens)
@@ -529,9 +558,10 @@ void ircbot::checkOffensiveWords(std::vector<string> &tokens)
 	string userNick;
 	chanIt it;
 
+	// :user5!~x@127.0.0.1 PRIVMSG #c :aaaa
 	userNick = getUserNick(tokens[0]);
 	it = getChanIt(tokens[2]);
-	if (hasBadWords(tokens.back()))
+	if (it != _channels.end() && hasBadWords(tokens.back()))
 	{
 		sendReply("PRIVMSG " + it->_name + " :Please refrain from using inappropriate language, " + userNick + ".\n");
 		it->addBadUser(userNick);

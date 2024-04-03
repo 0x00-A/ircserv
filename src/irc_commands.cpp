@@ -18,7 +18,7 @@ void Server::join(Client &client)
 
     if (!client.isConnected())
     {
-        throw (ERR_NOTREGISTERED + " " + client.getNick()  + \
+        throw (_servname + " " + ERR_NOTREGISTERED + " " + client.getNick()  + \
                 " :You have not registered");
     }
     initJoin(client);
@@ -26,7 +26,7 @@ void Server::join(Client &client)
     {
         if (_parsChannels[i].first[0] != '#')
         {
-            response = ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + _parsChannels[i].first + \
+            _servname + " " + ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + _parsChannels[i].first + \
                     " :No such channel";
             reply(client, response);
         }
@@ -51,7 +51,7 @@ void Server::privmsg(Client &client)
     {
         if (seenNicks.count(_sendMsgClient[i].first) > 0) 
         {
-            response = ERR_TOOMANYTARGETS + " " +  client.getNick() + \
+            _servname + " " + ERR_TOOMANYTARGETS + " " +  client.getNick() + \
                         " :Duplicate recipients";
             reply(client, response);
             continue ;
@@ -66,7 +66,7 @@ void Server::privmsg(Client &client)
             }
             else
             {
-                response = (ERR_NOSUCHCHANNEL) + " " +  client.getNick() + " " + \
+                _servname + " " + ERR_NOSUCHCHANNEL + " " +  client.getNick() + " " + \
                             _sendMsgClient[i].first + " :No such channel";
                 reply(client, response);
             }
@@ -80,7 +80,7 @@ void Server::privmsg(Client &client)
             }
             else
             {
-                response = ERR_NOSUCHNICK + " " +  client.getNick() + " " + \
+                _servname + " " + ERR_NOSUCHNICK + " " +  client.getNick() + " " + \
                                 _sendMsgClient[i].first + " :No such nick/channel";
                 reply(client, response);
             }
@@ -96,15 +96,15 @@ void Server::initPrivmsg(Client &client)
 {
     if (!client.isConnected())
     {
-        throw (ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
+        throw (_servname + " " + ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        throw (ERR_NORECIPIENT + " " + client.getNick()  + " :No recipient given (" + _params[0] + ")");
+        throw (_servname + " " + ERR_NORECIPIENT + " " + client.getNick()  + " :No recipient given (" + _params[0] + ")");
     }
     if (_params.size() < 3)
     {
-        throw (ERR_NOTEXTTOSEND + " " + client.getNick()  + " ::No text to send");
+        throw (_servname + " " + ERR_NOTEXTTOSEND + " " + client.getNick()  + " ::No text to send");
     }
     string clients = trim_comma(_params[1], 1);
     stringstream ss(clients);
@@ -128,7 +128,7 @@ void Server::initJoin(Client &client)
 
     if (_params.size() < 2)
     {
-        throw (ERR_NEEDMOREPARAMS + " " + client.getNick() + \
+        throw (_servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick() + \
                 " JOIN" + " :Not enough parameters");
     }
     line = trim_comma(_params[1], 1);
@@ -151,7 +151,7 @@ void Server::initJoin(Client &client)
         }
         if (seenChannels.count(chan) > 0) 
         {
-            response = ERR_TOOMANYTARGETS + " " +  client.getNick() + \
+            _servname + " " + ERR_TOOMANYTARGETS + " " +  client.getNick() + \
                     " :Duplicate recipients";
             reply(client, response);
             continue ;
