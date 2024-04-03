@@ -10,6 +10,7 @@ Channels also contain a topic. The topic is a line shown to all users when they 
 if channel already exist (join)
 :u4!~x@197.230.30.146 JOIN #ch1
 :mercury.libera.chat 332 u4 #ch1 :topic
+:mercury.libera.chat 332 u4 #ch1 :dsdssdsssssdsdsdsd
 :mercury.libera.chat 333 u4 #ch1 u1!~x@197.230.30.146 1711076841
 :mercury.libera.chat 353 u4 @ #ch1 :u4 u3 @u1
 :mercury.libera.chat 366 u4 #ch1 :End of /NAMES list.
@@ -42,6 +43,8 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 [ ] :471 #ch1 :Cannot join channel (+l) > :*.freenode.net 471 kakaka #ch111 :Cannot join channel (channel is full)
 :*.freenode.net 482 kakaka #ch111 :You do not have access to change the topic on this channel
 
+
+
 ###############################
 [x] close fds CTRL-c
 [v] handle SIGPIPE < handled in unix check macos >
@@ -54,6 +57,7 @@ invite someone without operator priv
 
 
 send(_ircSock, msg, len, MSG_NOSIGNAL);
+send(_botSock, msg, len, MSG_NOSIGNAL);
 
 + what is unbound socket and what happens when we call bind()
 - what is diff bitween write/send read/recv
@@ -104,3 +108,4 @@ invite
 
 
 bot ircserver addr
+:qazxsw!~f@197.230.30.146 TOPIC #yyy11 :

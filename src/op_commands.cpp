@@ -3,8 +3,6 @@
 
 void Server::kick(Client& client)
 {
-    // :q1!~f@197.230.30.146 KICK #edc q4 :q4
-    // :q1!~f@197.230.30.146 KICK #edc q3 :speck english
     if (!client.isConnected()) {
         reply(client, _servname + " " + ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
         return;
@@ -16,7 +14,6 @@ void Server::kick(Client& client)
 
     std::string channelName = _params[1];
     std::string key = _params[2];
-	std::string reason = (_params.size() > 3) ? _params[3] : "No reason provided";
 
 	channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
@@ -28,24 +25,28 @@ void Server::kick(Client& client)
         return;
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        reply(client, _servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " :You're not channel operator");
+        reply(client, _servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + channelName + " :You're not a channel operator");
         return;
     }
 
 	if (doesUserExit(key) == _clients.end()) {
-        reply(client, _servname + " " + ERR_NOSUCHNICK + " " + client.getNick() + " " + channelName + " :No such nick/channel");
+        reply(client, _servname + " " + ERR_NOSUCHNICK + " " + client.getNick() + " " +  key + " :No such nick/channel");
         return;
 	}
     if (!chanit->isUserInChannel(key)) {
-        reply(client, _servname + " " + ERR_USERNOTINCHANNEL + " " + client.getNick() + " " + channelName + " :they are not on that channel");
+        reply(client, _servname + " " + ERR_USERNOTINCHANNEL + " " + client.getNick() + " " + key + " " + channelName + " :they aren't on that channel");
         return;
     }
-    std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
+    std::string kickMessage;
+
+    if (_params.size() > 3)
+        kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + _params[3];
+    else
+        kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
+
     reply(client, kickMessage);
 	broadcastMsg(client, kickMessage, *chanit);
 	removeUserFromChannel(key, channelName);
-
-    std::cout << "User " << client.getNick() << " kicked " << key << " from " << channelName << "\n";
 }
 
 
@@ -74,19 +75,17 @@ void Server::invite(Client& client)
     }
     if (!chanit->isUserOperator(client.getNick())) {
         throw (_servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + chanName + \
-                " :You're not channel operator");
+                " :You're not a channel operator");
     }
     if ( (invitedUserIter = doesUserExit(invitedUser)) == _clients.end()){
         throw (_servname + " " + ERR_NOSUCHNICK + " " + client.getNick() + " " + invitedUser + \
-                " :No such nick");
+                " :No such nick/channel");
     }
     if (chanit->isUserInChannel(invitedUser)) {
         throw (_servname + " " + ERR_USERONCHANNEL + " "+ client.getNick() + " " + invitedUser + " " + \
                 chanName + " :is already on channel");
     }
-    // message sent to the inviter
     reply(client, _servname + " " + RPL_INVITING + " " + client.getNick() + " " + invitedUser + " " + chanName);
-    // message sent to the invited user
     reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " :" + chanName);
     invitedUserIter->inviteToChannel(chanName);
 }
@@ -146,9 +145,6 @@ void Server::topic(Client& client)
         }
         return;
     }
-        // std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
-        // reply(client, msg);
-        // broadcastMsg(client, msg, *chanit);
 }
 
 void    Server::mode(Client& client)
