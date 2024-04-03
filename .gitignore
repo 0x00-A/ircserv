@@ -7,3 +7,4 @@ ircserv
 in
 ./bot/obj
 *.py
+ircbot
