@@ -46,8 +46,8 @@ void Server::channelWelcomeMessages(Client &client, Channel& ch)
 
 	if (!ch.getTopic().empty())
 	{
-		reply(client, RPL_TOPIC + " " + client.getNick() + " " +  ch.getName() + " :" + ch.getTopic());
-		reply(client, RPL_TOPICWHOTIME + " " + client.getNick() + " " + ch.getName()  \
+		reply(client, _servname + " " + RPL_TOPIC + " " + client.getNick() + " " +  ch.getName() + " :" + ch.getTopic());
+		reply(client, _servname + " " + RPL_TOPICWHOTIME + " " + client.getNick() + " " + ch.getName()  \
 			+ " "  + client.identifier() + " " + itos(ch.getTimeOfTopic()));
 	}
 	// reply(client, _servname + " MODE " + ch.getName( + " " + ch.channelModeIs());

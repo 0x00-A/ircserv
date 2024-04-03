@@ -27,11 +27,11 @@ extern int IsBotRunning;
 
 using std::string;
 
-class ircbot
+class IRCbot
 {
 	private:
 
-		struct Channel;
+		struct	Channel;
 		struct	User;
 
 		typedef std::vector<User>::iterator userIter;
@@ -42,6 +42,7 @@ class ircbot
 		{
 				string _nick;
 				long _timer;
+
 				User(const string& nick);
 		};
 
@@ -56,7 +57,7 @@ class ircbot
 
 			void					logUsers( string& users );
 			void					updateOperators( std::vector<string>& tokens );
-			void					updateUsers(std::vector<string>& tokens);
+			void					updateUsers(std::vector<string>& tokens, string& botnick);
 			userIter				doesUserExit(const string& user);
 			bool					isOperator( string& user );
 			bool					isMember( string& user );
@@ -70,53 +71,49 @@ class ircbot
 
 		};
 
-
 	private:
 
-		int						_ircSock;
-		int						_weatherSock;
-		string					_passwd;
-		string					_ircPort;
-		std::string				_recvbuf;
-		string					_nick;
+		int									_ircSock;
+		int									_weatherSock;
+		string								_servaddr;
+		string								_ircPort;
+		string								_passwd;
+		string								_nick;
+		std::string							_recvbuf;	
+		std::vector<Channel>				_channels;
+		std::vector<string> 				_wordlist;
+		string								_weatherServIP;
 
-		// string					_channel;
+		chanIt								getChanIt( string& name );
 
-		// std::vector<string> 	_operators;
-		// std::vector<string>		_badUsers;
-		// std::vector<User> 		_loggedUsers;
-		
-		std::vector<Channel>	_channels;
-		std::vector<string> 	_wordlist;
-		string					_weatherServIP;
-
-		chanIt					getChanIt( string& name );
-
-		void					checkOffensiveWords( std::vector<string>& tokens );
-		bool					hasBadWords( string& str );
-		void					sendReply(const string& reply);
-		bool					isErrorCode( const string& code );
+		void								checkOffensiveWords( std::vector<string>& tokens );
+		bool								hasBadWords( string& str );
+		void								sendReply( const string& reply );
+		bool								isErrorCode( const string& code );
 	
-		void					IRCServRegister( void );
-		string					getWeatherInfo( void );
-		void					handleRead( void );
-		string					getCommand( void );
-		void					parseCommand( string&, std::vector<string>& tokens );
-		void					sendWeatherInfo( string& client_nick );
-		string 					parseInfo(std::string marker, string endMarker, std::string& response);
-		void					handleCommand( std::vector<string>& tokens );
-		void					updateChannels(chanIt& iter);
-		void					logtimeReply( string& nick, Channel& chan );
-		void					blacklistReply( string& nick, Channel& chan );
+		void								IRCServRegister( void );
+		string								getWeatherInfo( void );
+		void								handleRead( void );
+		string								getCommand( void );
+		void								parseCommand( string&, std::vector<string>& tokens );
+		void								sendWeatherInfo( string& client_nick );
+		string 								parseInfo( std::string marker, string endMarker, std::string& response );
+		void								handleCommand( std::vector<string>& tokens );
+		void								updateChannels( std::vector<string>& tokens );
+		// void								removeChannel( chanIt & );
+		void								joinChannel( string & );
+		void								logtimeReply( string& nick, Channel& chan );
+		void								blacklistReply( string& nick, Channel& chan );
+		std::pair<string, string>			parseRequest( string& token );
+		void								privmsg( std::vector<string>& tokens );
 
-		static string			itos(int num);
-		static string			getUserNick( string& token );
-		std::pair<string, string>			parseRequest( string& token );				
+		static string						itos( int num );
+		static string						getUserNick( string& token );
 
 	public:
 
-		ircbot( string, string, string );
-		~ircbot();
+		IRCbot( string, string, string, string );
+		~IRCbot();
 
 		void					run( void );
 		void					connectToIRCServer( void );

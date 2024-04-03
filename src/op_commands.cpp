@@ -136,7 +136,7 @@ void Server::topic(Client& client)
     {
         std::string currentTopic = chanit->getTopic();
         if (currentTopic.empty())
-            reply(client, RPL_NOTOPIC + " " + client.getNick() + " " + channelName + " :No topic is set.");
+            reply(client, _servname + " " + RPL_NOTOPIC + " " + client.getNick() + " " + channelName + " :No topic is set.");
 		else
         {
             // :adrift.sg.quakenet.org 333 dsfdsfds #cv565 dsfdsfds 1712018309
@@ -176,8 +176,8 @@ void    Server::mode(Client& client)
     }
     if (_params.size() == 2)
     {
-        reply(client, (RPL_CHANNELMODEIS + " " + \
-        client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
+        reply(client, _servname + " " + RPL_CHANNELMODEIS + " " + \
+        client.getNick() + " " + _params[1] + " " + chan->channelModeIs());
         throw (_servname + " " + RPL_CREATIONTIME + " " + \
         client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
     }

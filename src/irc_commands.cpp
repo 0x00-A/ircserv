@@ -32,7 +32,7 @@ void Server::join(Client &client)
     {
         if (_parsChannels[i].first[0] != '#')
         {
-            _servname + " " + ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + _parsChannels[i].first + \
+            response = _servname + " " + ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + _parsChannels[i].first + \
                     " :No such channel";
             reply(client, response);
         }
@@ -57,7 +57,7 @@ void Server::privmsg(Client &client)
     {
         if (seenNicks.count(_sendMsgClient[i].first) > 0) 
         {
-            _servname + " " + ERR_TOOMANYTARGETS + " " +  client.getNick() + \
+            response = _servname + " " + ERR_TOOMANYTARGETS + " " +  client.getNick() + \
                         " :Duplicate recipients";
             reply(client, response);
             continue ;
@@ -72,7 +72,7 @@ void Server::privmsg(Client &client)
             }
             else
             {
-                _servname + " " + ERR_NOSUCHCHANNEL + " " +  client.getNick() + " " + \
+                response = _servname + " " + ERR_NOSUCHCHANNEL + " " +  client.getNick() + " " + \
                             _sendMsgClient[i].first + " :No such channel";
                 reply(client, response);
             }
@@ -86,7 +86,7 @@ void Server::privmsg(Client &client)
             }
             else
             {
-                _servname + " " + ERR_NOSUCHNICK + " " +  client.getNick() + " " + \
+                response = _servname + " " + ERR_NOSUCHNICK + " " +  client.getNick() + " " + \
                                 _sendMsgClient[i].first + " :No such nick/channel";
                 reply(client, response);
             }
@@ -156,7 +156,7 @@ void Server::initJoin(Client &client)
         }
         if (seenChannels.count(chan) > 0) 
         {
-            _servname + " " + ERR_TOOMANYTARGETS + " " +  client.getNick() + \
+            response =_servname + " " + ERR_TOOMANYTARGETS + " " +  client.getNick() + \
                     " :Duplicate recipients";
             reply(client, response);
             continue ;

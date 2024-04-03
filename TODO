@@ -9,7 +9,7 @@ Channels also contain a topic. The topic is a line shown to all users when they 
 
 if channel already exist (join)
 :u4!~x@197.230.30.146 JOIN #ch1
-:mercury.libera.chat 332 u4 #ch1 :dsdssdsssssdsdsdsd
+:mercury.libera.chat 332 u4 #ch1 :topic
 :mercury.libera.chat 333 u4 #ch1 u1!~x@197.230.30.146 1711076841
 :mercury.libera.chat 353 u4 @ #ch1 :u4 u3 @u1
 :mercury.libera.chat 366 u4 #ch1 :End of /NAMES list.
@@ -39,8 +39,8 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 <<<< for rachid >>>>
 [ ] :lalala!~s@197.230.30.146 QUIT :Quit: comment (handle quit comment sent in broadcast to channels)
-
-
+[ ] :471 #ch1 :Cannot join channel (+l) > :*.freenode.net 471 kakaka #ch111 :Cannot join channel (channel is full)
+:*.freenode.net 482 kakaka #ch111 :You do not have access to change the topic on this channel
 
 ###############################
 [x] close fds CTRL-c
@@ -53,7 +53,7 @@ qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 invite someone without operator priv
 
 
-send(_botSock, msg, len, MSG_NOSIGNAL);
+send(_ircSock, msg, len, MSG_NOSIGNAL);
 
 + what is unbound socket and what happens when we call bind()
 - what is diff bitween write/send read/recv
@@ -95,5 +95,12 @@ NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390
 topic #yyy11 :
 :qazxsw!~f@197.230.30.146 TOPIC #yyy11 :
 
-lusers replace num with defines
- ERR_BADCHANNELKEY
+
+>> tested in freenode server (invite with no params gives a list of channels the sended has been invitet to)
+invite
+:*.freenode.net 336 akakaka :#ch22
+:*.freenode.net 336 akakaka :#ch11
+:*.freenode.net 337 akakaka :End of INVITE list
+
+
+bot ircserver addr

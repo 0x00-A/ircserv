@@ -5,12 +5,12 @@ SRCDIR = .
 OBJDIR = obj
 INCLUDES = ./inc
 
-SRC = main.cpp ircbot.cpp
+SRC = main.cpp IRCbot.cpp parsing.cpp Channel.cpp
 
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst %.cpp,$(OBJDIR)/%.d,$(SRC))
 
-NAME = ../ircbot
+NAME = ../IRCbot
 
 all: $(NAME)
 
