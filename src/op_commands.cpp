@@ -67,19 +67,19 @@ void Server::invite(Client& client)
 	channelIter chanit = doesChannelExist(chanName);
     if (chanit == _channels.end()) {
         throw (ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + chanName + \
-                " :No such channel"); G
+                " :No such channel");
     }
 	if (!chanit->isUserInChannel(client.getNick())) {
         throw (ERR_NOTONCHANNEL + " " + client.getNick() + " " + chanName + \
-                " :You're not on that channel"); G
+                " :You're not on that channel");
     }
     if (!chanit->isUserOperator(client.getNick())) {
         throw (ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + chanName + \
-                " :You're not a channel operator"); G
+                " :You're not a channel operator");
     }
     if ( (invitedUserIter = doesUserExit(invitedUser)) == _clients.end()){
         throw (ERR_NOSUCHNICK + " " + client.getNick() + " " + invitedUser + \
-                " :No such nick/channel"); G
+                " :No such nick/channel");
     }
     if (chanit->isUserInChannel(invitedUser)) {
         throw (ERR_USERONCHANNEL + " "+ client.getNick() + " " + invitedUser + " " + \
