@@ -82,7 +82,7 @@ void Server::user(Client &client)
         throw (_servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick()  + " " + this->_params[0] + \
                 " :Not enough parameters");
     }
-    if (this->_params[1].size() > USERNAMELEN)
+    if (this->_params[1].size() >= USERNAMELEN)
         this->_params[1].erase(USERNAMELEN);
     client.setHasUsedUser(true);
     client.setUsername(this->_params[1]);

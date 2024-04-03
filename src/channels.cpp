@@ -50,7 +50,6 @@ void Server::channelWelcomeMessages(Client &client, Channel& ch)
 		reply(client, _servname + " " + RPL_TOPICWHOTIME + " " + client.getNick() + " " + ch.getName()  \
 			+ " "  + client.identifier() + " " + itos(ch.getTimeOfTopic()));
 	}
-	// reply(client, _servname + " MODE " + ch.getName( + " " + ch.channelModeIs());
 	if (ch.isUserOperator(client.getNick()))
 		reply(client, client.identifier() + " MODE " + ch.getName() + " " + "+t");
 
@@ -101,7 +100,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 					return ;
 				}
 			}
-			if (_channels[i].hasPasskey()  && !_channels[i].hasInvite())
+			if (_channels[i].hasPasskey()  && !client.isInvitedToChannel(channel.first))
 			{
 				if (_channels[i].getPasskey() != channel.second)
 				{

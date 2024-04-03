@@ -49,13 +49,33 @@ void Server::kick(Client& client)
 	removeUserFromChannel(key, channelName);
 }
 
-
 void Server::invite(Client& client)
 {
     clientIter invitedUserIter;
+
+
     if (!client.isConnected()) {
         reply(client, "451 :You have not registered");
         return;
+    }
+
+    if (_params.size() == 1)
+    {
+        std::vector<string> invitedChannels;
+        string              iChannels;
+
+        invitedChannels = client.getInvitedChannels();
+        if (!invitedChannels.empty())
+        {
+            for (size_t i = 0; i < invitedChannels.size(); i++)
+            {
+                iChannels += invitedChannels[i] + " ";
+            }
+            reply(client, "336 " + client.getNick() + " :" + iChannels);
+        }
+        reply(client, "337 " + client.getNick() + " :End of INVITE list.");
+        return ;
+
     }
     if (_params.size() < 3) {
         reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters");
@@ -96,34 +116,29 @@ void Server::topic(Client& client)
         reply(client, _servname + " " + ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
         return;
     }
-
     if (_params.size() < 2) {
         reply(client, _servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick() + " TOPIC :Not enough parameters");
         return;
     }
-
     std::string channelName = _params[1];
     channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
         reply(client, _servname + " " + ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + channelName + " :No such channel");
         return ;
     }
-
     if (!chanit->isUserInChannel(client.getNick())) {
         reply(client, _servname + " " + ERR_NOTONCHANNEL + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
-
     if(_params.size() > 2)
     {
         if (chanit->hasTopic() && !chanit->isUserOperator(client.getNick())) {
             reply(client, _servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick()  + " "  + channelName + " :You're not channel operator");
             return;
         }
-        
         std::string newTopic = _params[2];
         cout << "newTopic: " << newTopic << endl;
-        if (newTopic.size() > TOPICLEN)
+        if (newTopic.size() >= TOPICLEN)
             newTopic.erase(TOPICLEN);
         chanit->setTopic(newTopic);
         chanit->setTimeOfTopic();
@@ -138,8 +153,6 @@ void Server::topic(Client& client)
             reply(client, _servname + " " + RPL_NOTOPIC + " " + client.getNick() + " " + channelName + " :No topic is set.");
 		else
         {
-            // :adrift.sg.quakenet.org 333 dsfdsfds #cv565 dsfdsfds 1712018309
-            // :tantalum.libera.chat 333 sdew #xcxcx sdew!~df@197.230.30.146 1712018513
             reply(client, _servname + " " + RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + currentTopic);
             reply(client, _servname + " " + RPL_TOPICWHOTIME + " " + client.getNick() + " " + channelName + " "  + client.identifier() + " " + itos(chanit->getTimeOfTopic()));
         }
