@@ -6,11 +6,11 @@ void Server::kick(Client& client)
     // :q1!~f@197.230.30.146 KICK #edc q4 :q4
     // :q1!~f@197.230.30.146 KICK #edc q3 :speck english
     if (!client.isConnected()) {
-        reply(client, ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
+        reply(client, _servname + " " + ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
         return;
     }
     if (_params.size() < 3) {
-        reply(client, ERR_NEEDMOREPARAMS + " " + client.getNick() + " KICK :Not enough parameters");
+        reply(client, _servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick() + " KICK :Not enough parameters");
         return;
     }
 
@@ -20,24 +20,24 @@ void Server::kick(Client& client)
 
 	channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
-        reply(client, ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + channelName + " :No such channel");
+        reply(client, _servname + " " + ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + channelName + " :No such channel");
         return;
     }
     if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, ERR_NOTONCHANNEL + " " + client.getNick() + " " + channelName + " :You're not on that channel");
+        reply(client, _servname + " " + ERR_NOTONCHANNEL + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        reply(client, ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " :You're not channel operator");
+        reply(client, _servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " :You're not channel operator");
         return;
     }
 
 	if (doesUserExit(key) == _clients.end()) {
-        reply(client, ERR_NOSUCHNICK + " " + client.getNick() + " " + channelName + " :No such nick/channel");
+        reply(client, _servname + " " + ERR_NOSUCHNICK + " " + client.getNick() + " " + channelName + " :No such nick/channel");
         return;
 	}
     if (!chanit->isUserInChannel(key)) {
-        reply(client, ERR_USERNOTINCHANNEL + " " + client.getNick() + " " + channelName + " :they are not on that channel");
+        reply(client, _servname + " " + ERR_USERNOTINCHANNEL + " " + client.getNick() + " " + channelName + " :they are not on that channel");
         return;
     }
     std::string kickMessage = client.identifier() + " KICK " + channelName + " " + key + " :" + key;
@@ -65,60 +65,60 @@ void Server::invite(Client& client)
 
 	channelIter chanit = doesChannelExist(chanName);
     if (chanit == _channels.end()) {
-        throw (ERR_NOSUCHCHANNEL + client.getNick() + " " + chanName + \
+        throw (_servname + " " + ERR_NOSUCHCHANNEL + client.getNick() + " " + chanName + \
                 " :No such channel");
     }
 	if (!chanit->isUserInChannel(client.getNick())) {
-        throw (ERR_NOTONCHANNEL + " " + client.getNick() + " " + chanName + \
+        throw (_servname + " " + ERR_NOTONCHANNEL + " " + client.getNick() + " " + chanName + \
                 " :You're not on that channel");
     }
     if (!chanit->isUserOperator(client.getNick())) {
-        throw (ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + chanName + \
+        throw (_servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick() + " " + chanName + \
                 " :You're not channel operator");
     }
     if ( (invitedUserIter = doesUserExit(invitedUser)) == _clients.end()){
-        throw (ERR_NOSUCHNICK + " " + client.getNick() + " " + invitedUser + \
+        throw (_servname + " " + ERR_NOSUCHNICK + " " + client.getNick() + " " + invitedUser + \
                 " :No such nick");
     }
     if (chanit->isUserInChannel(invitedUser)) {
-        throw (ERR_USERONCHANNEL + " "+ client.getNick() + " " + invitedUser + " " + \
+        throw (_servname + " " + ERR_USERONCHANNEL + " "+ client.getNick() + " " + invitedUser + " " + \
                 chanName + " :is already on channel");
     }
     // message sent to the inviter
-    reply(client, RPL_INVITING + " " + client.getNick() + " " + invitedUser + " " + chanName);
+    reply(client, _servname + " " + RPL_INVITING + " " + client.getNick() + " " + invitedUser + " " + chanName);
     // message sent to the invited user
-    reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " " + chanName);
+    reply(*invitedUserIter, client.identifier() + " INVITE " + invitedUser + " :" + chanName);
     invitedUserIter->inviteToChannel(chanName);
 }
 
 void Server::topic(Client& client)
 {
     if (!client.isConnected()) {
-        reply(client, ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
+        reply(client, _servname + " " + ERR_NOTREGISTERED + " " + client.getNick() + " :You have not registered");
         return;
     }
 
     if (_params.size() < 2) {
-        reply(client,  ERR_NEEDMOREPARAMS + " " + client.getNick() + " TOPIC :Not enough parameters");
+        reply(client, _servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick() + " TOPIC :Not enough parameters");
         return;
     }
 
     std::string channelName = _params[1];
     channelIter chanit = doesChannelExist(channelName);
     if (chanit == _channels.end()) {
-        reply(client, ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + channelName + " :No such channel");
+        reply(client, _servname + " " + ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + channelName + " :No such channel");
         return ;
     }
 
     if (!chanit->isUserInChannel(client.getNick())) {
-        reply(client, ERR_NOTONCHANNEL + " " + client.getNick() + " " + channelName + " :You're not on that channel");
+        reply(client, _servname + " " + ERR_NOTONCHANNEL + " " + client.getNick() + " " + channelName + " :You're not on that channel");
         return;
     }
 
     if(_params.size() > 2)
     {
         if (chanit->hasTopic() && !chanit->isUserOperator(client.getNick())) {
-            reply(client, ERR_CHANOPRIVSNEEDED + " " + client.getNick()  + " "  + channelName + " :You're not channel operator");
+            reply(client, _servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick()  + " "  + channelName + " :You're not channel operator");
             return;
         }
         
@@ -141,11 +141,14 @@ void Server::topic(Client& client)
         {
             // :adrift.sg.quakenet.org 333 dsfdsfds #cv565 dsfdsfds 1712018309
             // :tantalum.libera.chat 333 sdew #xcxcx sdew!~df@197.230.30.146 1712018513
-            reply(client, RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + currentTopic);
-            reply(client, RPL_TOPICWHOTIME + " " + client.getNick() + " " + channelName + " "  + client.identifier() + " " + itos(chanit->getTimeOfTopic()));
+            reply(client, _servname + " " + RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + currentTopic);
+            reply(client, _servname + " " + RPL_TOPICWHOTIME + " " + client.getNick() + " " + channelName + " "  + client.identifier() + " " + itos(chanit->getTimeOfTopic()));
         }
         return;
     }
+        // std::string msg = client.identifier() + " TOPIC " + channelName + " :" + newTopic;
+        // reply(client, msg);
+        // broadcastMsg(client, msg, *chanit);
 }
 
 void    Server::mode(Client& client)
@@ -158,30 +161,30 @@ void    Server::mode(Client& client)
 
     if (!client.isConnected())
     {
-        throw (ERR_NOTREGISTERED + " " + \
+        throw (_servname + " " + ERR_NOTREGISTERED + " " + \
         client.getNick()  + " :You have not registered");
     }
     if (_params.size() < 2)
     {
-        throw (ERR_NEEDMOREPARAMS + " " + \
+        throw (_servname + " " + ERR_NEEDMOREPARAMS + " " + \
         client.getNick() + " " + _params[0]  + " :Not enough parameters");
     }
     if ( (chan = doesChannelExist(_params[1])) == _channels.end())
     {
-        throw (ERR_NOSUCHCHANNEL + " " + \
+        throw (_servname + " " + ERR_NOSUCHCHANNEL + " " + \
         client.getNick() + " " + _params[1]  + " :No such channel");
     }
     if (_params.size() == 2)
     {
         reply(client, (RPL_CHANNELMODEIS + " " + \
         client.getNick() + " " + _params[1] + " " + chan->channelModeIs()));
-        throw (RPL_CREATIONTIME + " " + \
+        throw (_servname + " " + RPL_CREATIONTIME + " " + \
         client.getNick() + " " + _params[1] + " " + chan->getCreationTime());
     }
     parseModes(modes, client);
     if (!chan->isUserOperator(client.getNick()))
     {
-        throw (ERR_CHANOPRIVSNEEDED + " " + \
+        throw (_servname + " " + ERR_CHANOPRIVSNEEDED + " " + \
         client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
 	}
 	while (!modes.empty())
@@ -239,17 +242,17 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
             if ( (c == 'o' || (c == 'k' && sign == "+") || (c == 'l' && sign == "+"))
                 && (!(k < _params.size()) || _params[k].find_first_not_of(" ") == string::npos))
             {
-                throw ( ERR_NEEDMOREPARAMS + " " + \
+                throw ( _servname + " " + ERR_NEEDMOREPARAMS + " " + \
                 client.getNick() + " " + _params[0]  + " :Not enough parametersss" );
             }
             if (c == 'k' && sign == "+")
             {
                 if (badFormKey(_params[k]))
-                    throw (ERR_INVALIDKEY + " " + client.getNick() + " " + _params[1] + \
+                    throw (_servname + " " + ERR_INVALIDKEY + " " + client.getNick() + " " + _params[1] + \
                             " :Key is not well-formed");
                 if (doesChannelExist(_params[1])->hasPasskey())
                 {
-                    reply(client, ERR_KEYALREADYSET + " " + client.getNick() + " " + \
+                    reply(client, _servname + " " + ERR_KEYALREADYSET + " " + client.getNick() + " " + \
                         _params[1] + " :Channel key already set");
                 }
             }
@@ -260,7 +263,7 @@ bool    Server::parseModes(std::queue< std::pair<string, string> >& modes, Clien
         }
         else
         {
-            throw ( ERR_UNKNOWNMODE + " " + client.getNick() + \
+            throw ( _servname + " " + ERR_UNKNOWNMODE + " " + client.getNick() + \
             " " + _params[2].substr(i, 1) + " :is an unknown mode char to me" );
         }
         modeCount++;
@@ -272,12 +275,12 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
 {
     if (doesUserExit(m.second) == _clients.end())
     {
-        reply(cli, ERR_NOSUCHNICK + " " + \
+        reply(cli, _servname + " " + ERR_NOSUCHNICK + " " + \
             cli.getNick() + " " + m.second + " :No such nick");
     }
     else if (!chan->isUserInChannel(m.second))
     {
-        reply(cli, ERR_USERNOTINCHANNEL + " " + \
+        reply(cli, _servname + " " + ERR_USERNOTINCHANNEL + " " + \
             cli.getNick() + " " + _params[1] + " :They aren't on that channel");
     }
     else if (m.first == "+o" && chan->setChannelOperator(m.second))
@@ -308,7 +311,7 @@ void Server::handleLimitFlag(strPair &m, string &modesave, string &paramsave, ch
 		}
         else
         {
-            reply(cli, ERR_INVALIDMODEPARAM + " " + cli.getNick() + " " + chan->getName() + \
+            reply(cli, _servname + " " + ERR_INVALIDMODEPARAM + " " + cli.getNick() + " " + chan->getName() + \
                     " :Invalid limit mode parameter. Syntax: <limit>.");
         }
 	}

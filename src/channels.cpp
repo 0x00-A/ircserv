@@ -83,7 +83,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 
 	if (client.getChannels().size() >= MAXCHANNELS)
 	{
-		throw (ERR_TOOMANYCHANNELS + " " + client.getNick() + " " + channel.first + \
+		throw (_servname + " " + ERR_TOOMANYCHANNELS + " " + client.getNick() + " " + channel.first + \
 				" :You have joined too many channels");
 	}
 	for (size_t i = 0; i < this->_channels.size(); i++)
@@ -95,7 +95,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (!client.isInvitedToChannel(channel.first)) 
 				{
-					response =  (ERR_INVITEONLYCHAN + " " + client.getNick()  + " " + \
+					response =  (_servname + " " + ERR_INVITEONLYCHAN + " " + client.getNick()  + " " + \
 						_channels[i].getName() + " :Cannot join channel, you must be invited (+i)");
 					reply(client, response);
 					return ;
@@ -115,7 +115,7 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getUserLimit() <= _channels[i].getSize())
 				{
-					response =  (ERR_CHANNELISFULL + " " + _channels[i].getName() + " :Cannot join channel (+l)");
+					response =  (_servname + " " + ERR_CHANNELISFULL + " " + _channels[i].getName() + " :Cannot join channel (+l)");
 					reply(client, response);
 					return ;
 				}
@@ -182,7 +182,7 @@ void Server::showChannelNames(Client &client, Channel &ch)
 	string 			    prefix;
 	std::set<string>	users;
 
-	prefix = RPL_NAMREPLY + " " + client.getNick() + " @ " +  ch.getName() + " :";
+	prefix = _servname + " " + RPL_NAMREPLY + " " + client.getNick() + " @ " +  ch.getName() + " :";
 	users = ch.getUserList();
 	size_t newlen;
 	response = prefix;
@@ -206,7 +206,7 @@ void Server::showChannelNames(Client &client, Channel &ch)
 	}
 	if (response != prefix)
         reply(client, response);
-	response = RPL_ENDOFNAMES + " " + client.getNick() + " " +  ch.getName() + \
+	response = _servname + " " + RPL_ENDOFNAMES + " " + client.getNick() + " " +  ch.getName() + \
 				" :End of /NAMES list.";
 	reply(client, response);
 }

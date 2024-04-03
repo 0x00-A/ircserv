@@ -94,3 +94,6 @@ NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390
 
 topic #yyy11 :
 :qazxsw!~f@197.230.30.146 TOPIC #yyy11 :
+
+lusers replace num with defines
+ ERR_BADCHANNELKEY

@@ -55,22 +55,22 @@ void	Server::motd(Client& client)
 
     if (!motdfile.is_open())
     {
-        throw (ERR_NOMOTD + " " + client.getNick() + " :MOTD File is missing");
+        throw (_servname + " " + ERR_NOMOTD + " " + client.getNick() + " :MOTD File is missing");
     }
-	reply(client, RPL_MOTDSTART + " " + client.getNick() + " :- " + _servname + " Message of the Day -");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :-                                                      ");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :-   __  _         _               _  _____ _____ _____ ");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :-  / _|| |_      (_) _ __  ___   / ||___ /|___ /|___  |");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :- | |_ | __|     | || '__|/ __|  | |  |_ \\  |_ \\   / / ");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :- |  _|| |_      | || |  | (__   | | ___) |___) | / /  ");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :- |_|   \\__|_____|_||_|   \\___|  |_||____/|____/ /_/   ");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :-          |_____|                                     ");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :-                                                      ");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :- irc1337 is a really cool network!");
-	// reply(client, RPL_MOTD + " " + client.getNick() + " :- No spamming please, thank you!");
+	reply(client, _servname + " " + RPL_MOTDSTART + " " + client.getNick() + " :- " + _servname + " Message of the Day -");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :-                                                      ");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :-   __  _         _               _  _____ _____ _____ ");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :-  / _|| |_      (_) _ __  ___   / ||___ /|___ /|___  |");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :- | |_ | __|     | || '__|/ __|  | |  |_ \\  |_ \\   / / ");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :- |  _|| |_      | || |  | (__   | | ___) |___) | / /  ");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :- |_|   \\__|_____|_||_|   \\___|  |_||____/|____/ /_/   ");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :-          |_____|                                     ");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :-                                                      ");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :- irc1337 is a really cool network!");
+	// reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " :- No spamming please, thank you!");
     while (std::getline(motdfile, line))
     {
-        reply(client, RPL_MOTD + " " + client.getNick() + " " + line);
+        reply(client, _servname + " " + RPL_MOTD + " " + client.getNick() + " " + line);
     }
-	reply(client, RPL_ENDOFMOTD + " " + client.getNick() + " :End of /MOTD command.");
+	reply(client, _servname + " " + RPL_ENDOFMOTD + " " + client.getNick() + " :End of /MOTD command.");
 }

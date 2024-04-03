@@ -10,7 +10,7 @@ void Server::broadcastMsg(Client &sender, const string &msg, const Channel &chan
 {
 	if (chan.isUserInChannel(sender.getNick()) == false)
 	{
-            reply(sender, ERR_CANNOTSENDTOCHAN + " " + \
+            reply(sender, _servname + " " + ERR_CANNOTSENDTOCHAN + " " + \
 				sender.getNick() + " " + chan.getName() + " :Cannot send to channel");
 	}
 	else
@@ -31,18 +31,18 @@ void Server::welcomeClient(Client &client)
 {
 	string	response;
 
-	response  = RPL_WELCOME + " " + client.getNick() + " :Welcome to the " + _servname + \
+	response  = _servname + " " + RPL_WELCOME + " " + client.getNick() + " :Welcome to the " + _servname + \
 				" Network, " + client.identifier();
 	reply(client, response);
-	response = RPL_YOURHOST + " " + client.getNick() + " :Your host is " + _servname + \
+	response = _servname + " " + RPL_YOURHOST + " " + client.getNick() + " :Your host is " + _servname + \
 				", running version " + "version: 01";
 	reply(client, response);
-	response = RPL_CREATED + " " + client.getNick() + " :This server was created " + \
+	response = _servname + " " + RPL_CREATED + " " + client.getNick() + " :This server was created " + \
 				getStartTime();
 	reply(client, response);
     // :calcium.libera.chat 005 aaa CHANMODES=k,l,i,t CHANLIMIT=#:250 MODES=4 NETWORK=Libera.Chat NICKLEN=16 CHANNELLEN=50 TOPICLEN=390 :are supported by this server
 	// :hostsailor.ro.quakenet.org 005 lalala WHOX WALLCHOPS WALLVOICES USERIP CPRIVMSG CNOTICE SILENCE=15 MODES=6 MAXCHANNELS=40 MAXBANS=45 NICKLEN=15 :are supported by this server
-	response = RPL_ISUPPORT + " " + client.getNick() + " CHANMODES=" + CHANMODES + " MODES=" + \
+	response = _servname + " " + RPL_ISUPPORT + " " + client.getNick() + " CHANMODES=" + CHANMODES + " MODES=" + \
 			itos(MODES) + " NICKLEN=" + itos(NICKLEN) + " MAXCHANNELS=" + itos(MAXCHANNELS) + \
 			" TOPICLEN=" + itos(TOPICLEN) + " USERNAMELEN=" + itos(USERNAMELEN) + " CHANNELLEN=" + \
 			itos(CHANNELLEN) + " :are supported by this server";

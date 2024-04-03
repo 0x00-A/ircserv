@@ -5,11 +5,11 @@ void Server::pass(Client &client)
 {
     if (client.isConnected())
     {
-        throw (ERR_ALREADYREGISTRED + " " + client.getNick()  + " :You may not reregister");
+        throw (_servname + " " + ERR_ALREADYREGISTRED + " " + client.getNick()  + " :You may not reregister");
     }
     if (this->_params.size() < 2)
     {
-        throw (ERR_NEEDMOREPARAMS + " " + client.getNick()  + " " + this->_params[0] + \
+        throw (_servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick()  + " " + this->_params[0] + \
                 " :Not enough parameters");
     }
     if (this->_params[1] == this->_passwd)
@@ -19,7 +19,7 @@ void Server::pass(Client &client)
     else
     {
         client.setHasPassed(false);
-        throw (ERR_PASSWDMISMATCH + " " + client.getNick()  + " " + this->_params[1] + \
+        throw (_servname + " " + ERR_PASSWDMISMATCH + " " + client.getNick()  + " " + this->_params[1] + \
                 " :Password incorrect");
     }
 }
@@ -30,11 +30,11 @@ void Server::nick(Client &client)
 
     if (client.getHasPassed() == false)
     {
-        throw (ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
+        throw (_servname + " " + ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
     }
     if (this->_params.size() < 2)
     {
-        throw (ERR_NONICKNAMEGIVEN + " " + client.getNick()  + " :No nickname given");
+        throw (_servname + " " + ERR_NONICKNAMEGIVEN + " " + client.getNick()  + " :No nickname given");
     }
     if (this->_params[1].size() >= NICKLEN)
     {
@@ -42,11 +42,11 @@ void Server::nick(Client &client)
     }
     if (client.checkNick(this->_params[1]) == false)
     {
-        throw (ERR_ERRONEUSNICKNAME + " " + client.getNick()  + " :Erroneus nickname");
+        throw (_servname + " " + ERR_ERRONEUSNICKNAME + " " + client.getNick()  + " :Erroneus nickname");
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
-        throw (ERR_NICKNAMEINUSE + " " + client.getNick()  + " :Nickname is already in use");
+        throw (_servname + " " + ERR_NICKNAMEINUSE + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (client.getHasUsedNick() == true && !client.isConnected())
     {
@@ -71,15 +71,15 @@ void Server::user(Client &client)
 {
     if (client.isConnected())
     {
-        throw (ERR_ALREADYREGISTRED + " " + client.getNick()  + " :You may not reregister");
+        throw (_servname + " " + ERR_ALREADYREGISTRED + " " + client.getNick()  + " :You may not reregister");
     }
     if (client.getHasPassed() == false)
     {
-        throw (ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
+        throw (_servname + " " + ERR_NOTREGISTERED + " " + client.getNick()  + " :You have not registered");
     }
     if (this->_params.size() < 5)
     {
-        throw (ERR_NEEDMOREPARAMS + " " + client.getNick()  + " " + this->_params[0] + \
+        throw (_servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick()  + " " + this->_params[0] + \
                 " :Not enough parameters");
     }
     if (this->_params[1].size() > USERNAMELEN)

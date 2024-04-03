@@ -17,7 +17,11 @@
 # include <algorithm>
 # include <ctime>
 # include <sys/types.h>
-# include <strings.h>
+# include <string>
+# include <signal.h>
+# include <strings.h> // for bzero
+
+extern int IsBotRunning;
 
 # define BUF_SIZE 1024
 
@@ -27,66 +31,99 @@ class ircbot
 {
 	private:
 
-		class	User
+		struct Channel;
+		struct	User;
+
+		typedef std::vector<User>::iterator userIter;
+		typedef std::vector<string>::iterator strVecIter;
+		typedef std::vector<Channel>::iterator chanIt;
+
+		struct	User
 		{
-			public:
 				string _nick;
 				long _timer;
 				User(const string& nick);
 		};
 
-		typedef std::vector<User>::iterator userIter;
-		typedef std::vector<string>::iterator strVecIter;
+		struct Channel
+		{
+			string					_name;
+			std::vector<string> 	_operators;
+			std::vector<string>		_badUsers;
+			std::vector<User> 		_loggedUsers;
+
+			Channel(const string& name);
+
+			void					logUsers( string& users );
+			void					updateOperators( std::vector<string>& tokens );
+			void					updateUsers(std::vector<string>& tokens);
+			userIter				doesUserExit(const string& user);
+			bool					isOperator( string& user );
+			bool					isMember( string& user );
+			string					getBadUsers( void );
+			void					addBadUser( string& user );
+			void					removeUser(const string& user);
+			void					updateUserNick( const string& old_nick, const string& new_nick );
+			long					getTime(const string& user);
+
+			void	debugInfo( void );
+
+		};
+
 
 	private:
 
-		int						_botSock;
+		int						_ircSock;
+		int						_weatherSock;
 		string					_passwd;
 		string					_ircPort;
 		std::string				_recvbuf;
 		string					_nick;
-		string					_channel;
-		std::vector<string> 	_operators;
-		std::vector<string> 	_wordlist;
-		std::vector<User> 		_loggedUsers;
-		std::vector<string>		_badUsers;
 
-		void					registerBot( void );
-		void					handleRead( void );
-		string					getCommand( void );
-		void					parseCommand( string&, std::vector<string>& );
-		void					handleCommand( std::vector<string>& );
-		string					getUserNick( string& token );
+		// string					_channel;
+
+		// std::vector<string> 	_operators;
+		// std::vector<string>		_badUsers;
+		// std::vector<User> 		_loggedUsers;
+		
+		std::vector<Channel>	_channels;
+		std::vector<string> 	_wordlist;
+		string					_weatherServIP;
+
+		chanIt					getChanIt( string& name );
+
 		void					checkOffensiveWords( std::vector<string>& tokens );
 		bool					hasBadWords( string& str );
-		void					updateOperators( std::vector<string>& tokens );
-		void					updateUsers(std::vector<string>& tokens);
-		void					logUsers( string& users );
-		void					blacklistReply( string& nick );
-		void					logtimeReply( string& nick );
-		std::string				itos(int num);
-		long					getTime(const string& user);
-		void					removeUser(const string& user);
-		void					updateUserNick( const string& old_nick, const string& new_nick );
-		userIter				doesUserExit(const string& user);
-		bool					isOperator( string& user );
-		bool					isMember( string& user );
-		string					getBadUsers( void );
-		void					addBadUser( string& user );
 		void					sendReply(const string& reply);
 		bool					isErrorCode( const string& code );
 	
+		void					IRCServRegister( void );
+		string					getWeatherInfo( void );
+		void					handleRead( void );
+		string					getCommand( void );
+		void					parseCommand( string&, std::vector<string>& tokens );
+		void					sendWeatherInfo( string& client_nick );
+		string 					parseInfo(std::string marker, string endMarker, std::string& response);
+		void					handleCommand( std::vector<string>& tokens );
+		void					updateChannels(chanIt& iter);
+		void					logtimeReply( string& nick, Channel& chan );
+		void					blacklistReply( string& nick, Channel& chan );
+
+		static string			itos(int num);
+		static string			getUserNick( string& token );
+		std::pair<string, string>			parseRequest( string& token );				
+
 	public:
 
-		ircbot( string, string, string, string );
+		ircbot( string, string, string );
 		~ircbot();
 
 		void					run( void );
-		void					connectToServer( void );
+		void					connectToIRCServer( void );
+		void					connectToWeatherServer( void );
 
 		static long 			getTimeInMinutes();
 
-		void	debugInfo( void );
 };
 
 #endif //IRCBOT_HPP
