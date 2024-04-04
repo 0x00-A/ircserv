@@ -24,21 +24,6 @@ void Server::broadcastToJoinedChannels(Client& client, string &msg)
 	this->broadcastMsg(client, msg, tmpChannel);
 }
 
-// string		Server::getMembers(Channel& ch)
-// {
-//     string response;
-
-// 	std::set<string>  members = ch.getUserList();
-// 	std::set<string>::iterator it = members.begin();
-// 	for ( ; it != members.end(); it++)
-// 	{
-// 		response += " " + *it;
-// 	}
-// 	if (response[0] == ' ')
-// 		response.erase(0, 1);
-// 	return response;
-
-// }
 
 void Server::channelWelcomeMessages(Client &client, Channel& ch)
 {
@@ -104,8 +89,8 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getPasskey() != channel.second)
 				{
-					response =  (":" + client.getIPAddr() + " "  + ERR_BADCHANNELKEY + client.getNick() \
-					+ " " + channel.first + " :Cannot join channel (+K) - bad key");
+					response =  (_servname + " "  + ERR_BADCHANNELKEY + " " + client.getNick() + " "\
+					+ _channels[i].getName() + " :Cannot join channel, you need the correct key (+k)");
 					reply(client, response);
 					return ;
 				}
@@ -114,7 +99,8 @@ void Server::joinChannel(Client &client, std::pair<string, string> channel)
 			{
 				if (_channels[i].getUserLimit() <= _channels[i].getSize())
 				{
-					response =  (_servname + " " + ERR_CHANNELISFULL + " " + _channels[i].getName() + " :Cannot join channel (+l)");
+					response =  (_servname + " " + ERR_CHANNELISFULL + " " + client.getNick() + " " + \
+					_channels[i].getName() + " :Cannot join channel, Channel is full (+l)");
 					reply(client, response);
 					return ;
 				}

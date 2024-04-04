@@ -71,14 +71,13 @@ void Server::invite(Client& client)
             {
                 iChannels += invitedChannels[i] + " ";
             }
-            reply(client, "336 " + client.getNick() + " :" + iChannels);
+            reply(client, _servname + " " + "346 " + client.getNick() + " :" + iChannels);
         }
-        reply(client, "337 " + client.getNick() + " :End of INVITE list.");
+        reply(client, _servname + " " + "347 " + client.getNick() + " :End of INVITE list");
         return ;
-
     }
     if (_params.size() < 3) {
-        reply(client, "461 " + client.getNick() + " INVITE :Not enough parameters");
+        reply(client, _servname + " " + ERR_NEEDMOREPARAMS + " " + client.getNick() + " INVITE :Not enough parameters");
         return;
     }
     std::string invitedUser = _params[1];
@@ -86,7 +85,7 @@ void Server::invite(Client& client)
 
 	channelIter chanit = doesChannelExist(chanName);
     if (chanit == _channels.end()) {
-        throw (_servname + " " + ERR_NOSUCHCHANNEL + client.getNick() + " " + chanName + \
+        throw (_servname + " " + ERR_NOSUCHCHANNEL + " " + client.getNick() + " " + chanName + \
                 " :No such channel");
     }
 	if (!chanit->isUserInChannel(client.getNick())) {
