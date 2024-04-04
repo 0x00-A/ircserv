@@ -15,10 +15,9 @@ Server::Server(const string& port, const string& passwd)
 	// First entry in the _pollfds array is used for the listening socket
 	struct pollfd servPoll;
 	servPoll.fd = _servfd;
-	servPoll.events = POLLIN;	// specify events of interest on fd
+	servPoll.events = POLLIN;	// events of interest on fd
 	_pollfds.push_back(servPoll);
 
-	//
 	this->commandMap["PASS"] = &Server::pass;
     this->commandMap["USER"] = &Server::user;
     this->commandMap["NICK"] = &Server::nick;
@@ -67,7 +66,7 @@ int Server::handleNewConnection()
 		return (1);
 	}
 	// get ip address
-	if (!(ip = inet_ntoa(cliaddr.sin_addr)))		// inet_ntoa returns a pointer to a static buffer inside the function
+	if (!(ip = inet_ntoa(cliaddr.sin_addr)))
 	{
 		cerr << "inet_ntoa failed" << endl;
 		close(connfd);
@@ -84,11 +83,9 @@ int Server::handleNewConnection()
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
 	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN), .revents = 0});
 
-	cout << "client connected - fd: " << connfd << " client host: " << ip << endl;
-
 	// for testing	/********* DELETE **********/
 	stringstream ss; ss << connfd;
-	_clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + ss.str() + "\n";
+	// _clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + ss.str() + "\n";
 	// _pollfds.back().events |= POLLOUT;
 	return (0);
 }
@@ -101,8 +98,6 @@ void Server::disconnectClient(int id)
 	cli_it = _clients.begin() + id;
 	poll_it = _pollfds.begin() + id + 1;
 	exitUserFromChannels(cli_it);
-	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
-	// cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
 }
@@ -124,7 +119,7 @@ int Server::handleRead(int id)
 			}
 			return (0);
 		}
-		if (bytesread == 0) // is this neccessary? or add it in previous check
+		if (bytesread == 0)
 		{
 			return (-1);
 		}
@@ -201,11 +196,9 @@ void	Server::run()
 		{
 			if (_pollfds[i].revents & POLLIN)	// data sent from client
 			{
-				//
 				if (_pollfds[i].fd == _servfd)
 				{
 					
-					// cout << "Server has incomming connection(s)" << endl;
 					do
 					{
 						// accept incomming connections
@@ -216,14 +209,10 @@ void	Server::run()
 				else
 				{
 					// handle existing connections
-					// cout << "fd " << _pollfds[i].fd << " is readable" << endl;
 					ret = handleRead(i-1);
 					if (ret == -1)
 					{
-						// disconnectClient(--i);
 						quit(_clients[i-1]);
-						// cleanUnusedClients();
-						// continue;
 					}
 					else
 					{
@@ -249,13 +238,9 @@ void	Server::run()
 				/*  almost always be set if you ask for it. So, asking for POLLOUT when you   */
 				/*  don’t have anything to write would just waste CPU cycles. 	              */
 				/******************************************************************************/
-			
-				// cout << "fd " << _pollfds[i].fd << " is writeable" << endl;
 				ret = handleWrite(i-1);
 				if (ret == -1)
 				{
-					// disconnectClient(--i);
-					// continue;
 					quit(_clients[i-1]);
 				}
 			}
@@ -268,7 +253,6 @@ void	Server::run()
 				}
 				else
 				{
-					// disconnectClient(--i);
 					quit(_clients[i-1]);
 				}
 			}

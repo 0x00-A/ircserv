@@ -24,7 +24,6 @@ struct tm *getCurrentTime()
 string itos(int num)
 {
     stringstream ss;
-    // oss << std::setw(3) << std::setfill('0') << num;
     ss << num;
     return ss.str();
 }

@@ -83,6 +83,5 @@ string Channel::channelModeIs() const
             s << this->getUserLimit();
         }
     }
-    std::cout << ">>>>>> " <<  s.str() << std::endl;
     return (s.str());
 }

@@ -7,13 +7,15 @@
 
 
 #######################################################################################################
+[ ] auto logging
+[ ] remove tmp mapping in server
 [x] close fds CTRL-c
 [v] handle SIGPIPE < handled in unix check macos >
 [x] fix time mode
 [x] mode key remove space
 [ ] :lalala!~x@197.230.30.146 QUIT :EOF from client (when a user disconnect broadcast to channels)
-[ ] server::_hostname (remove unused var)
-[ ] remove debuginfo
+[x] server::_hostname (remove unused var)
+[x] remove debuginfo
 
 + what is unbound socket and what happens when we call bind()
 +    check in poll         

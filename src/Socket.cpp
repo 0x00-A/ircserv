@@ -6,7 +6,7 @@ Socket::~Socket()
 
 Socket::Socket()
 {
-	// create an end-point communication socket
+	// end-point communication socket
 	if ( (_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		perror("socket");
@@ -35,7 +35,7 @@ void Socket::bindSocket(string port)
 		perror("setsockopt");
 	}
 
-	// bind The server's port to the socket
+	// bind The server's addr and port to the socket
 	if (bind(_sockfd, reinterpret_cast<SA*>(&servaddr), sizeof(servaddr)) == -1)
 	{
 		perror("bind");

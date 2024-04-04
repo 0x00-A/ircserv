@@ -31,7 +31,7 @@ class Client
 		~Client();
 
 		int 					getSockfd(void) const;
-		void 					closeSocket(void);
+		void 					closeSocket(void) const;
 		int 					getPort(void) const;
 		string 					getIPAddr(void) const;
 		string 					&rdBuf(void);

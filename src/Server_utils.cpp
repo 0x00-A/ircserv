@@ -39,7 +39,7 @@ void Server::closeAllOpenSockets(void)
 	{
 		close(_pollfds[i].fd);
 	}
-	cout << "Done closing all sockets" << endl;
+	cout << "Server closing..." << endl;
 }
 
 int Server::getIndexOfClient(const Client &cli)
