@@ -38,7 +38,6 @@ void Server::handleCommand(string& cmd, int id)
     cmdmapIter it = this->commandMap.find(this->_params[0]);
     if (it != this->commandMap.end())
     {
-        cout << "revieved: " << cmd << endl;
         (this->*it->second)(_clients[id]);
     }
     else if (_clients[id].isConnected())

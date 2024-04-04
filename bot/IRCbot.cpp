@@ -176,10 +176,7 @@ void	IRCbot::run()
 		
 		while ( (cmd = getCommand()) != "")
 		{
-			std::cout << cmd << std::endl;
-			// parse command
 			parseCommand(cmd, tokens);
-			// handle command
 			handleCommand(tokens);
 			tokens.clear();
 		}
