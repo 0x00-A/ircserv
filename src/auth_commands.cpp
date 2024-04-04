@@ -90,8 +90,8 @@ void Server::user(Client &client)
     }
     if (this->_params[1].size() >= USERNAMELEN)
         this->_params[1].erase(USERNAMELEN);
-    client.setHasUsedUser(true);
     client.setUsername(this->_params[1]);
+    client.setHasUsedUser(true);
     if (_clients.size() > 1 && client.getHasUsedNick())
     {
         checkSpamClient(client);
