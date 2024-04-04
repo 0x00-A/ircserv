@@ -55,7 +55,7 @@ void Server::invite(Client& client)
 
 
     if (!client.isConnected()) {
-        reply(client, "451 :You have not registered");
+        reply(client, ERR_NOTREGISTERED + " :You have not registered");
         return;
     }
 
@@ -71,9 +71,9 @@ void Server::invite(Client& client)
             {
                 iChannels += invitedChannels[i] + " ";
             }
-            reply(client, _servname + " " + "346 " + client.getNick() + " :" + iChannels);
+            reply(client, _servname + " " + RPL_INVEXLIST + " " + client.getNick() + " :" + iChannels);
         }
-        reply(client, _servname + " " + "347 " + client.getNick() + " :End of INVITE list");
+        reply(client, _servname + " " + RPL_ENDOFINVEXLIST + " " + client.getNick() + " :End of INVITE list");
         return ;
     }
     if (_params.size() < 3) {
