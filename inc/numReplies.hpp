@@ -39,6 +39,7 @@
 #define ERR_NOMOTD string("422")
 #define ERR_TOOMANYCHANNELS string("405")
 #define ERR_INVALIDMODEPARAM string("696")
+#define ERR_INVALIDMODEPARAM string("696")
 
 #define RPL_INVEXLIST string("346")
 #define RPL_ENDOFINVEXLIST string("347")
@@ -58,5 +59,8 @@
 #define RPL_TOPICWHOTIME string("333")
 #define RPL_INVITING string("341")
 #define RPL_ISUPPORT string("005")
+#define RPL_INVITELIST string("336")
+#define RPL_ENDOFINVITELIST string("337")
+
 
 #endif
