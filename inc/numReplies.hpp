@@ -38,6 +38,11 @@
 #define ERR_INPUTTOOLONG string("417")
 #define ERR_NOMOTD string("422")
 #define ERR_TOOMANYCHANNELS string("405")
+#define RPL_INVEXLIST string("346")
+#define RPL_ENDOFINVEXLIST string("347")
+#define RPL_LUSERUNKNOWN string("253")
+#define RPL_LUSERCHANNELS string("254")
+#define RPL_LUSERME string("255")
 
 #define RPL_MOTDSTART string("375")
 #define RPL_MOTD string("372")

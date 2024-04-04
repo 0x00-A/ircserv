@@ -148,3 +148,6 @@ join #xzxz
 :tungsten.libera.chat 353 bn2 @ #xzxz :bn2 @bn1
 :tungsten.libera.chat 366 bn2 #xzxz :End of /NAMES list.
 :bn1!~f@197.230.30.146 KICK #xzxz bn2 :for me
+
+
+if invite and hydna l channel +i 

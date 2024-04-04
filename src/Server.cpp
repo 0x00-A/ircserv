@@ -88,7 +88,7 @@ int Server::handleNewConnection()
 
 	// for testing	/********* DELETE **********/
 	stringstream ss; ss << connfd;
-	_clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + ss.str() + "\n";
+	// _clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + ss.str() + "\n";
 	// _pollfds.back().events |= POLLOUT;
 	return (0);
 }

@@ -40,11 +40,11 @@ void Server::lusers(Client &client)
 {
     string message;
 
-    message = "253 " + client.getNick() + " " + itos(getUnknownConnections()) + " :unknown connection(s)";
+    message = _servname + " " + RPL_LUSERUNKNOWN + " " + client.getNick() + " " + itos(getUnknownConnections()) + " :unknown connection(s)";
     reply(client, message);
-    message = "254 " + client.getNick() + " " + itos(getExistingChannels()) + " :channels formed";
+    message = _servname + " " + RPL_LUSERCHANNELS + " " + client.getNick() + " " + itos(getExistingChannels()) + " :channels formed";
     reply(client, message);
-    message = "255 " + client.getNick() + " :" + "I have " + itos(getKnownConnections()) + " clients and 1 servers";
+    message = _servname + " " + RPL_LUSERME + " " + client.getNick() + " :" + "I have " + itos(getKnownConnections()) + " clients and 1 servers";
     reply(client, message);
 }
 
