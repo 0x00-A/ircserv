@@ -7,8 +7,8 @@
 
 
 #######################################################################################################
-[ ] auto logging
-[ ] remove tmp mapping in server
+[x] auto logging
+[x] remove tmp mapping in server
 [x] close fds CTRL-c
 [v] handle SIGPIPE < handled in unix check macos >
 [x] fix time mode

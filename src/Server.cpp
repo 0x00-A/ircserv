@@ -32,19 +32,6 @@ Server::Server(const string& port, const string& passwd)
     this->commandMap["TOPIC"] = &Server::topic;
     this->commandMap["LUSERS"] = &Server::lusers;
     this->commandMap["MOTD"] = &Server::motd;
-
-
-	// temp
-	this->commandMap["P"] = &Server::pass;
-    this->commandMap["U"] = &Server::user;
-    this->commandMap["N"] = &Server::nick;
-    this->commandMap["Q"] = &Server::quit;
-    this->commandMap["J"] = &Server::join;
-    this->commandMap["PM"] = &Server::privmsg;
-    this->commandMap["M"] = &Server::mode;
-    this->commandMap["K"] = &Server::kick;
-    this->commandMap["I"] = &Server::invite;
-    this->commandMap["T"] = &Server::topic;
 }
 
 Server::~Server()
@@ -82,11 +69,6 @@ int Server::handleNewConnection()
 	// Add the new client socket to _clients and _pollfds
 	_clients.push_back(Client(ip, ntohs(cliaddr.sin_port), connfd));
 	_pollfds.push_back((struct pollfd){.fd = connfd, .events = (POLLIN), .revents = 0});
-
-	// for testing	/********* DELETE **********/
-	stringstream ss; ss << connfd;
-	// _clients.back().rdBuf() += "pass 1\nuser x x x x\nnick user" + ss.str() + "\n";
-	// _pollfds.back().events |= POLLOUT;
 	return (0);
 }
 
