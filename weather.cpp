@@ -29,7 +29,7 @@ int main() {
     // std::string serverIP = "api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=851bb946327ee4bdc5230fe57cd6439f";
     std::string serverIP = "37.139.20.5";
     std::string request = 
-        "GET /data/2.5/weather?q=Casablanca,MA,uk&APPID=851bb946327ee4bdc5230fe57cd6439f HTTP/1.1\r\n"
+        "GET /data/2.5/weather?q=Khouribgaa,MA&APPID=851bb946327ee4bdc5230fe57cd6439f HTTP/1.1\r\n"
         "Host: 37.139.20.5\r\n"
         "Connection: close\r\n\r\n";
 
@@ -61,12 +61,6 @@ int main() {
 
     send(sock, request.c_str(), request.size(), 0);
     ssize_t rr = read(sock, buffer, 1024);
-
-    buffer[rr] = 0;
-    std::cout << buffer << std::endl;
-
-    send(sock, request.c_str(), request.size(), 0);
-    rr = read(sock, buffer, 1024);
 
     buffer[rr] = 0;
     std::cout << "rec::: \n" << buffer << std::endl;
@@ -116,7 +110,7 @@ int main() {
     std::cout << std::endl;
     
     reply += "Location: " + parseInfo("\"name\":\"", "\"", response) + ", " + parseInfo("\"country\":\"", "\"", response); 
-    std::cout << "Location: Casablanca, MA" << std::endl;
+    std::cout << reply << std::endl;
     
     reply = "Coordinates: Longitude " + parseInfo("\"lon\":", "\"", response) + " Latitude " + parseInfo("\"lat\":", "}", response);
     std::cout << reply << std::endl;

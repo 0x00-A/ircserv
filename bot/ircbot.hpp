@@ -92,11 +92,11 @@ class IRCbot
 		bool								isErrorCode( const string& code );
 	
 		void								IRCServRegister( void );
-		string								getWeatherInfo( void );
+		string								getWeatherInfo( string& location  );
 		void								handleRead( void );
 		string								getCommand( void );
 		void								parseCommand( string&, std::vector<string>& tokens );
-		void								sendWeatherInfo( string& client_nick );
+		void								sendWeatherInfo( string& client_nick, string& location );
 		string 								parseInfo( std::string marker, string endMarker, std::string& response );
 		void								handleCommand( std::vector<string>& tokens );
 		void								updateChannels( std::vector<string>& tokens );

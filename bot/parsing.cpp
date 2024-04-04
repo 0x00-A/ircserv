@@ -60,28 +60,42 @@ std::string IRCbot::parseInfo(std::string marker, string endMarker, std::string&
 std::pair<string, string> IRCbot::parseRequest(string &token)
 {
 	std::pair<string, string>	p;
-	size_t 						end = 0;
+	// size_t 						end = 0;
+	std::stringstream	ss(token);
+	string				arg;
+	std::vector<string> args;
 
-
-	size_t pos = token.find_first_not_of(" ");
-	if ((pos != string::npos) && (token[pos] == '#'))
+	while (ss >> arg)
 	{
-		end = token.find_first_of(" ", pos);
-		p.first = token.substr(pos, end);
+		args.push_back(arg);
+	}
+	if (args.size() >= 2)
+	{
+		p = std::make_pair(args[0], args[1]);
 	}
 	else
 	{
-		p.first = "";
+		p = std::make_pair("", "");
 	}
-	pos = token.find_first_not_of(" ", end + 1);
-	if (pos != string::npos)
-	{
-		p.second = token.substr(pos);
-	}
-	else
-	{
-		p.second = "";
-	}
+	// size_t pos = token.find_first_not_of(" ");
+	// if ((pos != string::npos) /*&& (token[pos] == '#')*/)
+	// {
+	// 	end = token.find_first_of(" ", pos);
+	// 	p.first = token.substr(pos, end);
+	// }
+	// else
+	// {
+	// 	p.first = "";
+	// }
+	// pos = token.find_first_not_of(" ", end + 1);
+	// if (pos != string::npos)
+	// {
+	// 	p.second = token.substr(pos);
+	// }
+	// else
+	// {
+	// 	p.second = "";
+	// }
 	return (p);
 }
 

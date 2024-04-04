@@ -15,6 +15,7 @@ void Server::quit(Client &client)
     broadcastToJoinedChannels(client, response);
     response += "\r\nERROR :Closing Link: " + client.getIPAddr()  + " (" + reason  + ")\r\n";
     write(client.getSockfd(), response.c_str(), response.length());
+    client.closeSocket();
     _pollfds[getIndexOfClient(client) + 1].fd = -1;
 }
 

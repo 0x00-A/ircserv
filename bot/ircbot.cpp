@@ -181,12 +181,13 @@ void	IRCbot::IRCServRegister()
 	sendReply(reply);
 }
 
-string IRCbot::getWeatherInfo()
+string IRCbot::getWeatherInfo(string& location)
 {
     char buffer[1024] = {0};
 
+	(void)location;
     std::string request = 
-        "GET /data/2.5/weather?q=Casablanca,MA,uk&APPID=851bb946327ee4bdc5230fe57cd6439f HTTP/1.1\r\n"
+        "GET /data/2.5/weather?q=" + location + "&APPID=851bb946327ee4bdc5230fe57cd6439f HTTP/1.1\r\n"
         "Host: 37.139.20.5\r\n"
         "Connection: close\r\n\r\n";
 
@@ -212,44 +213,40 @@ void	IRCbot::handleRead()
 	_recvbuf += buffer;
 }
 
-void IRCbot::sendWeatherInfo(string& client_nick)
+void IRCbot::sendWeatherInfo(string& client_nick, string& location)
 {
 	connectToWeatherServer();
 
-	string	response = getWeatherInfo();
-
-	std::cout << "res: " << response << std::endl;
-	// if (response.empty()){}
-
+	if (location.empty())
+	{
+		sendReply("PRIVMSG " + client_nick + " :No city provided");
+		return;
+	}
+	string	response = getWeatherInfo(location);
+	if (response.find("404") != string::npos)
+	{
+		sendReply("PRIVMSG " + client_nick + " :City not found");
+		return;
+	}
 	std::string res, reply;
-
-    std::cout << std::endl;
-    
     reply = "Weather for " + parseInfo("\"name\":\"", "\"", response) + ", " + \
 			parseInfo("\"country\":\"", "\"", response);
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
-    
     reply = "- Coordinates: Longitude " + parseInfo("\"lon\":", "\"", response) + \
 			" Latitude " + parseInfo("\"lat\":", "}", response);
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
-
     reply = "- Weather Main: " + parseInfo("\"main\":\"", "\"", response);
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
-
     reply = "- Weather Description: " + parseInfo("\"description\":\"", "\"", response);
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
-    
-    // res = parseInfo("\"temp\":", ",", response);
 	double d = std::strtod(parseInfo("\"temp\":", ",", response).c_str(), NULL);
 	d -= 273.15;
 	std::stringstream ss;
 	ss << d;
     reply = "- Temperature: " + ss.str() + " Celsius";
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
-
     reply = "- Humidity: " + parseInfo("\"humidity\":", "}", response) + "%";
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
-
     reply = "- Wind Speed: " + parseInfo("\"speed\":", ",", response) + " m/s";
 	sendReply("PRIVMSG " + client_nick + " :" + reply);
 	close(_weatherSock);
@@ -268,9 +265,9 @@ void	IRCbot::privmsg(std::vector<string>& tokens)
 
 	it = getChanIt(pair.first);
 
-	if (tokens[2] == _nick && tokens.back() == "weather")		// not just a privmsg to bot
+	if (tokens[2] == _nick && pair.first == "weather")		// not just a privmsg to bot
 	{
-		sendWeatherInfo(userNick);
+		sendWeatherInfo(userNick, pair.second);
 	}
 	else if (tokens[2] != _nick)		// not just a privmsg to bot
 	{
@@ -297,10 +294,13 @@ void	IRCbot::handleCommand(std::vector<string>& tokens)
 	chanIt				it;
 
 	command = tokens[1];
-	// std::cout << "token cmd: " << command << std::endl;
 	if (isErrorCode(command))
 	{
 		throw (tokens.back());
+	}
+	else if (tokens[0] == "PING")
+	{
+		sendReply("PONG " + tokens.back());
 	}
 	else if (command == "INVITE")
 	{
@@ -308,12 +308,8 @@ void	IRCbot::handleCommand(std::vector<string>& tokens)
 	}
 	else if (command == RPL_NAMREPLY)
 	{
-		// :ft_irc.1337.ma 353 bot @ #c :bot @user5
-		std::cout << "NAMEREPLY\n";
-		it = getChanIt(tokens[4]);
-		if (it != _channels.end())
+		if ( (it = getChanIt(tokens[4])) != _channels.end())
 		{
-			std::cout << ">> logging users |" << tokens.back() << std::endl;
 			it->logUsers(tokens.back());
 		}
 	}
@@ -328,7 +324,7 @@ void	IRCbot::handleCommand(std::vector<string>& tokens)
 	else if (command == "JOIN" || command == "KICK")
 	{
 		it = getChanIt(tokens[2]);
-		if (command == "KICK" && tokens[3] == _nick)	// bot kickek for a channel
+		if (command == "KICK" && tokens[3] == _nick)	// bot kickek from a channel
 		{
 			_channels.erase(it);
 		}
@@ -340,8 +336,7 @@ void	IRCbot::handleCommand(std::vector<string>& tokens)
 	}
 	else if (command == "MODE" && (tokens[3] == "+o" || tokens[3] == "-o"))
 	{
-		it = getChanIt(tokens[2]);
-		if (it != _channels.end())
+		if ( (it = getChanIt(tokens[2])) != _channels.end())
 		{
 			it->updateOperators(tokens);
 			it->debugInfo();
@@ -407,7 +402,7 @@ void	IRCbot::run()
 		
 		while ( (cmd = getCommand()) != "")
 		{
-			// std::cout << "cmd : " << cmd << std::endl;
+			std::cout << "cmd : " << cmd << std::endl;
 			// parse command
 			parseCommand(cmd, tokens);
 			// handle command

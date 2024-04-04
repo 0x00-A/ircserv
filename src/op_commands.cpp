@@ -224,7 +224,11 @@ void    Server::mode(Client& client)
 	}
 	removeExtraPlusMinus(modesave);
 	if (!modesave.empty())
+    {
+        broadcastMsg(client, client.identifier() + " MODE " + _params[1] + " " + modesave + paramsave, *chan);
 		throw (client.identifier() + " " + _params[0] + " " + _params[1] + " " + modesave + paramsave);
+    }
+    
 }
 
 /********************************************************************************/
@@ -294,13 +298,13 @@ void Server::handleOperatorFlag(strPair &m, string &modesave, string &paramsave,
     }
     else if (m.first == "+o" && chan->setChannelOperator(m.second))
     {
-        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first + " " + m.second, *chan);
+        // broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first + " " + m.second, *chan);
         modesave += m.first;
         paramsave += " " + m.second;
     }
     else if (m.first == "-o" && chan->unsetChannelOperator(m.second))
     {
-        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first + " " + m.second, *chan);
+        // broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first + " " + m.second, *chan);
         modesave += m.first;
         paramsave += " " + m.second;
     }
@@ -369,11 +373,12 @@ void Server::handleInviteFlag(strPair &m, string &modesave, channelIter &chan)
 
 void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan, Client &cli)
 {
+    (void)cli;
     if (m.first == "+t" && !chan->hasTopic())
     {
         chan->setMode(m.first);
         chan->setHasTopic(true);
-        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
+        // broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
         modesave += m.first;
         cout << chan->getName() << " MODE +t\n";
     }
@@ -381,7 +386,7 @@ void Server::handleTopicFlag(strPair &m, string &modesave, channelIter &chan, Cl
     {
         chan->setMode(m.first);
         chan->setHasTopic(false);
-        broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
+        // broadcastMsg(cli, cli.identifier() + " MODE " + _params[1] + " " + m.first, *chan);
         modesave += m.first;
         cout << chan->getName() << " MODE -t\n";
     }
@@ -428,7 +433,7 @@ bool Server::checkValidLimit(string &s)
         return (false);
     unsigned long long int n;
     n = std::strtoull(s.c_str(), NULL, 10);
-    if (n > __LONG_MAX__)
+    if (n == 0 || n > __LONG_MAX__)
         return (false);
     return (true);
 }

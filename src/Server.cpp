@@ -102,7 +102,7 @@ void Server::disconnectClient(int id)
 	poll_it = _pollfds.begin() + id + 1;
 	exitUserFromChannels(cli_it);
 	cout << "client disconnected - fd: " << _pollfds[id+1].fd << endl;
-	cli_it->closeSocket();
+	// cli_it->closeSocket();
 	_clients.erase(cli_it);
 	_pollfds.erase(poll_it);
 }
