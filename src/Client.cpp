@@ -26,9 +26,10 @@ int Client::getSockfd(void) const
 	return (_clifd);
 }
 
-void Client::closeSocket() const
+void Client::closeSocket()
 {
 	close(_clifd);
+    this->_clifd = -1;
 }
 
 int Client::getPort(void) const

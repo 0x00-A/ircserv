@@ -34,6 +34,7 @@ void Server::nick(Client &client)
     }
     if (this->_params.size() < 2)
     {
+        client.setHasUsedNick(false);
         throw (_servname + " " + ERR_NONICKNAMEGIVEN + " " + client.getNick()  + " :No nickname given");
     }
     if (this->_params[1].size() >= NICKLEN)
@@ -42,15 +43,17 @@ void Server::nick(Client &client)
     }
     if (client.checkNick(this->_params[1]) == false)
     {
+        client.setHasUsedNick(false);
         throw (_servname + " " + ERR_ERRONEUSNICKNAME + " " + client.getNick()  + " :Erroneus nickname");
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
+        client.setHasUsedNick(false);
         throw (_servname + " " + ERR_NICKNAMEINUSE + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (client.getHasUsedNick() == true && !client.isConnected())
     {
-        reply(client, client.identifier() + " NICK :" +  this->_params[1]);
+        reply(client, client.getNick() + "!@ NICK :" +  this->_params[1]);
     }
     if (client.isConnected())
     {
@@ -59,7 +62,10 @@ void Server::nick(Client &client)
     }
     client.setNick(this->_params[1]);
     client.setHasUsedNick(true);
-    if (client.isConnected() && !welcome) welcomeClient(client);
+    if (client.isConnected() && !welcome)
+    {
+        welcomeClient(client);
+    }
     if (_clients.size() > 1 && client.getHasUsedUser())
     {
         checkSpamClient(client);

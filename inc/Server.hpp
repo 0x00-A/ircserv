@@ -49,8 +49,8 @@ class Server
 		string 										_messagClient;
 		string										_servname;
 
-		std::map<string, void (Server::*)(Client &)>	commandMap;
-		std::vector<Channel> 							_channels;
+		std::map<string, void (Server::*)(Client &)> commandMap;
+		std::vector<Channel> 						_channels;
 
 		void broadcastMsg(Client &sender, const string &msg, const Channel &chan);
 
@@ -72,7 +72,6 @@ class Server
 
 		/***********************[ MODE ]***********************/
 		bool 			parseModes( std::queue<std::pair<string, string> > &modes, Client &cli );
-
 		void 			handleOperatorFlag( strPair &, string &, string &, channelIter &, Client & );
 		void 			handleLimitFlag( strPair &, string &, string &, channelIter &, Client & );
 		void 			handlePasskeyFlag( strPair &, string &, string &, channelIter & );
@@ -90,30 +89,22 @@ class Server
 		Server(const string &port, const string &passwd);
 		~Server();
 
-		void run();
-		// for get time in start
+		void 			run();
 		void 			setStartTime(void);
 		string 			getStartTime(void) const;
 
 		void 			welcomeClient(Client &client);
 
-		// ============================================================ //
-		// parser functions
 		void 			handleCommand(string &cmd, int id);
 		void 			parseCommand(string &cmd);
 		string 			trim_comma(const string &str, int flg);
 		void 			initPrivmsg(Client &client);
 		void 			initJoin(Client &client);
-
-		// check nick clients
 		bool 			checkAlreadyNick(string &nick);
 		void 			checkSpamClient(Client &client);
 		void 			changeNick(Client &client);
-		// fun reply
-		// void    replyNotConnected(Client &client);
 
-
-		// command member functions
+		/****************[ COMMAND ]***********************/
 		void 			pass(Client &client);
 		void 			user(Client &client);
 		void 			nick(Client &client);
@@ -125,30 +116,24 @@ class Server
 		void 			names(Client &client);
 		void 			lusers(Client &client);
 		void			motd(Client& client);
-
 		void    		kick(Client& client);
 		void 			invite(Client& client);
 		void 			topic(Client& client);
-		
+		/************************************************/
 
-		// channel member functions
-
+		/****************[ CHANNEL FUN ]***********************/
 		void 			joinChannel(Client &client, std::pair<string, string> channel);
 		void 			channelWelcomeMessages(Client &client, Channel &channel);
 		void 			joinedAChannel(Client &client, Channel &channel);
-		
 		channelIter 	doesChannelExist(const string &chan);
-		clientIter 		doesUserExit(const string nick);
 		void 			removeUserFromChannel(const string user, const string chan);
-
 		void 			exitUserFromChannels(clientIter cli);
 		void			showChannelNames(Client& client, Channel& chan);
+		clientIter 		doesUserExit(const string nick);
 
+		/****************[ COMMUNICATION FUN  ]***********************/
 		void			broadcastToJoinedChannels( Client& client, string &msg );
-
-		// send messg
 		void 			reply(Client &client, string const &reply);
-
 };
 
 #endif // SERVER_HPP
