@@ -17,7 +17,7 @@ class Channel
 		string							_admin;
 		std::set<string>				_users;
 		
-		string						_modes;	// although there are booleans to check if a certain flag is set i used this also save order of flags in channel when printing
+		string						_modes;
 
 
 		string						_topic;
@@ -36,7 +36,6 @@ class Channel
 
 	public:
 
-		// iterator here 
 		typedef	std::set<string>::iterator setIter;
 
 		Channel();
@@ -52,7 +51,7 @@ class Channel
 
 		bool				isUserInChannel( const string& user ) const;
 
-		bool				isUserOperator( const string& user ) const;	// -o
+		bool				isUserOperator( const string& user ) const;
 		
 		bool				setChannelOperator( const string& user );
 		bool				unsetChannelOperator( const string& user );
@@ -65,12 +64,8 @@ class Channel
 		void				setTimeOfTopic( void );
 		void				setPasskey( const string& key );
 		void				setUserLimit( string limit );
-		// void				setInviteOnly();
 	
 		void				unsetTopic( void );
-		// void				unsetPasskey( const string& key );
-		// void				unsetUserLimit( int limit );
-		// void				unsetInviteOnly();
 
 		string				getAdmin() const;
 		size_t				getTimeOfTopic() const;
@@ -78,7 +73,6 @@ class Channel
 		string				getName() const;
 		string				getModes( void ) const;
 		std::set<string>		getUserList( void ) const;
-		// std::set<string>	getOperatorList() const;
 		string				getPasskey( void ) const;
 		size_t				getUserLimit( void ) const;
 		string				getTopic( void ) const;
@@ -96,7 +90,6 @@ class Channel
 		void				setHasInvite( bool stat );
 		void				setHasTopic( bool stat );
 		void				setUsers(std::set<string>& users);
-
 };
 
 #endif  // CHANNEL_HPP

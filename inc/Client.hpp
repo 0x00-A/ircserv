@@ -15,21 +15,14 @@ class Client
 		string 					_real;
 		string 					_hostname;
 
-		// for time 
-		// struct tm*				_startTime;
-
-		// bool 	_isOperator;
-		// bool 	_isRegistered;
-
-		// track the commands
 		bool 					_hasPassed;
 		bool 					_hasUsedNick;
 		bool 					_hasUsedUser;
 		string 					_recvBuf;
 		std::queue<string> 		_sendBuf;
 		int 					_clifd;
-		std::vector<string> 	_invitedChannels; // here add chan name and invite status ture or false 
-		std::set<string> 		_channels; // channels user currently in
+		std::vector<string> 	_invitedChannels;
+		std::set<string> 		_channels;
 
 		Client();
 
@@ -38,9 +31,6 @@ class Client
 		Client(const string &ip, int port, int sockfd);
 		~Client();
 
-		// Add getters and sitters
-
-		// get socket fd
 		int 				getSockfd(void) const;
 
 		void 				closeSocket(void) const;
@@ -49,10 +39,8 @@ class Client
 
 		string 				getIPAddr(void) const;
 
-		// get read buffer
 		string 				&rdBuf(void);
 
-		// get send buffer
 		std::queue<string>	&sdBuf(void);
 
 		///////////////////////////////////////////
@@ -61,8 +49,6 @@ class Client
 		void 				addChannels(string &channel);
 		void 				setNick(string nick);
 		void 				setUsername(string username);
-
-		// void 				setStartTimeToClinet();
 		void 				setHasPassed(bool value);
 		void 				setHasUsedNick(bool value);
 		void 				setHasUsedUser(bool value);
@@ -72,7 +58,6 @@ class Client
 		
 		bool 				isConnected();
 		
-		// struct tm 			*getStartTimeToClinet();
 		std::vector<string> 	getInvitedChannels( void ) const;
 		bool 					getHasPassed();
 		bool 					getHasUsedNick();
@@ -80,7 +65,6 @@ class Client
 			
 		string 					identifier( void );
 
-		// bool 			isRegistered(void);
 		bool 				checkNick(string &nick);
 
 		std::set<string> 	getChannels(void);
