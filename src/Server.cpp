@@ -152,7 +152,6 @@ int	Server::handleWrite(int id)
 		// if all data was sent
 		buffer.pop();
 	}
-	cout << "Done sending data to client - fd: " << _clients[id].getSockfd()  << " send_size: " << sent_data << endl;
 	_pollfds[id+1].events = POLLIN;
 	return (0);
 }

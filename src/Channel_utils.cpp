@@ -22,7 +22,7 @@ bool Channel::unsetChannelOperator(const string &user)
 
 bool Channel::partUser(const string& user)
 {
-    if (_users.erase(user) || _users.erase("@" + user))     // returns Number of elements removed (0 or 1)
+    if (_users.erase(user) || _users.erase("@" + user))
     {
         cout << user << " left channel " << _name << endl;
         return (true);
