@@ -4,36 +4,34 @@ IRCbot::Channel::Channel(const string &name) : _name(name)
 {
 }
 
-void IRCbot::Channel::debugInfo(void)	// only for debug
-{
-	if (!_loggedUsers.empty())
-	{
-		std::cout << ">>>>>>>>>>>>> [ ALL USERS " << _name << " ] <<<<<<<<<<<<<<" << std::endl;
-		for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
-		{
-			std::cout << _name << ": " << it->_nick << "(" << it->_timer << ")" << " | " << std::endl;
-		}
-		std::cout << "\n\n";
-	}
-	if (!_operators.empty())
-	{
-		std::cout << ">>>>>>>>>>>>> [ OPERATORS " << _name << " ] <<<<<<<<<<<<<<" << std::endl;
-		for (strVecIter it = _operators.begin(); it < _operators.end(); it++)
-		{
-			std::cout << *it << " " << std::endl;
-		}
-		std::cout << "\n\n";
-	}
-	if (!_badUsers.empty())
-	{
-		std::cout << ">>>>>>>>>>>>> [ BLACKLIST " << _name << " ] <<<<<<<<<<<<<<" << std::endl;
-		for (strVecIter it = _badUsers.begin(); it < _badUsers.end(); it++)
-		{
-			std::cout << *it << " " << std::endl;
-		}
-	}
-	std::cout << std::endl;
-}
+// void IRCbot::Channel::debugInfo(void)	// only for debug
+// {
+// 	if (!_loggedUsers.empty())
+// 	{
+// 		std::cout << ">>>>>>>>>>>>> [ ALL USERS " << _name << " ] <<<<<<<<<<<<<<" << std::endl;
+// 		for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
+// 		{
+// 			std::cout << it->_nick << std::endl;
+// 		}
+// 	}
+// 	if (!_operators.empty())
+// 	{
+// 		std::cout << ">>>>>>>>>>>>> [ OPERATORS " << _name << " ] <<<<<<<<<<<<<<" << std::endl;
+// 		for (strVecIter it = _operators.begin(); it < _operators.end(); it++)
+// 		{
+// 			std::cout << *it << " " << std::endl;
+// 		}
+// 	}
+// 	if (!_badUsers.empty())
+// 	{
+// 		std::cout << ">>>>>>>>>>>>> [ BLACKLIST " << _name << " ] <<<<<<<<<<<<<<" << std::endl;
+// 		for (strVecIter it = _badUsers.begin(); it < _badUsers.end(); it++)
+// 		{
+// 			std::cout << *it << " " << std::endl;
+// 		}
+// 	}
+// 	std::cout << std::endl;
+// }
 
 void IRCbot::Channel::updateOperators(std::vector<string> &tokens)
 {
@@ -57,12 +55,9 @@ void IRCbot::Channel::updateUsers(std::vector<string>& tokens, string& botnick)
 	string user;
 
 	user = getUserNick(tokens[0]);
-	// :u6!~x@127.0.0.1 KICK #c u5 :u5
 
 	if (tokens[1] == "JOIN" && user != botnick)
 	{
-		// if (user == _nick)
-		// 	return ;
 		User cli(user);
 		_loggedUsers.push_back(cli);
 	}
@@ -83,8 +78,6 @@ void IRCbot::Channel::logUsers(string &users)
 	std::stringstream ss(users);
 	while (ss >> user)
 	{
-		// if (user == _nick || "@" + user == _nick)
-		// 	continue ;
 		if (user[0] == '@')
 		{
 			_operators.push_back(user.substr(1));
@@ -96,7 +89,6 @@ void IRCbot::Channel::logUsers(string &users)
 			User cli(user);
 			_loggedUsers.push_back(cli);
 		}
-		std::cout << "BOT INFO: user `" << user << "` logged" << std::endl;
 	}
 }
 
@@ -126,7 +118,6 @@ void IRCbot::Channel::removeUser(const string &user)
 			break;
 		}
 	}
-	std::cout << "BOT INFO: removed user `" << user << "`" << std::endl;
 }
 
 void IRCbot::Channel::updateUserNick(const string &old_nick, const string &new_nick)
@@ -136,7 +127,6 @@ void IRCbot::Channel::updateUserNick(const string &old_nick, const string &new_n
 		if (it->_nick == old_nick)
 		{
 			it->_nick = new_nick;
-			std::cout << "user `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
 			break;
 		}
 	}
@@ -145,7 +135,6 @@ void IRCbot::Channel::updateUserNick(const string &old_nick, const string &new_n
 		if (*it == old_nick)
 		{
 			*it = new_nick;
-			std::cout << "operator `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
 			break;
 		}
 	}
@@ -154,11 +143,9 @@ void IRCbot::Channel::updateUserNick(const string &old_nick, const string &new_n
 		if (*it == old_nick)
 		{
 			*it = new_nick;
-			std::cout << "blacklist nick  `" << old_nick << "` changed to `" << new_nick << "`" << std::endl;
 			break;
 		}
 	}
-	std::cout << "BOT INFO: user `" << old_nick << "` changed nick to `" << new_nick << "`" << std::endl;
 }
 
 long	IRCbot::Channel::getTime(const string& user)
@@ -178,7 +165,7 @@ IRCbot::userIter IRCbot::Channel::doesUserExit(const string& user)
 {
 	for (userIter it = _loggedUsers.begin(); it < _loggedUsers.end(); it++)
 	{
-		if (it->_nick == user)// || it->_nick == ("@" + user))
+		if (it->_nick == user)
 		{
 			return (it);
 		}
@@ -229,6 +216,5 @@ void IRCbot::Channel::addBadUser(string &user)
 		else
 			_badUsers[i % 10] = user;
 		i++;
-		std::cout << "added " << user << " to blacklist" << std::endl;
 	}
 }

@@ -1,114 +1,29 @@
 
-mode broadcast
-
-:nel-baz!~naim@197.230.30.146 JOIN #dfgh
-
-:Cannot join channel (+l) - channel is full, try again later
-
-
-Channels also contain a topic. The topic is a line shown to all users when they join the channel, and all users in the channel are notified when the topic of a channel is changed.
-
-
-
-if channel already exist (join)
-:u4!~x@197.230.30.146 JOIN #ch1
-:mercury.libera.chat 332 u4 #ch1 :topic
-:mercury.libera.chat 332 u4 #ch1 :dsdssdsssssdsdsdsd
-:mercury.libera.chat 333 u4 #ch1 u1!~x@197.230.30.146 1711076841
-:mercury.libera.chat 353 u4 @ #ch1 :u4 u3 @u1
-:mercury.libera.chat 366 u4 #ch1 :End of /NAMES list.
-
-
-
-###### messages are broadcasted to other clients to keep them informed about channel events and user interactions
-	+ User Joins a Channel
-	+ User Parts (Leaves) a Channel
-	+ User Quits the Server
-	+ Channel Topic Changes
-	+ Channel Modes Changes
-	+ Private Messages (Queries)
-
-PASS 200
-NICK REL
-USER U2 0 * FD
-PRIVMSG DS,#HKDJS,#JKDS :DSH JDHSF DSJHF
-
-
-":uu!~j@127.0.0.1 KICK #ch uu :uudhjfkjdlffffhdfjvjdjkfvkdfbjkdfbjdkbjjdkfdjkfvdjfvkdfjvkdfkdfjkncfgvbhjnkldfbghjkmlszdxcfgvklfdkl;sl,dxl;cdfkl;fghjkcfgvbhjkcfgvbhjkmdxcfjklcfgvbhjklcvbhjnklcfvgbhjnklcvbjnkmlcfvgbhjnkmldfghjkl;sdfghjkl;awsedrijklp;dxcfgvbhjkmlcgvbhjkl;dcfgvbhjnkmldxcfgvbhjnkldxcfgvbhjnkfghjkldfghjkldfghjkl;cfgvbhjnkml,fcgvbhjnkmlbhjnkmfffffvjdlfkjvldkfvjdlkfnvkdfnvldknfxlvdfvldfvldfvldsfvkdflvdkdfkdkldfkldfkvkdkvxdvkdxmfvkmdkvdlfvkklgkblgmclb mcbl clb mclbmflkff;lfbkl;k;fb;flbfl;bfk;bkf;bfb"
-
-
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqx
-
-
-
 <<<< for rachid >>>>
-[ ] :lalala!~s@197.230.30.146 QUIT :Quit: comment (handle quit comment sent in broadcast to channels)
-[ ] :471 #ch1 :Cannot join channel (+l) > :*.freenode.net 471 kakaka #ch111 :Cannot join channel (channel is full)
-:*.freenode.net 482 kakaka #ch111 :You do not have access to change the topic on this channel
+[x] :lalala!~s@197.230.30.146 QUIT :Quit: comment (handle quit comment sent in broadcast to channels)
+[x] :471 #ch1 :Cannot join channel (+l) > :*.freenode.net 471 kakaka #ch111 :Cannot join channel (channel is full)
+[x]:*.freenode.net 482 kakaka #ch111 :You do not have access to change the topic on this channel
+[x] tested in freenode server (invite with no params gives a list of channels the sended has been invitet to)
 
 
-
-###############################
+#######################################################################################################
 [x] close fds CTRL-c
 [v] handle SIGPIPE < handled in unix check macos >
 [x] fix time mode
+[x] mode key remove space
 [ ] :lalala!~x@197.230.30.146 QUIT :EOF from client (when a user disconnect broadcast to channels)
 [ ] server::_hostname (remove unused var)
-
-
-invite someone without operator priv
-
-
-send(_ircSock, msg, len, MSG_NOSIGNAL);
-send(_botSock, msg, len, MSG_NOSIGNAL);
+[ ] remove debuginfo
 
 + what is unbound socket and what happens when we call bind()
-- what is diff bitween write/send read/recv
-+ complete server
-
-
 +    check in poll         
 			if (errno == EINTR) // (interrupted system call)
         		continue;
 
-mode key remove space
+[x] NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390 CHANLIMIT=#:250 MODES 4 CHANLIMIT=#:250 
 
 
-
-
-
-forbidin :: string.back, 
-
-
-
-mode #ch1111 -o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o-o+o kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka kakaka
-mode #cc -l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l-l+l+w+z 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5 4 5
-
-
-NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390 CHANLIMIT=#:250 
-
-MODES 4
-
-
-CHANLIMIT=#:250 
-Received: :molybdenum.libera.chat 405 lalalala0 #chchch250 :You have joined too many channels
-
-:*.freenode.net 696 lalala #chch1 l 2222222222222222222222 :Invalid limit mode parameter. Syntax: <limit>.
-NICKLEN=16 MODES=20 USERNAME=9 CHANNELLEN=50 TOPICLEN=390
-
-
->> tested in freenode server (invite with no params gives a list of channels the sended has been invitet to)
-invite
-:*.freenode.net 336 akakaka :#ch22
-:*.freenode.net 336 akakaka :#ch11
-:*.freenode.net 337 akakaka :End of INVITE list
-
-
-bot ircserver addr
-:qazxsw!~f@197.230.30.146 TOPIC #yyy11 :
-
-
-
+#######################################################################################################
 kick #bnn11 cv
 :copper.libera.chat 401 bn1 cv :No such nick/channel  ////// this cv
 

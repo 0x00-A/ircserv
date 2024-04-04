@@ -12,11 +12,10 @@
 #define NICKLEN 16
 #define USERNAMELEN 9
 #define CHANNELLEN 50
-
-#define TOPICLEN 10
+#define TOPICLEN 300
 #define MODES 20
 #define CHANMODES "k,l,i,t"
-#define MAXCHANNELS 3
+#define MAXCHANNELS 250
 
 #define CHANNEL 1
 #define CLIENT 2
@@ -50,10 +49,8 @@ class Server
 		string 										_messagClient;
 		string										_servname;
 
-		std::map<string, void (Server::*)(Client &)> commandMap;
-
-		//
-		std::vector<Channel> _channels;
+		std::map<string, void (Server::*)(Client &)>	commandMap;
+		std::vector<Channel> 							_channels;
 
 		void broadcastMsg(Client &sender, const string &msg, const Channel &chan);
 

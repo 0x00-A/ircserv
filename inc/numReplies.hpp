@@ -38,12 +38,13 @@
 #define ERR_INPUTTOOLONG string("417")
 #define ERR_NOMOTD string("422")
 #define ERR_TOOMANYCHANNELS string("405")
+#define ERR_INVALIDMODEPARAM string("696")
+
 #define RPL_INVEXLIST string("346")
 #define RPL_ENDOFINVEXLIST string("347")
 #define RPL_LUSERUNKNOWN string("253")
 #define RPL_LUSERCHANNELS string("254")
 #define RPL_LUSERME string("255")
-
 #define RPL_MOTDSTART string("375")
 #define RPL_MOTD string("372")
 #define RPL_ENDOFMOTD string("376")
@@ -57,6 +58,5 @@
 #define RPL_TOPICWHOTIME string("333")
 #define RPL_INVITING string("341")
 #define RPL_ISUPPORT string("005")
-#define ERR_INVALIDMODEPARAM string("696")
 
 #endif

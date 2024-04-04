@@ -22,7 +22,7 @@
 # include <algorithm>
 # include <fstream>
 # include "numReplies.hpp"
-
+# include <ctime>
 
 using std::string;
 using std::cout;
@@ -30,7 +30,6 @@ using std::cerr;
 using std::perror;
 using std::endl;
 using std::stringstream;
-
 
 std::string		itos(int num);
 struct tm		*getCurrentTime();

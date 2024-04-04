@@ -21,7 +21,7 @@
 # include <signal.h>
 # include <strings.h> // for bzero
 
-extern int IsBotRunning;
+extern int ircSock;
 
 # define BUF_SIZE 1024
 
@@ -67,13 +67,12 @@ class IRCbot
 			void					updateUserNick( const string& old_nick, const string& new_nick );
 			long					getTime(const string& user);
 
-			void	debugInfo( void );
+			// void					debugInfo( void );
 
 		};
 
 	private:
 
-		int									_ircSock;
 		int									_weatherSock;
 		string								_servaddr;
 		string								_ircPort;
@@ -100,7 +99,6 @@ class IRCbot
 		string 								parseInfo( std::string marker, string endMarker, std::string& response );
 		void								handleCommand( std::vector<string>& tokens );
 		void								updateChannels( std::vector<string>& tokens );
-		// void								removeChannel( chanIt & );
 		void								joinChannel( string & );
 		void								logtimeReply( string& nick, Channel& chan );
 		void								blacklistReply( string& nick, Channel& chan );
@@ -115,11 +113,11 @@ class IRCbot
 		IRCbot( string, string, string, string );
 		~IRCbot();
 
-		void					run( void );
-		void					connectToIRCServer( void );
-		void					connectToWeatherServer( void );
+		void								run( void );
+		void								connectToIRCServer( void );
+		void								connectToWeatherServer( void );
 
-		static long 			getTimeInMinutes();
+		static long 						getTimeInMinutes();
 
 };
 
