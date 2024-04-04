@@ -114,7 +114,6 @@ bool Channel::setChannelOperator(const string &user)
         return (false);
     _users.erase(user);
     _users.insert("@" + user);
-    cout << user << " is now an operator in channel " << _name << endl;
     return (true);
 }
 

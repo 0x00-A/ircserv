@@ -100,11 +100,13 @@ void	IRCbot::privmsg(std::vector<string>& tokens)
 	}
 	else if (tokens[2] == _nick && pair.second == "logtime")
 	{
-		logtimeReply(userNick, *it);
+		if (it != _channels.end())
+			logtimeReply(userNick, *it);
 	}
 	else if (tokens[2] == _nick && pair.second == "blacklist")
 	{
-		blacklistReply(userNick, *it);
+		if (it != _channels.end())
+			blacklistReply(userNick, *it);
 	}
 }
 

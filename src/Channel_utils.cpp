@@ -16,7 +16,6 @@ bool Channel::unsetChannelOperator(const string &user)
         return (false);
     _users.erase("@" + user);
     _users.insert(user);
-    cout << user << " is no longer an operator in channel " << _name << endl;
     return (true);
 }
 
@@ -24,10 +23,8 @@ bool Channel::partUser(const string& user)
 {
     if (_users.erase(user) || _users.erase("@" + user))
     {
-        cout << user << " left channel " << _name << endl;
         return (true);
     }
-    cout << user << " is not in channel " << _name << endl;
     return (false);
 }
 
@@ -59,10 +56,8 @@ bool Channel::joinUser(const string& user)
 {
     if ((_users.insert(user)).second)
     {
-        cout << user << " joined channel " << _name << endl;
         return (true);
     }
-    cout << user << " already in channel " << _name << endl;
     return (false);
 }
 

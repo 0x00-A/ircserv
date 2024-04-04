@@ -1,5 +1,6 @@
 CXX = c++
 CXXFLAGS = -g -Wall -Wextra -Werror -MP -MD -std=c++98 -I$(INCLUDES)
+FSAN = -fsanitize=address 
 SRCDIR = .
 OBJDIR = obj
 INCLUDES = ./inc
@@ -14,10 +15,10 @@ NAME = ../ircbot
 all: $(NAME)
 
 $(NAME) : $(OBJ)
-	$(CXX) $(OBJ) -o $(NAME)
+	$(CXX) $(FSAN) $(OBJ) -o $(NAME)
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(FSAN) $(CXXFLAGS) -c $< -o $@
 
 
 
