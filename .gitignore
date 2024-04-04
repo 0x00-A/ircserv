@@ -8,3 +8,5 @@ in
 ./bot/obj
 *.py
 ircbot
+a.out
+weather.cpp
