@@ -4,8 +4,6 @@ irc/ircserv
 obj
 ircserv
 .DS_Store
-in
 ./bot/obj
-*.py
 ircbot
 a.out

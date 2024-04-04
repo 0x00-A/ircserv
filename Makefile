@@ -1,6 +1,5 @@
 CXX = c++
-CXXFLAGS = -g -Wall -Wextra -Werror -MP -MD -std=c++98 -I$(INCLUDES)
-FSAN = -fsanitize=address 
+CXXFLAGS = -Wall -Wextra -Werror -MP -MD -std=c++98 -I$(INCLUDES)
 SRCDIR = src
 OBJDIR = obj
 INCLUDES = ./inc
@@ -17,10 +16,10 @@ NAME = ircserv
 all: $(NAME)
 
 $(NAME) : $(OBJ)
-	$(CXX) $(FSAN) $(OBJ) -o $(NAME)
+	$(CXX) $(OBJ) -o $(NAME)
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.cpp | $(OBJDIR)
-	$(CXX) $(FSAN) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
 
