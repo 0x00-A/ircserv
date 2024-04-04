@@ -71,9 +71,9 @@ void Server::invite(Client& client)
             {
                 iChannels += invitedChannels[i] + " ";
             }
-            reply(client, _servname + " " + RPL_INVEXLIST + " " + client.getNick() + " :" + iChannels);
+            reply(client, _servname + " " + RPL_INVITELIST + " " + client.getNick() + " :" + iChannels);
         }
-        reply(client, _servname + " " + RPL_ENDOFINVEXLIST + " " + client.getNick() + " :End of INVITE list");
+        reply(client, _servname + " " +  RPL_ENDOFINVITELIST + " " + client.getNick() + " :End of INVITE list");
         return ;
     }
     if (_params.size() < 3) {
@@ -132,11 +132,10 @@ void Server::topic(Client& client)
     if(_params.size() > 2)
     {
         if (chanit->hasTopic() && !chanit->isUserOperator(client.getNick())) {
-            reply(client, _servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick()  + " "  + channelName + " :You're not channel operator");
+            reply(client, _servname + " " + ERR_CHANOPRIVSNEEDED + " " + client.getNick()  + " "  + channelName + " :You're not a channel operator");
             return;
         }
         std::string newTopic = _params[2];
-        cout << "newTopic: " << newTopic << endl;
         if (newTopic.size() >= TOPICLEN)
             newTopic.erase(TOPICLEN);
         chanit->setTopic(newTopic);
@@ -153,7 +152,7 @@ void Server::topic(Client& client)
 		else
         {
             reply(client, _servname + " " + RPL_TOPIC + " " + client.getNick() + " " + channelName + " :" + currentTopic);
-            reply(client, _servname + " " + RPL_TOPICWHOTIME + " " + client.getNick() + " " + channelName + " "  + client.identifier() + " " + itos(chanit->getTimeOfTopic()));
+            reply(client, _servname + " " + RPL_TOPICWHOTIME + " " + client.getNick() + " " + channelName + " "  + client.identifier().substr(1) + " " + itos(chanit->getTimeOfTopic()));
         }
         return;
     }
@@ -193,7 +192,7 @@ void    Server::mode(Client& client)
     if (!chan->isUserOperator(client.getNick()))
     {
         throw (_servname + " " + ERR_CHANOPRIVSNEEDED + " " + \
-        client.getNick() + " " + _params[1] + " " + " :You're not channel operator");
+        client.getNick() + " " + _params[1] + " " + " :You're not a channel operator");
 	}
 	while (!modes.empty())
 	{
