@@ -1,0 +1,56 @@
+# IRC Server Project README
+
+**Internet Relay Chat (IRC)** is a network of Internet servers that enables real-time online conversations via PCs and other devices.
+
+1. **Chat System for Instant Messaging**:
+   - IRC is a **text-based chat system** designed for group communication.
+   - It allows users to participate in **discussion forums** called channels.
+   - Users can also engage in **one-on-one communication** through private messages.
+
+2. **Client-Server Model**:
+   - IRC operates on a **client–server networking model**.
+   - Users connect to an **IRC server** using various clients (web apps, standalone desktop programs, or embedded components).
+   - The server may be part of a larger **IRC network**.
+
+3. **History**:
+   - Created by **Jarkko Oikarinen** in August 1988.
+   - Originated at the **University of Oulu in Finland**.
+   - Initially intended to extend BBS software for real-time discussions and Usenet-style news.
+   - The first IRC network ran on a single server named **tolsun.oulu.fi**.
+
+4. **Features**:
+   - **Group Communication**: Channels for discussions.
+   - **Private Messages**: One-on-one communication.
+   - **Data Transfer**: Including file sharing.
+
+## Supported Commands
+The IRC server supports the following commands:
+
+1. **PASS**: Authenticate with a password.
+2. **NICK**: Set your nickname.
+3. **USER**: Specify user details.
+4. **LUSERS**: Display server statistics.
+5. **MOTD**: Retrieve the Message of the Day.
+6. **JOIN**: Join a channel.
+7. **PRIVMSG**: Send private messages.
+8. **MODE**: Modify channel modes (k, l, i, t).
+9. **KICK**: Remove a user from a channel.
+10. **TOPIC**: Set or query the channel topic.
+11. **INVITE**: Invite a user to a channel.
+12. **NAMES**: List users in a channel.
+
+## Bot Functionality
+We've also implemented a bot with additional features:
+
+1. **Weather Command**:
+   - Usage: `PRIVMSG bot :weather city`
+   - The bot responds with weather information for the specified city.
+
+2. **User Tracking and Blacklist**:
+   - Invite the bot to a channel.
+   - The bot can track users who use inappropriate language and maintain a blacklist.
+   - Usage:
+     - `PRIVMSG bot :#channel blacklist`: Manage the blacklist. (for operators only)
+     - `PRIVMSG bot :#channel logtime`: Track users' time spent in the channel.
+
+IRC remains a part of Internet history, Happy coding! 🚀🌟
