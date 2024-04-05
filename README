@@ -54,3 +54,10 @@ We've also implemented a bot with additional features:
      - `PRIVMSG bot :#channel logtime`: Track users' time spent in the channel.
 
 IRC remains a part of Internet history, Happy coding! 🚀🌟
+
+- text in red
++ text in green
+! text in orange
+# text in gray
+@@ text in purple (and bold) @@
+
