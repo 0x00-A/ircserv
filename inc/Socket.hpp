@@ -21,15 +21,17 @@ class Socket
 
 		~Socket();
 
-		int getfd(void);
+		int		getfd( void );
 
-		void bindSocket(string port);
+		void	createSocket( void );
 
-		void listenSocket();
+		void	bindSocket( string port );
 
-		void setSocketNonBlocking();
+		void	listenSocket( void );
 
-		void closeSocket(void);
+		void	setSocketNonBlocking( void );
+
+		void	closeSocket( void );
 };
 
 #endif // SOCKET_HPP

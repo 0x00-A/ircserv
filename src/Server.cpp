@@ -8,6 +8,7 @@ Server::Server(const string& port, const string& passwd)
 	parseargs();
 	// socket part
 	_servname = ":ft_irc.1337.ma";
+	_socket.createSocket();
 	_socket.bindSocket(_port);
 	_socket.listenSocket();
 	_socket.setSocketNonBlocking();

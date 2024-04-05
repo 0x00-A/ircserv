@@ -6,17 +6,21 @@ Socket::~Socket()
 
 Socket::Socket()
 {
+}
+
+int Socket::getfd()
+{
+	return (_sockfd);
+}
+
+void Socket::createSocket()
+{
 	// end-point communication socket
 	if ( (_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		perror("socket");
 		exit(1);
 	}
-}
-
-int Socket::getfd()
-{
-	return (_sockfd);
 }
 
 void Socket::bindSocket(string port)

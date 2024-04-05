@@ -48,7 +48,6 @@ void Server::nick(Client &client)
     }
     if (checkAlreadyNick(this->_params[1]) == false)
     {
-        client.setHasUsedNick(false);
         throw (_servname + " " + ERR_NICKNAMEINUSE + " " + client.getNick()  + " :Nickname is already in use");
     }
     if (client.getHasUsedNick() == true && !client.isConnected())
