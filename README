@@ -1,7 +1,5 @@
 # IRC Server Project README
 
-**Internet Relay Chat (IRC)** is a network of Internet servers that enables real-time online conversations via PCs and other devices.
-
 1. **Chat System for Instant Messaging**:
    - IRC is a **text-based chat system** designed for group communication.
    - It allows users to participate in **discussion forums** called channels.
@@ -12,13 +10,7 @@
    - Users connect to an **IRC server** using various clients (web apps, standalone desktop programs, or embedded components).
    - The server may be part of a larger **IRC network**.
 
-3. **History**:
-   - Created by **Jarkko Oikarinen** in August 1988.
-   - Originated at the **University of Oulu in Finland**.
-   - Initially intended to extend BBS software for real-time discussions and Usenet-style news.
-   - The first IRC network ran on a single server named **tolsun.oulu.fi**.
-
-4. **Features**:
+3. **Features**:
    - **Group Communication**: Channels for discussions.
    - **Private Messages**: One-on-one communication.
    - **Data Transfer**: Including file sharing.
